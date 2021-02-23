@@ -1,31 +1,31 @@
 
-#include "../Interfaces/HatCommand.h"
 #include "../Source/Main.h"
-#include "../Helpers/VTable.h"
-#include "../Interfaces/IVEClientTrace.h"
-#include "../Interfaces/IClientMode.h"
-#include "../Helpers/Timer.h"
+#include "../GlobalHook/vhook.h"
+#include "../GlobalHook/load_routine.h"
 
-class AutoDetonate : public MenuPanel
+#include "../Helpers/Commons.h"
+#include "../Interfaces/HatCommand.h"
+#include "../Interfaces/IClientMode.h"
+#include "../Interfaces/IVEClientTrace.h"
+#include "../Interfaces/IClientListener.h"
+
+
+class AutoDetonate : public ExtraPanel, public IMainRoutine
 {
-public:	//	AutoDetonate
 	AutoBool bEnabled		{ "AutoDetonate::Enable", true };
 	AutoBool bIgnoreStealth	{ "AutoDetonate::bIgnoreStealth", true };
+	IGlobalVHook<bool, float, CUserCmd*>* CreateMove;
 
-public:	//	Globals::IGlobalHooks
-	AutoDetonate() 
-	{
-		IGlobalEvent::CreateMove::Hook::Register(std::bind(&AutoDetonate::OnCreateMove, this, std::placeholders::_1));
-	};
-	HookRes OnCreateMove(bool&);
+public:	//	AutoDetonate
+	HookRes OnCreateMove(CUserCmd*);
 
 public:	//	ExtraPanel
-	void OnRenderExtra() override final
+	void OnRenderExtra() final
 	{
-		ImGui::Checkbox("Auto-Detonate", bEnabled.get());
+		ImGui::Checkbox("Auto-Detonate", &bEnabled);
 	}
 
-	void JsonCallback(Json::Value& cfg, bool read) override
+	void JsonCallback(Json::Value& cfg, bool read) final
 	{
 		Json::Value& extra = cfg["Extra"]["Auto-Detonate"];
 		if (read)
@@ -36,53 +36,58 @@ public:	//	ExtraPanel
 			PROCESS_JSON_WRITE(extra, "Enabled", *bEnabled);
 		}
 	}
-} static autodeto;
+
+public:	//	IMainRoutine
+	void OnLoadDLL() final
+	{
+		using namespace IGlobalVHookPolicy;
+		CreateMove = CreateMove::Hook::QueryHook(CreateMove::Name);
+		CreateMove->AddPostHook(HookCall::Any, std::bind(&AutoDetonate::OnCreateMove, this, std::placeholders::_2));
+	}
+} static auto_detonate;
 
 
-HookRes AutoDetonate::OnCreateMove(bool& ret)
+HookRes AutoDetonate::OnCreateMove(CUserCmd* cmd)
 {
 	if (!bEnabled)
 		return HookRes::Continue;
 
-	if (pLocalPlayer->GetClass() != TFClass::Demoman)
+	ITFPlayer* pMe = ::ILocalPtr();
+
+	if (pMe->GetClass() != TF_Demoman)
 		return HookRes::Continue;
 	
 	static Timer timer_leftclick;
 	static Timer timer_checkscottish;
 
-	if (Globals::m_pUserCmd->buttons & IN_ATTACK)
+	if (cmd->buttons & IN_ATTACK)
 		timer_leftclick.update();
 
-	if (!timer_leftclick.has_elapsed(500))
+	if (!timer_leftclick.has_elapsed(500ms))
 		return HookRes::Continue;
 
 	static bool IsScottishResistance = false;
-	if (timer_checkscottish.trigger_if_elapsed(2500))
+	if (timer_checkscottish.trigger_if_elapsed(2500ms))
 	{
-		IBaseHandle& pHndl = pLocalPlayer->GetWeaponList()[1];
-		IBaseObject* pWeapon = reinterpret_cast<IBaseObject*>(clientlist->GetClientEntityFromHandle(pHndl));
+		IBaseObject* pWeapon = ::GetIBaseObject(pMe->GetWeaponList()[1]);
 		IsScottishResistance = pWeapon && pWeapon->GetItemDefinitionIndex() == 130;
 	}
 
 	static std::vector<IBaseObject*> stickies;	stickies.clear();
 	static std::vector<ITFPlayer*> players;		players.clear();
 	
-	ITFPlayer* pPlayer;
-	ITFPlayer* pMe = pLocalPlayer;
-
 	{
-		IClientShared* pEnt;
 		for (const auto& infos = ent_infos.GetInfos(); 
 			const MyClientCacheList& cache : infos)
 		{
-			pEnt = cache.pEnt;
-			if(cache.flag == EntFlag::EF_EXTRA && pEnt->IsClassID(ClassID_CTFGrenadePipebombProjectile) && *pEnt->GetEntProp<int>("m_iType") == 1)
+			IClientShared* pEnt = cache.pEnt;
+			if(cache.flag == EntFlag::Extra && pEnt->IsClassID(ClassID_CTFGrenadePipebombProjectile) && *pEnt->GetEntProp<int, PropType::Recv>("m_iType") == 1)
 			{
 				stickies.push_back(reinterpret_cast<IBaseObject*>(pEnt));
 			}
-			else if (cache.flag == EntFlag::EF_PLAYER)
+			else if (cache.flag == EntFlag::Player)
 			{
-				pPlayer = reinterpret_cast<ITFPlayer*>(pEnt);
+				ITFPlayer* pPlayer = reinterpret_cast<ITFPlayer*>(pEnt);
 
 				if (pPlayer == pMe)
 					continue;
@@ -104,20 +109,18 @@ HookRes AutoDetonate::OnCreateMove(bool& ret)
 		}
 	}
 
-	ICollideable* pCollide;
-	trace_t tr;
+	ICollideable* pCollide = pMe->GetCollideable();
 
-	pCollide = pLocalPlayer->GetCollideable();
-	Vector position;
-	bool bFound = false;
-	static Vector sec1, sec2;
+	bool change_hr = false;
+
+	trace_t tr;
 	Trace::ILocalFilterSimple filter;
 
 	for (const IBaseObject* stickie : stickies)
 	{
 		Vector vecOrigin = stickie->GetAbsOrigin();
 		{
-			position = pLocalPlayer->GetAbsOrigin() + ((pCollide->OBBMins() + pCollide->OBBMaxs()) / 2);
+			const Vector position = pMe->GetAbsOrigin() + ((pCollide->OBBMins() + pCollide->OBBMaxs()) / 2);
 			if (vecOrigin.DistTo(position) < 170.f)
 			{
 				Trace::TraceLine(vecOrigin, position, COLLISION_GROUP_PLAYER_MOVEMENT, &tr, &filter);
@@ -128,10 +131,7 @@ HookRes AutoDetonate::OnCreateMove(bool& ret)
 
 		for (const ITFPlayer* target: players)
 		{
-			if (bFound)
-				break;
-
-			position = target->GetAbsOrigin() + ((pCollide->OBBMins() + pCollide->OBBMaxs()) / 2);
+			const Vector position = target->GetAbsOrigin() + ((pCollide->OBBMins() + pCollide->OBBMaxs()) / 2);
 
 			if (vecOrigin.DistTo(position) > 150.f)
 				continue;
@@ -144,24 +144,23 @@ HookRes AutoDetonate::OnCreateMove(bool& ret)
 			if (IsScottishResistance)
 			{
 				QAngle angRes = GetAimAngle(stickie->GetAbsOrigin());
-				Globals::m_pUserCmd->viewangles = angRes;
-				ret = false;
+				cmd->viewangles = angRes;
+				CreateMove->SetReturnInfo(false);
+				change_hr = true;
 			}
 
-			bFound = true;
+			cmd->buttons |= IN_ATTACK2;
 			break;
 		}
 	}
 
-	if (bFound)
-		Globals::m_pUserCmd->buttons |= IN_ATTACK2;
-
-	return HookRes::Continue;
+	return change_hr ? HookRes::ChangeReturnValue : HookRes::Continue;
 }
 
 
 HAT_COMMAND(autodetonate_toggle, "Turn off/on auto-backstab")
 {
-	autodeto.bEnabled = !autodeto.bEnabled;
-	REPLY_TO_TARGET(return, "Auto-Detonate is now %s\n", autodeto.bEnabled ? "ON":"OFF");
+	AutoBool enable("AutoDetonate::Enable");
+	enable = !enable;
+	REPLY_TO_TARGET(return, "Auto-Detonate is now %s\n", enable ? "ON":"OFF");
 }

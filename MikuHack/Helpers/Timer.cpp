@@ -5,7 +5,19 @@
 #include <stack>
 #include <queue>
 
+
+using TimerFlagType = std::underlying_type_t<TimerFlags>;
+
 using namespace std;
+
+template<>
+struct std::hash<Timer>
+{
+	size_t operator()(const Timer& timer) const
+	{
+		return timer.seed();
+	}
+};
 
 struct FrameRawData
 {
@@ -20,8 +32,8 @@ struct FrameRawData
 
 struct TimerData
 {
-	float time = 0.1f;
-	short flag;
+	std::chrono::milliseconds time = 100ms;
+	TimerFlags flag;
 	FrameRawData raw;
 
 	void ExecuteData()
@@ -32,13 +44,13 @@ struct TimerData
 
 using PTimerData = unique_ptr<TimerData>;
 
-static unordered_map<Timer*, PTimerData> m_pFutures;
+static unordered_map<Timer, PTimerData> m_pFutures;
 static queue<FrameRawData> frame_callbacks;
 
-const Timer Timer::CreateFuture(float time, short flags, TimerCallbackFn callback, void* cdata)
+const TimerID Timer::CreateFuture(std::chrono::milliseconds time, TimerFlags flags, const TimerCallbackFn& callback, void* cdata)
 {
-	if (time <= 0.1f)
-		time = 0.1f;
+	if (time < 100ms)
+		time = 100ms;
 
 	PTimerData data = make_unique<TimerData>();
 
@@ -46,11 +58,12 @@ const Timer Timer::CreateFuture(float time, short flags, TimerCallbackFn callbac
 	data->flag = flags;
 	data->raw = { callback , cdata };
 	
-	Timer* timer = new Timer;
+	Timer timer;
+	TimerID seed = timer.seed();
 
-	m_pFutures.insert(make_pair(timer, move(data)));
+	m_pFutures.insert(make_pair(move(timer), move(data)));
 
-	return *timer;
+	return seed;
 }
 
 
@@ -63,27 +76,25 @@ void Timer::RequestFrame(TimerCallbackFn callback, void* data)
 void Timer::ExecuteFrame()
 {
 	static Timer timer_execute_next;
-	if (!timer_execute_next.has_elapsed(100))
+	if (!timer_execute_next.has_elapsed(100ms))
 		return;
 
 	timer_execute_next.update();
 
 	TimerData* data;
-	Timer* timer;
 
 	for (auto iter = m_pFutures.begin(); iter != m_pFutures.end(); iter++)
 	{
-		timer = iter->first;
+		const Timer& timer = iter->first;
 		data = iter->second.get();
 
-		if (!timer->has_elapsed(data->time * 1000))
+		if (!timer.has_elapsed(data->time))
 			continue;
 
 		data->ExecuteData();
-		if (data->flag & TIMER_AUTO_REPEAT)
+		if (static_cast<TimerFlagType>(data->flag) & static_cast<TimerFlagType>(TimerFlags::AutoRepeat))
 			continue;
 
-		delete timer;
 		iter = m_pFutures.erase(iter);
 	}
 
@@ -95,32 +106,31 @@ void Timer::ExecuteFrame()
 }
 
 
-void Timer::DeleteFuture(Timer* timer, bool execute)
+void Timer::DeleteFuture(const TimerID& timer, bool execute)
 {
+	constexpr  size_t sz = sizeof(TimerID);
 	for (auto iter = m_pFutures.begin(); iter != m_pFutures.end(); iter++)
 	{
-		if (*iter->first == *timer)
+		if (iter->first == timer)
 		{
 			TimerData* pData = iter->second.get();
 			if (execute)
 				pData->ExecuteData();
 
-			delete iter->first;
 			m_pFutures.erase(iter);
-
 			break;
 		}
 	}
 }
 
 
-void Timer::RollBack(Timer* timer)
+void Timer::RewindBack(const TimerID& seed)
 {
-	for(auto& iter: m_pFutures)
+	for(auto& [timer, data]: m_pFutures)
 	{
-		if (*iter.first == *timer)
+		if (timer == seed)
 		{
-			iter.first->update();
+			const_cast<Timer&>(timer).update();
 			break;
 		}
 	}
@@ -129,17 +139,10 @@ void Timer::RollBack(Timer* timer)
 
 [[inline]] void Timer::RunOnLevelShutdown()
 {
-	TimerData* pData;
-	Timer* timer;
-
-	for (auto& entry : m_pFutures)
+	for (auto& [timer, pData] : m_pFutures)
 	{
-		pData = entry.second.get();
-		if (pData->flag & TIMER_EXECUTE_ON_MAP_END)
+		if (static_cast<TimerFlagType>(pData->flag) & static_cast<TimerFlagType>(TimerFlags::ExecuteOnMapEnd))
 			pData->ExecuteData();
-
-		timer = entry.first;
-		delete timer;
 	}
 
 	m_pFutures.clear();

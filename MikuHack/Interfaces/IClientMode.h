@@ -7,38 +7,9 @@
 class CUserCmd
 {
 public:
-	virtual ~CUserCmd() { };
+	virtual ~CUserCmd() = default;
 
-	CUserCmd& operator =(const CUserCmd& src)
-	{
-		if (this == &src)
-			return *this;
-
-		command_number = src.command_number;
-		tick_count = src.tick_count;
-		viewangles = src.viewangles;
-		forwardmove = src.forwardmove;
-		sidemove = src.sidemove;
-		upmove = src.upmove;
-		buttons = src.buttons;
-		impulse = src.impulse;
-		weaponselect = src.weaponselect;
-		weaponsubtype = src.weaponsubtype;
-		random_seed = src.random_seed;
-		mousedx = src.mousedx;
-		mousedy = src.mousedy;
-
-		hasbeenpredicted = src.hasbeenpredicted;
-
-		return *this;
-	}
-
-	CUserCmd(const CUserCmd& src)
-	{
-		*this = src;
-	}
-
-	CRC32_t GetChecksum(void) const
+	CRC32_t GetChecksum() const
 	{
 		CRC32_t crc;
 
@@ -61,25 +32,26 @@ public:
 		return crc;
 	}
 
-	int		command_number;
+public:
+	int		command_number{ };
 
-	int		tick_count;
+	int		tick_count{ };
 
-	QAngle	viewangles;
-	float	forwardmove;
-	float	sidemove;
-	float	upmove;
-	int		buttons;
-	byte    impulse;
-	int		weaponselect;
-	int		weaponsubtype;
+	QAngle	viewangles{ };
+	float	forwardmove{ };
+	float	sidemove{ };
+	float	upmove{ };
+	int		buttons{ };
+	byte    impulse{ };
+	int		weaponselect{ };
+	int		weaponsubtype{ };
 
-	int		random_seed;
+	int		random_seed{ };
 
-	short	mousedx;
-	short	mousedy;
+	short	mousedx{ };
+	short	mousedy{ };
 
-	bool	hasbeenpredicted;
+	bool	hasbeenpredicted{ };
 };
 
 #define IN_ATTACK		(1 << 0)
@@ -108,3 +80,4 @@ public:
 #define IN_GRENADE1		(1 << 23)	// grenade 1
 #define IN_GRENADE2		(1 << 24)	// grenade 2
 #define	IN_ATTACK3		(1 << 25)
+

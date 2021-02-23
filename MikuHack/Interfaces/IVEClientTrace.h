@@ -1,6 +1,7 @@
 #pragma once
 
-#include "CBaseEntity.h"
+#include "../Helpers/Commons.h"
+
 #include <engine/IEngineTrace.h>
 #include <gametrace.h>
 #include <worldsize.h>
@@ -18,17 +19,17 @@ namespace Trace
 	{
 	public:
 		IHandleEntity* pHndl;
-		ShouldHitFn callback;
+		[[no_unique_address]] ShouldHitFn callback;
 
-		ITraceFilterSimple(IHandleEntity* pHndl = NULL, ShouldHitFn extra = NULL) : pHndl(pHndl), callback(extra) { };
-		ITraceFilterSimple(IClientShared* pEnt = NULL, ShouldHitFn extra = NULL) : pHndl(reinterpret_cast<IHandleEntity*>(pEnt)), callback(extra) { };
+		explicit ITraceFilterSimple(IHandleEntity* pHndl = NULL, ShouldHitFn extra = NULL) : pHndl(pHndl), callback(extra) { };
+		explicit ITraceFilterSimple(IClientShared* pEnt = NULL, ShouldHitFn extra = NULL) : pHndl(reinterpret_cast<IHandleEntity*>(pEnt)), callback(extra) { };
 		bool ShouldHitEntity(IHandleEntity* pHndl, int mask) override;
 	};
 
 	class ILocalFilterSimple : public ITraceFilterSimple
 	{
 	public:
-		ILocalFilterSimple(ShouldHitFn extra = NULL) : ITraceFilterSimple(reinterpret_cast<IHandleEntity*>(pLocalPlayer), extra) { };
+		explicit ILocalFilterSimple(ShouldHitFn extra = NULL) : ITraceFilterSimple(reinterpret_cast<IHandleEntity*>(ILocalPtr()), extra) { };
 	};
 
 	void TraceLine(	const Vector& vec1,
@@ -52,7 +53,7 @@ namespace Trace
 								IClientShared* pEnt,
 								uint32_t mask = MASK_SHOT)
 	{
-		static trace_t res;
+		trace_t res;
 		ITraceFilterSimple filter(pIgnore);
 		TraceLine(start, end, mask, &res, &filter);
 

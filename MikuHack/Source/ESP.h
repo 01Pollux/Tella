@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Main.h"
-#include "../Helpers/VTable.h"
+#include "../GlobalHook/vhook.h"
+#include "../GlobalHook/load_routine.h"
 
 struct ESPData;
 class IClientShared;
 
-class ESPMenu: public MenuPanel
+class ESPMenu: public MenuPanel, public IMainRoutine
 {
 public:
 
@@ -81,20 +82,23 @@ public: //MenuPanel
 
 public:
 
-	ESPMenu()
+	void OnLoadDLL() override
 	{
-		IGlobalEvent::PaintTraverse::Hook::Register(std::bind(&ESPMenu::OnPaintTraverse, this));
-	};
+		using namespace IGlobalVHookPolicy;
+		paint_traverse = PaintTraverse::Hook::QueryHook(PaintTraverse::Name);
+		paint_traverse->AddPostHook(HookCall::Late, std::bind(&ESPMenu::OnPaintTraverse, this, std::placeholders::_1));
+	}
 
-	HookRes OnPaintTraverse();
+	HookRes OnPaintTraverse(uint);
 
 private:
+	IGlobalVHook<void, uint, bool, bool>* paint_traverse;
 
 	void CollectEntities();
 	void DrawEntities(ESPData& data);
 
 	bool DrawBox(ESPData& data);
-	bool IsActive() 
+	constexpr bool IsActive() noexcept
 	{ 
 		return  player_esp[0].base.m_bActive	||
 				building_esp[0].base.m_bActive	||

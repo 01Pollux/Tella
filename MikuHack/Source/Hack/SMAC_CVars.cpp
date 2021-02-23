@@ -1,19 +1,22 @@
 
+#include "../Main.h"
+#include "../GlobalHook/load_routine.h"
+#include "../GlobalHook/detour.h"
+
 #include "../Interfaces/HatCommand.h"
 #include "../Interfaces/NetMessage.h"
-#include "../Main.h"
+#include "../Interfaces/IVEngineClient.h"
 
-#include "../Helpers/VTable.h"
-#include "../Detour/detours.h"
+#include "../Debug.h"
+#include "../Helpers/Timer.h"
 
 void ParseKeyValues(KeyValues*);
 
-class SMAC_AntiCVars : public ExtraPanel
+class SMAC_AntiCVars : public ExtraPanel, public IMainRoutine
 {
 public:	//	SMAC_AntiCVars
 	std::unordered_map<std::string, std::string> m_CVarsList {
 //		{ "sv_cheats",				"0.0" },
-//		{ "sv_footsteps",			"1.0" },	
 		{ "snd_visualize",			"0.0" },
 		{ "snd_show",				"0.0" },
 		{ "r_visocclusion",			"0.0" },
@@ -32,18 +35,20 @@ public:	//	SMAC_AntiCVars
 	};
 	AutoBool bEnabled{ "SMAC_Cvars::Enable", false };
 
-public:	//	Globals::IGlobalHooks
-	SMAC_AntiCVars() 
+public:
+	void OnLoadDLL() final
 	{
-		IGlobalEvent::SendNetMsg::Hook::Register(std::bind(&SMAC_AntiCVars::OnSendNetMsg, this, std::placeholders::_1));
+		using namespace IGlobalDHookPolicy;
+		auto send_net_msg = SendNetMsg::Hook::QueryHook(SendNetMsg::Name);
+		send_net_msg->AddPreHook(HookCall::Any, std::bind(&SMAC_AntiCVars::OnSendNetMsg, this, std::placeholders::_1));
 	};
 	HookRes OnSendNetMsg(INetMessage&);
 
 public:	//	ExtraPanel
-	void OnRenderExtra() override final
+	void OnRenderExtra() final
 	{
-		///Add input
-		ImGui::Checkbox("Fake Query CVars", bEnabled.get());
+		// Add input
+		ImGui::Checkbox("Fake Query CVars", &bEnabled);
 	}
 } static smac_anti_cvars;
 
@@ -53,7 +58,9 @@ HookRes SMAC_AntiCVars::OnSendNetMsg(INetMessage& msg)
 	if (!bEnabled)
 		return HookRes::Continue;
 
-	if (msg.GetType() == clc_RespondCvarValue)
+	switch (msg.GetType())
+	{
+	case clc_RespondCvarValue:
 	{
 		CLC_RespondCvarValue& cvar_respond = reinterpret_cast<CLC_RespondCvarValue&>(msg);
 		const char* name = cvar_respond.m_szCvarName;
@@ -61,11 +68,15 @@ HookRes SMAC_AntiCVars::OnSendNetMsg(INetMessage& msg)
 
 		if (i != m_CVarsList.end())
 			cvar_respond.m_szCvarValue = i->second.c_str();
+		break;
 	}
-	else if(msg.GetType() == clc_CmdKeyValues && MIKUDebug::m_bDebugging)
+	case clc_CmdKeyValues:
 	{
-		KeyValues* kv_msg = reinterpret_cast<CLC_CmdKeyValues&>(msg).m_pKeyValues;
-		ParseKeyValues(kv_msg);
+		if (MIKUDebug::m_bDebugging)
+			ParseKeyValues(static_cast<CLC_CmdKeyValues&>(msg).m_pKeyValues);
+		break;
+	}
+	default: break;
 	}
 
 	return HookRes::Continue;

@@ -1,0 +1,168 @@
+{
+   "Demoman" : null,
+   "Engineer" : {
+      "141" : {
+         "Attributes" : {
+            "1007" : 1,
+            "2013" : 2004,
+            "2014" : 4,
+            "2025" : 3,
+            "719" : 49
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS Fes Frontier",
+         "New ID" : 1004
+      },
+      "142" : {
+        "Attributes": {
+          "1007": 1,
+          "2013": 2004,
+          "2014": 4,
+          "2025": 3
+        },
+         "Disabled" : false,
+         "Name" : "Pro KS GunsLinger",
+         "New ID" : -1
+      },
+      "22" : {
+         "Attributes" : {
+            "1007" : 1,
+            "2013" : 2004,
+            "2014" : 7,
+            "2025" : 3
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS ShotToHell",
+         "New ID" : 15102
+      },
+      "9" : {
+         "Attributes" : {
+            "1007" : 1,
+            "2013" : 2004,
+            "2014" : 1,
+            "2025" : 3
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS Shotgun",
+         "New ID" : 15133
+      }
+   },
+   "Heavy" : null,
+   "Medic" : null,
+   "Pyro" : null,
+   "Scout" : {
+      "0" : {
+         "Attributes" : {
+            "2013" : 2007,
+            "2014" : 4,
+            "2025" : 3
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS Bat",
+         "New ID" : 30667
+      },
+      "13" : {
+         //Australium Scatter Gun + pro ks
+         "Attributes" : {
+            "2013" : 2004,
+            "2014" : 7,
+            "2022" : 1,
+            "2025" : 3,
+            "2027" : 1,
+            "542" : 1
+         },
+         "Disabled" : false,
+         "Name" : "Auss PKS Scattergun",
+         "New ID" : 13
+      },
+      "22" : {
+         "Attributes" : {
+            "2013" : 2005,
+            "2014" : 2,
+            "2025" : 3
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS CAPPER",
+         "New ID" : 30666
+      },
+      "45" : {
+         "Attributes" : {
+            "2013" : 2007,
+            "2014" : 4,
+            "2025" : 3,
+            "2053" : 1
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS Festive Force a Nature",
+         "New ID" : 1078
+      },
+      "46" : {
+         "Attributes" : {
+            "2053" : 1
+         },
+         "Disabled" : false,
+         "Name" : "Festive BONK",
+         "New ID" : 1145
+      },
+      "773" : {
+         "Attributes" : {
+            "2013" : 2005,
+            "2014" : 2,
+            "2025" : 3
+         },
+         "Disabled" : false,
+         "Name" : "Pro KS Pretty Boy",
+         "New ID" : 30666
+      }
+   },
+   "Sniper" : {
+      "14" : {
+         "Attributes" : {
+            "1007" : 1,
+            "2013" : 2007,
+            "2014" : 4,
+            "2025" : 3
+         },
+         "Disabled" : false,
+         "Name" : "Rifle->Aussie Thunderbolt",
+         "New ID" : 15059
+      },
+      "16" : {
+         "Attributes" : {
+            "1007" : 1,
+            "2013" : 2007,
+            "2014" : 4,
+            "2025" : 3,
+            "2053" : 1
+         },
+         "Disabled" : false,
+         "Name" : "Festive SMG -> SMG",
+         "New ID" : 1149
+      }
+   },
+   "Soldier" : {
+      "127" : {
+        "Attributes": {
+          "1007": 1,
+          "2013": 2007,
+          "2014": 4,
+          "2025": 3
+        },
+         "Disabled" : false,
+         "Name" : "IDK",
+         "New ID" : -1
+      },
+      "18" : {
+        "Attributes": {
+          "1007": 1,
+          "2013": 2007,
+          "2014": 4,
+          "2025": 3
+        },
+         "Disabled" : false,
+         "Name" : "American Rocket launcher",
+         "New ID" : 15028
+      }
+   },
+   "Spy" : null
+}

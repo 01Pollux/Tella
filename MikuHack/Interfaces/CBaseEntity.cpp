@@ -17,104 +17,94 @@ const char* m_szTeams[] =
 
 
 CTFPlayerResource ctfresource;
-class EmptyClass { };
 
-CUtlVector<IClientEntityListener*>* FindEntityListener()
-{
-	uintptr_t pEntListener = Library::clientlib.FindPattern("pCEntityListPtr") + Offsets::ClientDLL::To_EntListenerVec;
-	return reinterpret_cast<CUtlVector<IClientEntityListener*>*>(pEntListener);
-}
 
 int IClientShared::GetTeam()
 {
-	return *this->GetEntProp<int>("m_iTeamNum");
+	return *this->GetEntProp<int, PropType::Recv>("m_iTeamNum");
 }
 
-void IClientShared::UpdateGlowEffect()
+[[inline]] void IClientShared::UpdateGlowEffect() noexcept
 {
 	void** vtable = *reinterpret_cast<void***>(this);
 
 	union {
-		void (EmptyClass::* fn)();
+		void (IClientShared::* fn)();
 		void* ptr;
-	} u{ .ptr = reinterpret_cast<void*>(vtable[Offsets::IBaseEntity::VTIdx_UpdateGlowEffect]) };
+	} u{ .ptr = vtable[Offsets::IBaseEntity::VTIdx_UpdateGlowEffect] };
 	
-	(reinterpret_cast<EmptyClass*>(this)->*u.fn)();
+	(this->*u.fn)();
 }
 
-void IClientShared::DestroyGlowEffect()
+[[inline]] void IClientShared::DestroyGlowEffect() noexcept
 {
 	void** vtable = *reinterpret_cast<void***>(this);
 
 	union {
-		void (EmptyClass::* fn)();
+		void (IClientShared::* fn)();
 		void* ptr;
-	} u{ .ptr = reinterpret_cast<void*>(vtable[Offsets::IBaseEntity::VTIdx_DestroyGlowEffect]) };
+	} u{ .ptr = vtable[Offsets::IBaseEntity::VTIdx_DestroyGlowEffect] };
 
-	(reinterpret_cast<EmptyClass*>(this)->*u.fn)();
+	(this->*u.fn)();
 }
 
-void IClientShared::SetModel(int index)
+[[inline]] void IClientShared::SetModel(int index)
 {
-	uintptr_t ptr = Library::clientlib.FindPattern("CBaseEntity::SetModelIndex");
-
 	union {
-		void (EmptyClass::* fn)(int);
-		void* ptr;
-	} u{ .ptr = reinterpret_cast<void*>(ptr) };
+		void (IClientShared::* fn)(int);
+		uintptr_t ptr;
+	} u{ .ptr = Library::clientlib.FindPattern("CBaseEntity::SetModelIndex") };
 
-	(reinterpret_cast<EmptyClass*>(this)->*u.fn)(index);
+	(this->*u.fn)(index);
 }
 
-int IBaseObject::GetWeaponSlot()
+[[inline]]int IBaseObject::GetWeaponSlot() noexcept
 {
 	void** vtable = *reinterpret_cast<void***>(this);
 
 	union {
-		int (EmptyClass::* fn)();
+		int (IClientShared::* fn)();
 		void* ptr;
-	} u{ .ptr = reinterpret_cast<void*>(vtable[Offsets::IBaseEntity::VTIdx_GetSlot]) };
+	} u{ .ptr = vtable[Offsets::IBaseEntity::VTIdx_GetSlot] };
 
-	return (reinterpret_cast<EmptyClass*>(this)->*u.fn)();
+	return (this->*u.fn)();
 }
 
-bool IBaseObject::Melee_DoSwingTrace(trace_t& trace)
+[[inline]] bool IBaseObject::Melee_DoSwingTrace(trace_t& trace) noexcept
 {
 	void** vtable = *reinterpret_cast<void***>(this);
 
 	union {
-		bool (EmptyClass::* fn)(trace_t&);
+		bool (IClientShared::* fn)(trace_t&);
 		void* ptr;
 	} u{ .ptr = vtable[Offsets::IBaseEntity::VTIdx_DoSwingTrace] };
 
-	return (reinterpret_cast<EmptyClass*>(this)->*u.fn)(trace);
+	return (this->*u.fn)(trace);
 }
 
-float IBaseObject::Melee_GetSwingRange()
+[[inline]] float IBaseObject::Melee_GetSwingRange()
 {
-	uintptr_t ptr = Library::clientlib.FindPattern("Melee_GetSwingRangeFn");
-
 	union {
 		float (IBaseObject::* fn)();
-		void* ptr;
-	} u{ .ptr = reinterpret_cast<void*>(ptr) };
+		uintptr_t ptr;
+	} u{ .ptr = Library::clientlib.FindPattern("Melee_GetSwingRangeFn") };
 
 	return (this->*u.fn)();
 }
 
 void* ITFPlayer::GetShared()
 {
-	return *this->GetEntProp<void*>("m_Shared");
+	return *this->GetEntProp<void*, PropType::Recv>("m_Shared");
 }
 
-ITFPlayer* ITFPlayer::FromShared(const void* pEnt)
+ITFPlayer* ITFPlayer::FromShared(const void* pEnt) noexcept
 {
 	return *reinterpret_cast<ITFPlayer**>(reinterpret_cast<uintptr_t>(pEnt) + Offsets::IBaseEntity::TFPlayerShared::m_pOuter);
 }
 
 void* ITFPlayer::m_PlayerClass()
 {
-	return *this->GetEntProp<void*>("m_PlayerClass");
+	return *this->GetEntProp<void*, PropType::Recv>("m_PlayerClass");
 }
 
 Vector ITFPlayer::EyePosition()
@@ -128,43 +118,51 @@ Vector ITFPlayer::EyePosition()
 
 int ITFPlayer::GetHealth()
 {
-	return *this->GetEntProp<int>("m_iHealth");
+	return *this->GetEntProp<int, PropType::Recv>("m_iHealth");
 }
 
 Vector ITFPlayer::GetPosition()
 {
-	return *this->GetEntProp<Vector>("m_vecOrigin");
+	return *this->GetEntProp<Vector, PropType::Recv>("m_vecOrigin");
 }
 
 LIFE_STATE ITFPlayer::GetLifeState()
 {
-	return static_cast<LIFE_STATE>(*this->GetEntProp<uint8_t>("m_lifeState"));
+	return *this->GetEntProp<LIFE_STATE, PropType::Recv>("m_lifeState");
 }
 
 TFClass ITFPlayer::GetClass()
 {
-	return *this->GetEntProp<TFClass>("m_iClass");
+	return *this->GetEntProp<TFClass, PropType::Recv>("m_iClass");
 }
 
 int ITFPlayer::GetKillCount()
 {
-	return *this->GetEntProp<int>("m_iKills");
+	return *this->GetEntProp<int, PropType::Recv>("m_iKills");
 }
 
 
 IBaseHandle* ITFPlayer::GetWeaponList()
 {
-	return this->GetEntProp<IBaseHandle>("m_hMyWeapons");
+	return this->GetEntProp<IBaseHandle, PropType::Recv>("m_hMyWeapons");
 }
 
 IBaseHandle& ITFPlayer::GetActiveWeapon()
 {
-	return *this->GetEntProp<IBaseHandle>("m_hActiveWeapon");
+	return *this->GetEntProp<IBaseHandle, PropType::Recv>("m_hActiveWeapon");
 }
 
+/*
 struct CondVars
 {
-	const int cond_offsets[6] = {
+	enum class CondType
+	{
+		CondBits,
+		Cond0,
+		CondEx, CondEx2,
+		CondEx3, CondEx4,
+	}
+	static const uint32_t cond_offsets[6] = {
 	FindRecvOffset("CTFPlayer", "_condition_bits"),
 	FindRecvOffset("CTFPlayer", "m_nPlayerCond"),
 	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx"),
@@ -172,6 +170,7 @@ struct CondVars
 	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx3"),
 	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx4") };
 };
+*/
 
 bool ITFPlayer::InCond(ETFCond cond)
 {
@@ -180,7 +179,7 @@ bool ITFPlayer::InCond(ETFCond cond)
 	case 0:
 	{
 		int bit = 1 << cond;
-		if (*this->GetEntProp<uint32_t>("_condition_bits") & bit || *this->GetEntProp<uint32_t>("m_nPlayerCond") & bit)
+		if (*this->GetEntProp<uint32_t, PropType::Recv>("_condition_bits") & bit || *this->GetEntProp<uint32_t, PropType::Recv>("m_nPlayerCond") & bit)
 			return true;
 		break;
 	}
@@ -188,7 +187,7 @@ bool ITFPlayer::InCond(ETFCond cond)
 	case 1:
 	{
 		int bit = 1 << (cond - 32);
-		if (*this->GetEntProp<uint32_t>("m_nPlayerCondEx") & bit)
+		if (*this->GetEntProp<uint32_t, PropType::Recv>("m_nPlayerCondEx") & bit)
 			return true;
 		break;
 	}
@@ -196,7 +195,7 @@ bool ITFPlayer::InCond(ETFCond cond)
 	case 2:
 	{
 		int bit = 1 << (cond - 64);
-		if (*this->GetEntProp<uint32_t>("m_nPlayerCondEx2") & bit)
+		if (*this->GetEntProp<uint32_t, PropType::Recv>("m_nPlayerCondEx2") & bit)
 			return true;
 		break;
 	}
@@ -204,7 +203,7 @@ bool ITFPlayer::InCond(ETFCond cond)
 	case 3:
 	{
 		int bit = 1 << (cond - 96);
-		if (*this->GetEntProp<uint32_t>("m_nPlayerCondEx3") & bit)
+		if (*this->GetEntProp<uint32_t, PropType::Recv>("m_nPlayerCondEx3") & bit)
 			return true;
 		break;
 	}
@@ -212,25 +211,38 @@ bool ITFPlayer::InCond(ETFCond cond)
 	case 4:
 	{
 		int bit = 1 << (cond - 128);
-		if (*this->GetEntProp<uint32_t>("m_nPlayerCondEx4") & bit)
+		if (*this->GetEntProp<uint32_t, PropType::Recv>("m_nPlayerCondEx4") & bit)
 			return true;
-		break;
 	}
+	default:
+		break;
 	}
 
 	return false;
 }
 
 
-static void ChangeCond(ITFPlayer* pEnt, ETFCond cond, bool add)
+static [[noinline]] void ChangeCond(ITFPlayer* pEnt, ETFCond cond, bool add)
 {
-	static int cond_offsets[6] = {
-	FindRecvOffset("CTFPlayer", "_condition_bits"),
-	FindRecvOffset("CTFPlayer", "m_nPlayerCond"),
-	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx"),
-	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx2"),
-	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx3"),
-	FindRecvOffset("CTFPlayer", "m_nPlayerCondEx4") };
+	static int cond_offsets[6]{ };
+	if (!cond_offsets[0])
+	{
+		[pEnt](int* conds)
+		{
+			recvprop_info_t info;
+			ClientClass* cls = pEnt->GetClientClass();
+			constexpr const char* names[] = {
+					"_condition_bits", "m_nPlayerCond",
+					"m_nPlayerCondEx", "m_nPlayerCondEx2",
+					"m_nPlayerCondEx3", "m_nPlayerCondEx4"
+			};
+			for (int i = 0; i < SizeOfArray(names); i++)
+			{
+				LookupRecvPropC(cls, names[i], &info);
+				conds[i] = info.offset;
+			}
+		}(cond_offsets);
+	}
 
 
 	switch (static_cast<int>(cond / 32))
@@ -311,50 +323,50 @@ void ITFPlayer::RemoveCond(ETFCond cond)
 
 int& ITFPlayer::GetStreaks(ETFStreak type)
 {
-	return *this->GetEntProp<int>("m_nStreaks");
+	return *this->GetEntProp<int, PropType::Recv>("m_nStreaks");
 }
 
 
-bool IBaseObject::IsBaseCombatWeapon()
+[[inline]] bool IBaseObject::IsBaseCombatWeapon() noexcept
 {
 	void** vtable = *reinterpret_cast<void***>(this);
 
 	union {
-		bool (EmptyClass::*fn)();
+		bool (IClientShared::*fn)();
 		void* ptr;
 	} u{ .ptr = vtable[Offsets::IBaseEntity::VTIdx_IsBaseCombatWeapon] };
 	
-	return (reinterpret_cast<EmptyClass*>(this)->*u.fn)();
+	return (this->*u.fn)();
 }
 
 IBaseHandle& IBaseObject::GetOwnerEntity()
 {
-	return *this->GetEntProp<IBaseHandle>("m_hOwnerEntity");
+	return *this->GetEntProp<IBaseHandle, PropType::Recv>("m_hOwnerEntity");
 }
 
 int& IBaseObject::GetItemDefinitionIndex()
 {
-	return *this->GetEntProp<int>("m_iItemDefinitionIndex");
+	return *this->GetEntProp<int, PropType::Recv>("m_iItemDefinitionIndex");
 }
 
 IAttributeList* IBaseObject::GetAttributeList()
 {
-	return this->GetEntProp<IAttributeList>("m_AttributeList");
+	return this->GetEntProp<IAttributeList, PropType::Recv>("m_AttributeList");
 }
 
 int IBaseObject::GetUpgradeLvl()
 {
-	return *this->GetEntProp<int>("m_iUpgradeLevel");
+	return *this->GetEntProp<int, PropType::Recv>("m_iUpgradeLevel");
 }
 
 int IBaseObject::GetBuildingHealth()
 {
-	return *this->GetEntProp<int>("m_iHealth");
+	return *this->GetEntProp<int, PropType::Recv>("m_iHealth");
 }
 
 int IBaseObject::GetBuildingMaxHealth()
 {
-	return *this->GetEntProp<int>("m_iMaxHealth");
+	return *this->GetEntProp<int, PropType::Recv>("m_iMaxHealth");
 }
 
 
@@ -373,139 +385,17 @@ IClientEntity* CTFPlayerResource::Update()
 	}
 }
 
-#include "../Helpers/VTable.h"
-
-
-IEntityCached ent_infos;
-
-IEntityCached::IEntityCached()
-{
-	using namespace IGlobalEvent;
-
-	LoadDLL::Hook::Register(std::bind(&IEntityCached::OnDLLAttach, this));
-	UnloadDLL::Hook::Register(std::bind(&IEntityCached::OnDLLDetach, this));
-	LevelInit::Hook::Register([this]() -> HookRes { m_EntInfos.clear(); return HookRes::Continue; });
-	LevelShutdown::Hook::Register([this]() -> HookRes { m_EntInfos.clear(); return HookRes::Continue; });
-}
-
-HookRes IEntityCached::OnDLLAttach()
-{
-	AddEntityListener();
-	m_EntInfos.clear();
-
-	if (BAD_LOCAL())
-		return HookRes::Continue;
-
-	MyClientCacheList cache;
-	EntFlag flag;
-
-	int maxClients = gpGlobals->maxClients;
-	int maxEntities = clientlist->GetHighestEntityIndex();
-
-	for (int i = 1; i <= maxEntities; i++)
-	{
-		IClientShared* pEnt = GetClientEntityW(i);
-		if (!pEnt)
-			continue;
-
-		if (i <= maxClients)
-			flag = EntFlag::EF_PLAYER;
-		else
-		{
-			ClientClass* cls = pEnt->GetClientClass();
-			if (!cls)
-				flag = EntFlag::EF_INVALID;
-			else {
-				switch (cls->m_ClassID)
-				{
-				case ClassID::ClassID_CObjectSentrygun:
-				case ClassID::ClassID_CObjectTeleporter:
-				case ClassID::ClassID_CObjectDispenser:
-					flag = EntFlag::EF_BUILDING;
-					break;
-
-				default:
-					flag = EntFlag::EF_EXTRA;
-					break;
-				}
-			}
-		}
-
-		cache.pEnt = pEnt;
-		cache.flag = flag;
-
-		m_EntInfos.push_front(cache);
-	}
-
-	return HookRes::Continue;
-}
-
-void IEntityCached::OnEntityCreated(IClientShared* pEnt)
-{
-	if (!pEnt || !pEnt->GetClientNetworkable())
-		return;
-
-	int ent_index = pEnt->entindex();
-	if (ent_index < 0)
-		return;
-
-	MyClientCacheList cache;
-	EntFlag flag;
-
-	if (ent_index <= gpGlobals->maxClients)
-		flag = EntFlag::EF_PLAYER;
-	else
-	{
-		ClientClass* cls = pEnt->GetClientClass();
-		if (!cls)
-			flag = EntFlag::EF_INVALID;
-		else {
-			switch (cls->m_ClassID)
-			{
-			case ClassID::ClassID_CObjectSentrygun:
-			case ClassID::ClassID_CObjectTeleporter:
-			case ClassID::ClassID_CObjectDispenser:
-				flag = EntFlag::EF_BUILDING;
-				break;
-
-			default:
-				flag = EntFlag::EF_EXTRA;
-				break;
-			}
-		}
-	}
-
-	cache.pEnt = pEnt;
-	cache.flag = flag;
-
-	m_EntInfos.push_front(cache);
-//	NBoneCache::AddEntity(pEnt);
-}
-
-void IEntityCached::OnEntityDeleted(IClientShared* pEnt)
-{
-	if (!pEnt || !pEnt->GetClientNetworkable())
-		return;
-	if (m_EntInfos.remove_if([&pEnt](const MyClientCacheList& cache) -> bool { return cache.pEnt == pEnt; }))
-		pEnt->DestroyVirtualGlowObject();
-}
-
-HookRes IEntityCached::OnDLLDetach()
-{
-	RemoveEntityListener(); m_EntInfos.clear();
-	return HookRes::Continue;
-}
 
 
 
 QAngle GetAimAngle(const Vector& vecTarget, bool useLocalPunchAng)
 {
 	QAngle res;
-	Vector vecToTarget; vecToTarget = vecTarget - pLocalPlayer->LocalEyePosition();
+	Vector vecToTarget; vecToTarget = vecTarget - ILocalPtr()->LocalEyePosition();
 	VectorAngles(vecToTarget, res);
 
-	if(useLocalPunchAng)
-		res -= *pLocalPlayer->GetEntProp<QAngle>("m_vecPunchAngle");
+	if (useLocalPunchAng)
+		res -= *ILocalPtr()->GetEntProp<QAngle, PropType::Recv>("m_vecPunchAngle");
 
 	ClampAngle(res);
 	return res;
@@ -513,11 +403,11 @@ QAngle GetAimAngle(const Vector& vecTarget, bool useLocalPunchAng)
 
 float GetFOV(ITFPlayer* pViewer, const Vector& vecEnd)
 {
-	QAngle angView; angView = pViewer->GetAbsAngles();
+	const QAngle& angView = pViewer->GetAbsAngles();
 	Vector vecStartFwd; AngleVectors(angView, &vecStartFwd);
 	vecStartFwd.NormalizeInPlace();
 
-	Vector vecStart = pViewer->EyePosition();
+	const Vector& vecStart = pViewer->EyePosition();
 	Vector vecDelta = vecEnd - vecStart;
 	vecDelta.NormalizeInPlace();
 
@@ -527,12 +417,12 @@ float GetFOV(ITFPlayer* pViewer, const Vector& vecEnd)
 	return RAD2DEG(acosf(dot / (pow_len)));
 }
 
-float GetLocalFOV(const Vector& vecEnd)
+float GetLocalFOV(const QAngle& angles, const Vector& vecEnd)
 {
-	Vector vecFwd; AngleVectors(Globals::m_pUserCmd->viewangles, &vecFwd);
+	Vector vecFwd; AngleVectors(angles, &vecFwd);
 	vecFwd.NormalizeInPlace();
 
-	Vector vecDelta = vecEnd - pLocalPlayer->LocalEyePosition();
+	Vector vecDelta = vecEnd - ILocalPtr()->LocalEyePosition();
 	vecDelta.z = 0;
 	vecDelta.NormalizeInPlace();
 
@@ -542,6 +432,49 @@ float GetLocalFOV(const Vector& vecEnd)
 	return RAD2DEG(acosf(dot / (pow_len)));
 }
 
+float GetLerpTime()
+{
+	static float latency;
+	static Timer timer_update;
+
+	if (timer_update.trigger_if_elapsed(5s))
+	{
+		constexpr auto FastCVar = [](const char* name)				{ return g_pCVar->FindVar(name); };
+
+		constexpr auto get_max = [](auto&& a, auto&& b)				{ return a > b ? a : b; };
+		constexpr auto do_clamp = [](auto&& val, auto&& min, auto&& max) 
+		{ 
+			if (min > max)
+				return max;
+			else if (val > max)
+				return max;
+			else if (val < min)
+				return min;
+			else return val;
+		};
+
+
+		static ConVar* cl_interp = FastCVar("cl_interp");
+		static ConVar* cl_interp_ratio = FastCVar("cl_interp_ratio");
+		static ConVar* cl_updaterate = FastCVar("cl_updaterate");
+
+		float interp_ratio = cl_interp_ratio->GetFloat();
+		if (!interp_ratio) interp_ratio = 1.0f;
+
+		static const ConVar* sv_client_min_interp_ratio = FastCVar("sv_client_min_interp_ratio");
+		static const ConVar* sv_client_max_interp_ratio = FastCVar("sv_client_max_interp_ratio");
+
+		if (float tmp = sv_client_min_interp_ratio->GetFloat(); tmp != -1)
+		{
+			interp_ratio = do_clamp(interp_ratio, tmp, sv_client_max_interp_ratio->GetFloat());
+		}
+
+		latency = get_max(cl_interp->GetFloat(), interp_ratio / cl_updaterate->GetFloat());
+	}
+
+	return latency;
+}
+
 string_t AllocPooledString(const char* name)
 {
 	uintptr_t ptr = Library::clientlib.FindPattern("AllocPooledString");
@@ -549,8 +482,7 @@ string_t AllocPooledString(const char* name)
 	union {
 		string_t(*fn)(const char*);
 		void* ptr;
-	} u{ .ptr = reinterpret_cast<void*>(ptr) };
-	assert(u.fn);
+	} u{.ptr = reinterpret_cast<void*>(ptr) };
 
 	return (*u.fn)(name);
 }

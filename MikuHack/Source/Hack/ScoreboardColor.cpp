@@ -1,74 +1,63 @@
 
-#include "../Interfaces/HatCommand.h"
-#include "../Interfaces/NetMessage.h"
 #include "../Main.h"
-#include "../Helpers/VTable.h"
-
-#include <array>
+#include "../Interfaces/HatCommand.h"
+#include "../GlobalHook/load_routine.h"
 
 #include "../../Detour/detours.h"
 #include "../../Helpers/DrawTools.h"
+#include "../../Helpers/Commons.h"
 
-#include "../../Helpers/BytePatch.h"
+#include <KeyValues.h>
 
-class ScoreboardColor : public ExtraPanel
+
+class ScoreboardColor: public ExtraPanel, public IMainRoutine
 {
 public:	//	ScoreboardColor
 	AutoBool bEnabled	{ "ScoreboardColor::Enable", false };
 	AutoBool bRandom	{ "ScoreboardColor::Random", false };
-	AutoColor Colors[2]	{ { "ScoreboardColor::Color_RED"  }, 
-						  { "ScoreboardColor::Color_BLUE" } };
-
-public:	//	Globals::IGlobalHooks
-	ScoreboardColor()
-	{
-		IGlobalEvent::LoadDLL::Hook::Register(std::bind(&ScoreboardColor::OnLoad, this));
-		IGlobalEvent::UnloadDLL::Hook::Register(std::bind(&ScoreboardColor::OnUnload, this));
-
-		Colors[0].Set({ DrawTools::ColorTools::Cyan<char8_t> });
-		Colors[1].Set({ DrawTools::ColorTools::Fuschia<char8_t> });
-	};
-
-	HookRes OnLoad();
-	HookRes OnUnload();
-
+	AutoColor Colors[2]	{ { "ScoreboardColor::Color_RED", DrawTools::ColorTools::Cyan<char8_t>  },
+						  { "ScoreboardColor::Color_BLUE",DrawTools::ColorTools::Fuschia<char8_t> } };
 public:	//	ExtraPanel
-	void OnRenderExtra() override final;
+	void OnRenderExtra() final;
+
+public:	//	IMainRoutine
+	void OnLoadDLL() final;
+	void OnUnloadDLL() final;
+
 } static scoreboard_color;
 
-std::vector<std::array<int, 3>> m_RainbowClr{ };
 
-struct ColorData_t
+struct _ColorData
 {
 	Color next_clr{ 255, 0, 255, 255 };
+	static inline std::vector<std::array<int, 3>> RandomColors{ };
 
-	void ScrambleColor(const std::array<int, 3>& RandomC, float ratio)
+	void ScrambleColor(const std::array<int, 3>& color, float ratio)
 	{
-		this->next_clr.SetColor(RandomC[0], RandomC[1], RandomC[2], 255 * ratio);
+		this->next_clr.SetColor(color[0], color[1], color[2], 255 * ratio);
 	}
 	void ScrambleColor(float ratio, short team)
 	{
-		AutoColor& color = scoreboard_color.Colors[team];
+		const auto& color = *scoreboard_color.Colors[team];
 		this->next_clr.SetColor(color[0], color[1], color[2], 255 * ratio);
 	}
 
-	[[noinline]] Color GetCurrent(bool bAlive, short team)
+	const Color& GetCurrent(bool is_player_alive, short team)
 	{
 		if (scoreboard_color.bRandom)
 		{
-			const auto& clr = m_RainbowClr[RandomInt(0, m_RainbowClr.size() - 1)];
-			ScrambleColor(clr, bAlive ? 1.0:0.45);
+			const auto& clr = RandomColors[Random::Int(0, RandomColors.size() - 1)];
+			ScrambleColor(clr, is_player_alive ? 1.0 : 0.45);
 		}
-		else ScrambleColor(bAlive ? 1.0 : 0.45, team < 0 ? 0: team);
+		else ScrambleColor(is_player_alive ? 1.0 : 0.45, team < 0 ? 0: team);
 
 		return next_clr;
 	}
+} static ColorDdata[MAX_PLAYERS];
 
-} static m_ColorData[32];
-
-static inline ColorData_t& GetClientColor(int index)
+static inline _ColorData& GetClientColor(int index) noexcept
 {
-	return m_ColorData[index - 1];
+	return ColorDdata[index - 1];
 }
 
 
@@ -84,58 +73,67 @@ DETOUR_CREATE_MEMBER(void, SetItemFgColor, int iItemIndex, Color cClr)
 			return;
 		}
 	}
-	KeyValues* pKVList;
+
+	KeyValues* KVList;
 	bool bAlive;
-	_asm {
-		push esi
+	_asm 
+	{
+		push ESI
 
-		mov pKVList, esi
+		mov KVList, ESI
 
-		mov esi, [ebp]
-		mov bl, [esi-8h]
-		mov bAlive, bl
+		mov ESI, [EBP]
+		mov BL, [ESI-8h]
+		mov bAlive, BL
 
-		pop esi
+		pop ESI
 	};
 	
-	int index = pKVList->GetInt("playerIndex");
-	short team = GetClientEntityW(index)->GetTeam() - 2;
-
-	ColorData_t& data = GetClientColor(index);
-	Color c = data.GetCurrent(bAlive, team);
+	Color& c = cClr;
+	int index = KVList->GetInt("playerIndex");
+	if (ITFPlayer* pPlayer = ::GetITFPlayer(index))
+	{
+		int team = pPlayer->GetTeam() - 2;
+		_ColorData& data = GetClientColor(index);
+		c = data.GetCurrent(bAlive, team);
+	}
 
 	DETOUR_MEMBER_CALL(SetItemFgColor, iItemIndex, c);
 }
 
-HookRes ScoreboardColor::OnLoad()
+void ScoreboardColor::OnLoadDLL()
 {
+	constexpr size_t NumColors = 39;
 	std::array<int, 3> rand_clr;
-	for (int i = 0; i < 139; i++)
+	_ColorData::RandomColors.reserve(NumColors);
+
+	for (int i = 0; i < NumColors; i++)
 	{
 		for (int x = 0; x < 3; x++)
-			rand_clr[x] = rand() % 255;
+			rand_clr[x] = Random::Int(0, 255);
 
-		m_RainbowClr.push_back(rand_clr);
+		_ColorData::RandomColors.push_back(rand_clr);
 	}
 
 	uintptr_t ptr = Library::clientlib.FindPattern("SetItemFgColor");
 	{ DETOUR_LINK_TO_MEMBER(SetItemFgColor, ptr); }
-
-	return HookRes::Continue;
 }
 
-HookRes ScoreboardColor::OnUnload()
+void ScoreboardColor::OnUnloadDLL()
 {
 	DETOUR_UNLINK_FROM_MEMBER(SetItemFgColor); 
-	return HookRes::Continue;
 }
 
 void ScoreboardColor::OnRenderExtra()
 {
 	if (ImGui::CollapsingHeader("Scoreboard Color"))
 	{
-		ImGui::Checkbox("Enable", bEnabled.get());
-		ImGui::Checkbox("Fixed Colors", bRandom.get());
+		ImGui::Checkbox("Enable", &bEnabled);
+		ImGui::Checkbox("Random Colors", &bRandom);
+
+		constexpr const char* teams[]{ "Red Team", "Blu Team" };
+		for (char i = 0; i < 2; i++)
+			ImGui::ColorEdit4_2(teams[i], *scoreboard_color.Colors[i]);
 	}
 }
 
@@ -145,14 +143,14 @@ HAT_COMMAND(scramble_data, "Scramble Players data")
 		REPLY_TO_TARGET(return, "%sscramble_data <size>\n", CMD_TAG);
 
 	int size = atoi(args[1]);
-	m_RainbowClr.clear();
+	_ColorData::RandomColors.clear();
 
 	std::array<int, 3> rand_clr;
 	for (int i = 0; i < size; i++)
 	{
 		for (int x = 0; x < 3; x++)
-			rand_clr[x] = rand() % 255;
+			rand_clr[x] = Random::Int(0, 255);
 
-		m_RainbowClr.push_back(rand_clr);
+		_ColorData::RandomColors.push_back(rand_clr);
 	}
 }

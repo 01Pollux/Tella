@@ -1,14 +1,12 @@
-#include "sdk.h"
-#include "SigTools.h"
-#include <time.h>
 
-#include <cstdint>
-#include <psapi.h>
+#include "SigTools.h"
+
 #include <regex>
 #include <sstream>
+#include <mutex>
 #include <thread>
 
-#include "../Source/Debug.h"
+#include <windows.h>
 
 using namespace std;
 
@@ -43,8 +41,8 @@ void* SigTools::ResolveSymbol(void* lib, const char* sym)
 
 uintptr_t SigTools::FindPatternEx(uintptr_t lib, const char* sym)
 {
-	static mutex mu;
-	lock_guard<mutex> m(mu);
+	static mutex pattern_lock;
+	lock_guard<mutex> guard{ pattern_lock };
 
 	vector<int> bytes;
 	thread resolve_pattern(PatternToBytes, sym, ref(bytes));
@@ -52,7 +50,6 @@ uintptr_t SigTools::FindPatternEx(uintptr_t lib, const char* sym)
 	MEMORY_BASIC_INFORMATION MBI{ };
 	if (!VirtualQuery(reinterpret_cast<LPCVOID>(lib), &MBI, sizeof(MEMORY_BASIC_INFORMATION)))
 	{
-		MIKUDebug::LogCritical("VirtualQuery Failed");
 		resolve_pattern.detach();
 		return NULL;
 	}
@@ -87,7 +84,6 @@ uintptr_t SigTools::FindPatternEx(uintptr_t lib, const char* sym)
 		cur_address++;
 	}
 
-	MIKUDebug::LogCritical(Format("Failed to find patterns: \"", sym, "\""));
 	return NULL;
 }
 
@@ -100,18 +96,15 @@ uintptr_t SigTools::GetFuncStart(uintptr_t ptr)
 	return ptr;
 }
 
-size_t SigTools::FindPatternStr(uintptr_t ptr, const char* str, vector<uintptr_t>& pResults, size_t size)
+size_t SigTools::FindPatternStr(uintptr_t ptr, const char* str, vector<uintptr_t>& results, size_t search_size)
 {
 	const char* sym = str;
 	if (!str || !*sym)
-		return 0;
+		return NULL;
 
 	size_t len = strlen(str);
 	uintptr_t pCur = ptr;
-	uintptr_t pEnd = pCur + size;
-
-	static bool skip = false;
-	vector<uintptr_t> pAddress;
+	uintptr_t pEnd = pCur + search_size;
 
 	for (pCur; pCur < pEnd; pCur++)
 	{
@@ -119,7 +112,7 @@ size_t SigTools::FindPatternStr(uintptr_t ptr, const char* str, vector<uintptr_t
 			break;
 		if (*reinterpret_cast<uint8_t*>(pCur) == sym[0])
 		{
-			skip = false;
+			bool skip = false;
 			for (uint8_t i = 0; i < len; i++)
 			{
 				if (reinterpret_cast<uint8_t*>(pCur)[i] != sym[i])
@@ -129,11 +122,9 @@ size_t SigTools::FindPatternStr(uintptr_t ptr, const char* str, vector<uintptr_t
 				}
 			}
 			if (!skip)
-				pResults.push_back(pCur);
+				results.push_back(pCur);
 		}
 	}
-	for (auto addr : pResults)
-		pResults.push_back(GetFuncStart(addr));
 
-	return pResults.size();
+	return results.size();
 }

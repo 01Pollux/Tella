@@ -1,23 +1,13 @@
 
 #include "Library.h"
-#include <Windows.h>
-#include <optional>
 
 #include <fstream>
 #include <mutex>
-#include <deque>
 
 #include "json.h"
-
-#if defined _WINDOWS
-#define DLL_STR ".dll"
-#elif defined _LINUX
-#define DLL_STR ".so"
-#elif defined _OSX
-#define DLL_STR ".dylib"
-#endif
-
 #include "../Source/Debug.h"
+
+#define DLL_STR ".dll"
 
 namespace Library
 {
@@ -31,9 +21,6 @@ namespace Library
 	ILibraryManager tier0lib			= ILibraryManager("libtier0",			ILibraryManager::Types::Tier0);
 	ILibraryManager inputsyslib			= ILibraryManager("inputsystem",		ILibraryManager::Types::InputSys);
 	ILibraryManager materialsyslib		= ILibraryManager("materialsystem",		ILibraryManager::Types::MatSys);
-	ILibraryManager filesyslib			= ILibraryManager("filesystem_stdio",	ILibraryManager::Types::FileSys);
-//	ILibraryManager gameuilib			= ILibraryManager("gameui",				ILibraryManager::Types::GameUI);
-	ILibraryManager vgui2lib			= ILibraryManager("vgui2",				ILibraryManager::Types::VGUI2);
 	ILibraryManager vguimatsurfacelib	= ILibraryManager("vguimatsurface",		ILibraryManager::Types::VGUIMatSys);
 	ILibraryManager studiorenderlib		= ILibraryManager("studiorender",		ILibraryManager::Types::StudioRender);
 	ILibraryManager d3dlib				= ILibraryManager("shaderapidx9",		ILibraryManager::Types::D3D);
@@ -45,166 +32,98 @@ ILibraryManager::ILibraryManager(const char* dll_name, ILibraryManager::Types ty
 	this->ptr = LoadLibraryA(name.c_str());
 }
 
-static inline void LoadAllLibraries(bool* state)
-{
-	using namespace Library;
-	ILibraryManager* libs[] = {
-		&clientlib,			&enginelib,			&serverlib,
-		&steamclientlib,	&launcherlib,		&steamapilib,
-		&libvstd_lib,		&tier0lib,			&inputsyslib,
-		&materialsyslib,	&filesyslib,		//&gameuilib,
-		&vgui2lib,			&vguimatsurfacelib,	&studiorenderlib,
-		&d3dlib,
-	};
-
-	for (size_t i = 0; i < ILibraryManager::Types::Count; i++)
-	if (state[i])
-		libs[i]->LoadSymbols();
-}
 
 namespace ISymbols
 {
-	class SigResults
+	struct ISigInfo
 	{
-	public:
-		struct SigInfo {
-			enum Types {
-				NONE,
-				OFFSET,
-				READ
-			};
-
-			std::string name;
-			std::string value;
-			Types type;
-			int extra;
-			int read;
-		};
-		std::deque<SigInfo> m_Symbols{};
-
-		[[noinline]] std::optional<SigInfo> GetPattern(std::string pat)
-		{
-			auto pos = std::find_if(m_Symbols.begin(), m_Symbols.end(), [&pat](const SigInfo& o) { return o.name == (pat); });
-			if (pos == m_Symbols.end())
-				return {};
-
-			return *pos;
-		}
-
-		void Insert(std::string _name, std::string pat, SigInfo::Types types = SigInfo::Types::NONE, int offset = 0, int _read = 0)
-		{
-			m_Symbols.push_back(SigInfo{ .name = _name, .value = pat, .type = types, .extra = offset, .read = _read });
-		}
+		std::string value;
+		int extra;
+		int read;
 	};
-	SigResults* m_Libraries[ILibraryManager::Types::Count]{ };
 
-	void FillIn()
+	ISigInfo QuerySigInfo(const ILibraryManager* lib, const char* sym)
+	{
+		Json::Value sigs;
+		std::ifstream config(".\\Miku\\Signatures.json", std::ifstream::binary);
+		config >> sigs;
+
+		const char* name = lib->GetName();
+		Json::Value& data = sigs[name][sym];
+
+		int extra{ };
+		int read{ };
+
+		if (data.isMember("offset"))
+			extra = data["offset"].asInt();
+
+		if (data.isMember("read"))
+			read = data["read"].asInt();
+
+		return { data["value"].asString(), extra, read };
+	}
+
+	inline void LoadSymbols()
 	{
 		Json::Value libraries;
-		std::ifstream configDoc(".\\Miku\\Signatures.json", std::ifstream::binary);
-		configDoc >> libraries;
+		std::ifstream configs(".\\Miku\\Signatures.json", std::ifstream::binary);
+		configs >> libraries;
+		configs.close();
 
-		const std::string lib_names[] = {
-			"client",		"engine",			"server", 
-			"steamclient",	"launcher",			"steamapi",
-			"valve_std",	"tier0",			"inputsys",
-			"mat_sys",		"file_sys",			"vgui2", 
-			"vgui2_matsys", "studio_render",	"d3d"
+		using namespace Library;
+		constexpr ILibraryManager* libs[] = {
+			&clientlib,			&enginelib,			&serverlib,
+			&steamclientlib,	&launcherlib,		&steamapilib,
+			&libvstd_lib,		&tier0lib,			&inputsyslib,
+			&materialsyslib,	&vguimatsurfacelib,	&studiorenderlib,
+			&d3dlib,
 		};
-
-		bool states[ILibraryManager::Types::Count]{};
 
 		for (size_t i = 0; i < ILibraryManager::Types::Count; i++)
 		{
-			Json::Value& lib = libraries[lib_names[i]];
-			if (lib.empty())
-				continue;
-
-			m_Libraries[i] = new SigResults;
-			auto map = m_Libraries[i];
-
-			for (auto names = lib.getMemberNames(); std::string& name : names)
-			{
-				if (name.size())
-				{
-					Json::Value& infos = lib[name];
-
-					SigResults::SigInfo::Types types{ };
-					int extra{ };
-					int read{ };
-
-					std::string value = infos["value"].asString();
-
-					if (infos.isMember("offset"))
-					{
-						types = SigResults::SigInfo::Types::OFFSET;
-						extra = infos["offset"].asInt();
-					}
-					if (infos.isMember("read"))
-					{
-						types = SigResults::SigInfo::Types::READ;
-						read = infos["read"].asInt();
-					}
-
-					map->Insert(name, value, types, extra, read);
-
-					states[i] = true;
-				}
-			}
+			Json::Value& lib = libraries[libs[i]->GetName()];
+			if (!lib.empty())
+				libs[i]->LoadSymbols();
 		}
-
-		LoadAllLibraries(states);
 	}
 }
+
 
 void Library::LoadLibraries()
 {
-	ISymbols::FillIn();
+	ISymbols::LoadSymbols();
 }
 
-void Library::UnLoadLibraries()
-{
-	for (auto& sig : ISymbols::m_Libraries)
-	if (sig)
-		delete sig;
-}
 
 uintptr_t ILibraryManager::FindPattern(const char* sym)
 {
-	static std::mutex _m;
-	std::lock_guard<std::mutex> lock(_m);
-
-	if (!m_KeySymbols)
-	{
-		MIKUDebug::LogCritical(Format("[Library: ", name, "] Expexted \"", sym, "\", but m_KeySymbols was not initialized!"));
-		return NULL;
-	}
+	static std::mutex pattern_lock;
+	std::lock_guard<std::mutex> guard{ pattern_lock };
 
 	auto iter = m_KeySymbols->find(sym);
 
 	if (iter == m_KeySymbols->end())
 	{
-		const auto sig = ISymbols::m_Libraries[this->lib_type];
-		auto res = sig->GetPattern(sym);
+		auto res = ISymbols::QuerySigInfo(this, sym);
 
-		if (!res.has_value())
+		if (res.value.empty())
 		{
 			MIKUDebug::LogCritical(Format("[Library: ", name, "] Empty Signature for: \"", sym ? sym : "<NULL>", "\"."));
 			return NULL;
 		}
 
-		uintptr_t ptr = SigTools::FindPatternEx(reinterpret_cast<uintptr_t>(this->GetLibrary()), res->value.c_str());
+		uintptr_t ptr = SigTools::FindPatternEx(reinterpret_cast<uintptr_t>(this->GetLibrary()), res.value.c_str());
 		if (ptr)
 		{
-			ptr += res->extra;
-			for (int i = 0; i < res->read; i++)
+			ptr += res.extra;
+			for (int i = 0; i < res.read; i++)
 				ptr = *reinterpret_cast<uintptr_t*>(ptr);
 		}
 
 		m_KeySymbols->insert(std::make_pair(sym, ptr));
 
 		if (!ptr)
-			MIKUDebug::LogCritical(Format("[Library: ", name, "] Address of Signature: \"", sym, "\": \"", res->value.c_str(), "\" is NULL."));
+			MIKUDebug::LogCritical(Format("[Library: ", name, "] Address of Signature: \"", sym, "\": \"", res.value.c_str(), "\" is NULL."));
 
 		return ptr;
 	}

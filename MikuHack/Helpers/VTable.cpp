@@ -1,8 +1,36 @@
 #include "VTable.h"
+#include "../Source/Debug.h"
 
 #include <Windows.h>
 
-#include <mutex>
+
+class GuardVirtualProtect
+{
+	size_t size;
+	void* const ptr;
+	DWORD protection;
+	bool is_on = true;
+public:
+	GuardVirtualProtect(void* ptr, size_t size) : size(size), ptr(ptr)
+	{
+		if (!VirtualProtect(ptr, size, PAGE_EXECUTE_READWRITE, &protection))
+		{
+			is_on = false;
+			throw std::runtime_error("VirtualProtect Failed");
+		}
+	}
+	~GuardVirtualProtect()
+	{
+		if (is_on)
+			VirtualProtect(ptr, size, protection, &protection);
+	}
+
+public:
+	GuardVirtualProtect(const GuardVirtualProtect&)				= delete;
+	GuardVirtualProtect& operator=(const GuardVirtualProtect&)	= delete;
+	GuardVirtualProtect(GuardVirtualProtect&&)					= delete;
+	GuardVirtualProtect& operator=(GuardVirtualProtect&&)		= delete;
+};
 
 void ISingleVHook::Init(void* ptr, void* callback)
 {
@@ -15,12 +43,10 @@ void ISingleVHook::Init(void* ptr, void* callback)
 
 	actual = reinterpret_cast<uintptr_t>(callback);
 
-	BEGIN_VIRTUAL_PROTECT(vfnp, size_of_dword);
+	GuardVirtualProtect protect(vfnp, size_of_dword);
 
 	original = *vfnp;
 	*vfnp = actual;
-
-	RESTORE_VIRTUAL_PROTECT();
 }
 
 void ISingleVHook::Shutdown()
@@ -32,20 +58,8 @@ void ISingleVHook::Shutdown()
 
 	constexpr size_t size_of_dword = sizeof(uintptr_t);
 
-	BEGIN_VIRTUAL_PROTECT(vtable + offset, size_of_dword);
+	GuardVirtualProtect protect(vtable + offset, size_of_dword);
 	vtable[offset] = original;
-	RESTORE_VIRTUAL_PROTECT();
 
 	base = nullptr;
 }
-
-/*void InCallback(int )
-{
-
-}
-
-void EmitIDK()
-{
-	IGlobalHook::MyHook* test = IGlobalHook::MyHook::NewHook({nullptr, 0}, std::placeholders::_1);
-	test->AddPostHook(InCallback);
-}*/

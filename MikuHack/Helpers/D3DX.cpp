@@ -1,11 +1,14 @@
 
 #include "D3DX.h"
 #include "DrawTools.h"
-#include "../Source/Main.h"
 #include "Config.h"
-#include "../Helpers/VTable.h"
+#include "Library.h"
+#include "../Source/Main.h"
+#include "VTable.h"
 
 #include "../Interfaces/VGUIS.h"
+#include "../Profiler/mprofiler.h"
+
 
 static WNDPROC		oWndProc = nullptr;
 static HWND			hWindow = nullptr;
@@ -23,11 +26,9 @@ static inline void InitWindow()
 }
 
 static IUniqueVHook v_D3DEndScene;
-
 DECL_VHOOK_STATIC(HRESULT, WINAPI, WINAPI, EndScene, PDIRECT3DDEVICE9 ThisDevice)
 {
 	static std::once_flag init_once;
-	static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	std::call_once(init_once, 
 	[&]() {
@@ -36,21 +37,19 @@ DECL_VHOOK_STATIC(HRESULT, WINAPI, WINAPI, EndScene, PDIRECT3DDEVICE9 ThisDevice
 
 		ImGui_Impl_Init(hWindow, VHOOK_CAST_S(IDirect3DDevice9, ThisDevice));
 
-		for (auto& list = AutoList<MenuPanel>::List(); auto& tab : list)
+		for (auto& list = IAutoList<MenuPanel>::List(); auto& tab : list)
 			tab->OnMenuInit();
 	});
 
 	if (Mmain.m_bIsActive)
 	{
+		M0Profiler imgui_profiler("MainMenu::DoRender", M0PROFILER_GROUP::DISPATCH_IMGUI);
+		
 		ImGui_ImplDX9_NewFrame();
 
 		MainMenu::DoRender();
 
 		ImGui::EndFrame();
-
-		ThisDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
-		ThisDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-		ThisDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -126,17 +125,6 @@ LRESULT STDMETHODCALLTYPE hooked_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 }
 
 
-static IUniqueVHook v_SuraceCursor;
-DECL_VHOOK_CLASS(void, LockCursor)
-{
-	if (Mmain.m_bIsActive)
-	{
-		surface->UnlockCursor();
-		inputsys->ResetInputState();
-	}
-	else VHOOK_EXECUTE(LockCursor);
-}
-
 
 bool DrawTools::Init()
 {
@@ -151,9 +139,6 @@ bool DrawTools::Init()
 
 	v_D3DReset = VHOOK_REG_S(Reset, pDevice, Offsets::D3D::VTIdx_Reset);
 	VHOOK_LINK_S(v_D3DReset, Reset);
-
-	v_SuraceCursor = VHOOK_REG(LockCursor, surface, Offsets::VGUI::VTIdx_LockCursor);
-	VHOOK_LINK(v_SuraceCursor, LockCursor);
 
 	InitSurface();
 

@@ -7,12 +7,11 @@
 
 #include <fstream>
 
-#include "../Helpers/VTable.h"
 
-constexpr size_t flWeaponRefresh = 1200;
+constexpr std::chrono::milliseconds msWeaponRefresh{ 1200 };
 
 InventoryHack invmanager;
-ItemManager* g_ItemManager = nullptr;
+IItemManager* g_ItemManager = nullptr;
 
 const char* m_szActualModels[] = {
 	"models/player/scout.mdl",
@@ -33,7 +32,7 @@ class _PlayerClassData
 	GetClassDataFn pFn;
 
 public:
-	_PlayerClassData()
+	_PlayerClassData() noexcept
 	{
 		pFn = reinterpret_cast<GetClassDataFn>(Library::clientlib.FindPattern("GetPlayerClassData"));
 	}
@@ -43,21 +42,27 @@ public:
 		Shutdown();
 	}
 
-	void SetDataModel(uint8_t cls, const char* newMdl);
+	void SetDataModel(uint8_t cls, const char* newMdl) noexcept;
 
-	void Reset(uint8_t i)
+	void Reset(uint8_t i) noexcept
 	{
 		SetDataModel(i, NULL);
 	}
 
-	void Shutdown()
+	void Shutdown() noexcept
 	{
 		for (uint8_t i = 1; i <= 9; i++)
 			this->Reset(i);
 	}
+
+public:
+	_PlayerClassData(const _PlayerClassData&)			 = delete;
+	_PlayerClassData& operator=(const _PlayerClassData&) = delete;
+	_PlayerClassData(_PlayerClassData&&)				 = delete;
+	_PlayerClassData& operator=(_PlayerClassData&&)		 = delete;
 } static* player_data_model;
 
-void _PlayerClassData::SetDataModel(uint8_t cls, const char* newMdl)
+void _PlayerClassData::SetDataModel(uint8_t cls, const char* newMdl) noexcept
 {
 	uintptr_t* data = pFn(cls);
 	
@@ -70,31 +75,32 @@ void _PlayerClassData::SetDataModel(uint8_t cls, const char* newMdl)
 }
 
 
-void ForceFullUpdate();
-
-inline void PrecacheDataModel()
+void PrecacheDataModel()
 {
 	if (!nstcontainer)
 		return;
+
 	auto modelprecache = nstcontainer->FindTable("modelprecache");
 	if (!modelprecache)
 		return;
 
 	constexpr size_t count = invmanager.Models.size();
-	for (uint8_t i = 0; i < count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		auto& data = invmanager.Models[i].models;
-		for (auto& entry : data)
+		for (auto&& [name, path] : data)
 		{
-			if (modelprecache->AddString(false, entry.second.c_str()) == INVALID_STRING_INDEX)
-				MIKUDebug::LogCritical(Format("[Model] Failed to Precache model: \"", entry.first, "\":\"", entry.second, "\""));
+			if (modelprecache->AddString(false, path.c_str()) == INVALID_STRING_INDEX)
+				MIKUDebug::LogCritical(Format("[Model] Failed to Precache model: \"", name, "\":\"", path, "\""));
 		}
 	}
 }
 
+void ForceFullUpdate();
+
 static void InitModels()
 {
-	const std::vector<const char*> classes = {
+	constexpr const char* classes[] = {	//	TODO Maybe use m_szTFClasses?
 		"Scout", "Sniper", "Soldier",
 		"Demoman", "Medic", "Heavy",
 		"Pyro", "Spy", "Engineer"
@@ -104,7 +110,7 @@ static void InitModels()
 	std::ifstream cfg(".\\Miku\\Models.json", std::ifstream::binary);
 	cfg >> data;
 
-	for (size_t i = 0; i < classes.size(); i++)
+	for (size_t i = 0; i < SizeOfArray(classes); i++)
 	{
 		const char* cls = classes[i];
 		Json::Value& curClass = data[cls];
@@ -113,46 +119,37 @@ static void InitModels()
 			continue;
 
 		auto& dataMDL = invmanager.Models[i].models;
-		auto members = curClass.getMemberNames();
+		const auto& members = curClass.getMemberNames();
 
-		for (std::string& mdl : members)
+		for (const std::string& mdl : members)
 		{
-			if (!mdl.size())
-				continue;
-
-			std::string path = curClass[mdl].asString();
-
-			dataMDL[mdl] = path;
+			if (mdl.size())
+				dataMDL[mdl] = curClass[mdl].asString();
 		}
 	}
 }
 
-[[inline]] void InventoryHack::ProcessWeaponHack()
+void InventoryHack::ProcessWeaponHack()
 {
 	/// We don't want to be constantly looping through Weapon List (m_hMyWeapons)
 	{
 		static Timer timer;
-		if (!timer.has_elapsed(flWeaponRefresh))
+		if (!timer.has_elapsed(msWeaponRefresh))
 			return;
 		timer.update();
 	}
 
-	IBaseHandle hndl;
-	IBaseObject* weapon;
-	IAttributeList* pList;
-	WeaponInfo* infos;
-
-	ITFPlayer* pLocalplayer = pLocalPlayer;
+	ITFPlayer* pLocalplayer = ILocalPtr();
 	TFClass cls = pLocalplayer->GetClass();
 	IBaseHandle* list = pLocalplayer->GetWeaponList();
 
 	for (uint i = 0; i < 4; i++)
 	{
-		hndl = list[i];
+		IBaseHandle& hndl = list[i];
 		if (!hndl.IsValid())
 			return;
 
-		weapon = reinterpret_cast<IBaseObject*>(clientlist->GetClientEntityFromHandle(hndl));
+		IBaseObject* weapon = ::GetIBaseObject(hndl);
 		if (!weapon)
 			return;
 
@@ -160,33 +157,22 @@ static void InitModels()
 			continue;
 
 		int& id = weapon->GetItemDefinitionIndex();
-		infos = g_ItemManager->GetWeaponInfo(cls, id);
+		WeaponInfo* infos = g_ItemManager->GetWeaponInfo(cls, id);
 		if (!infos || infos->m_bDisabled)
 			continue;
 
-		pList = weapon->GetAttributeList();
+		IAttributeList* pList = weapon->GetAttributeList();
 
-		for (auto& attr : infos->m_Attributes)
-			pList->SetAttribute(attr.first, attr.second);
+		for (auto&& [attribute, value] : infos->m_Attributes)
+			pList->SetAttribute(attribute, value);
 
 		if (infos->m_iNewIndex != -1)
 			id = infos->m_iNewIndex;
 	}
 }
 
-HookRes InventoryHack::OnFrameStageNotify(ClientFrameStage_t stage)
-{
-	if (BAD_LOCAL() || !g_ItemManager)
-		return HookRes::Continue;
 
-	if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START && invmanager.bWeaponEnabled)
-		invmanager.ProcessWeaponHack();
-
-	return HookRes::Continue;
-}
-
-
-void ItemManager::InitFromFile()
+void IItemManager::InitFromFile()
 {
 	const std::vector<const char*> classes = {
 		"Scout", "Sniper", "Soldier",
@@ -200,7 +186,7 @@ void ItemManager::InitFromFile()
 	AttributeMap map;
 	int id;
 
-	std::ifstream cfg(m_szPath, std::ifstream::binary);
+	std::ifstream cfg(IItemManager::GetPath(), std::ifstream::binary);
 	cfg >> data;
 
 	const char* cursub = nullptr;
@@ -250,7 +236,7 @@ void ItemManager::InitFromFile()
 	}
 }
 
-void ItemManager::SaveToFile()
+void IItemManager::SaveToFile()
 {
 	const std::vector<const char*> classes = {
 		"Scout", "Sniper", "Soldier",
@@ -264,7 +250,7 @@ void ItemManager::SaveToFile()
 	WeaponInfo* infos;
 	int id;
 
-	std::ifstream cfg(m_szPath, std::ifstream::binary);
+	std::ifstream cfg(IItemManager::GetPath(), std::ifstream::binary);
 	cfg >> data;
 
 	char sub[6], attr[6];
@@ -301,10 +287,10 @@ void ItemManager::SaveToFile()
 		}
 	}
 
-	std::ofstream(m_szPath) << writer.write(data);
+	std::ofstream(IItemManager::GetPath()) << writer.write(data);
 }
 
-void ItemManager::Register(TFClass cls, int index, int new_index, std::string display_name, AttributeMap& map)
+void IItemManager::Register(TFClass cls, int index, int new_index, std::string display_name, AttributeMap& map)
 {
 	ItemsList& curcls = m_Classes[cls - 1];
 
@@ -337,55 +323,32 @@ void ItemManager::Register(TFClass cls, int index, int new_index, std::string di
 	}
 }
 
-void ItemManager::PrintList(TFClass cls)
-{
-	ItemsList& classes = this->m_Classes[cls - 1];
-	for (auto& entry : classes)
-	{
-		Msg("ID: %i\n", entry.first);
-		Msg("Disabled: %i\n", entry.second.m_bDisabled);
-		Msg("New ID: %i\n", entry.second.m_iNewIndex);
-		Msg("Name: %s\n", entry.second.m_szDisplayName.c_str());
-		Msg("Attributes:\n");
-
-		for (auto& attr : entry.second.m_Attributes)
-		{
-			Msg("			%i = %f\n", attr.first, attr.second);
-		}
-
-		Msg("----------------------------------------------------\n");
-	}
-}
-
-WeaponInfo* ItemManager::GetWeaponInfo(TFClass cls, int index)
+WeaponInfo* IItemManager::GetWeaponInfo(TFClass cls, int index) noexcept
 {
 	if (cls < 0 || cls > 9)
 		return nullptr;
 
 	ItemsList& list = m_Classes[cls - 1];
-	const auto& entry = list.find(index);
-
-	if (entry == list.end())
-		return nullptr;
-
-	return &entry->second;
+	return &list[index];
 }
 
 
 
 void InventoryHack::OnRender()
 {
+	using namespace std::chrono;
+
 	if (ImGui::BeginTabItem("Inv Manager"))
 	{
 		ImGui::PushID("WPN");
 		if (ImGui::CollapsingHeader("Weapons"))
 		{
 			ImGui::Text("Kill-streak Infos");
-			ImGui::Checkbox("Enabled: ", bWeaponEnabled.get());
+			ImGui::Checkbox("Enabled: ", &bWeaponEnabled);
 
 			ImGui::Separator();
 
-			if (bWeaponEnabled && !BAD_LOCAL())
+			if (bWeaponEnabled && !BadLocal())
 			{
 				static int curClass;
 
@@ -394,8 +357,8 @@ void InventoryHack::OnRender()
 					if (ImGui::Button("Force Full Update"))
 					{
 						ForceFullUpdate();
-						if (pLocalPlayer->GetClass())
-							pLocalPlayer->GetStreaks(ETFStreak::kTFStreak_Kills) = iStreaks[pLocalPlayer->GetClass() - 1];
+						if (ITFPlayer* pMe = ILocalPtr(); pMe->GetClass())
+							pMe->GetStreaks(ETFStreak::kTFStreak_Kills) = iStreaks[pMe->GetClass() - 1];
 
 					}
 					ImGui::Dummy(ImVec2(0, 10));
@@ -410,17 +373,17 @@ void InventoryHack::OnRender()
 					ImGui::Combo("Class: ", &curClass, m_szTFClasses, SizeOfArray(m_szTFClasses));
 
 					if (ImGui::InputInt("Streaks: ", &(iStreaks[curClass]), 1, 5, ImGuiInputTextFlags_AllowTabInput))
-						if (curClass == pLocalPlayer->GetClass() - 1)
-							pLocalPlayer->GetStreaks(ETFStreak::kTFStreak_Kills) = iStreaks[curClass];
+						if (ITFPlayer* pMe = ILocalPtr(); curClass == pMe->GetClass() - 1)
+							pMe->GetStreaks(ETFStreak::kTFStreak_Kills) = iStreaks[curClass];
 
 					ImGui::Dummy(ImVec2(0, 10));
 				}
 
 				//ItemsList
 				{
-					static ItemManager::ItemsList* pItems;
+					static IItemManager::ItemsList* pItems;
 					static Timer item_set;
-					if (item_set.trigger_if_elapsed(1200))
+					if (item_set.trigger_if_elapsed(1200ms))
 						pItems = &g_ItemManager->GetItemsList(static_cast<TFClass>(curClass));
 
 					ImGui::Text("Current Items: ");
@@ -472,7 +435,7 @@ void InventoryHack::OnRender()
 		ImGui::PushID("MDL");
 		if (ImGui::CollapsingHeader("Models"))
 		{
-			ImGui::Checkbox("Enabled: ", bModelEnabled.get());
+			ImGui::Checkbox("Enabled: ", &bModelEnabled);
 			ImGui::Separator();
 
 			if (bModelEnabled)
@@ -510,7 +473,7 @@ void InventoryHack::OnRender()
 
 								if (ImGui::Selectable(print.c_str()))
 								{
-									if (timer_update_model[curClass].trigger_if_elapsed(600))
+									if (timer_update_model[curClass].trigger_if_elapsed(600ms))
 									{
 										const char* newMdl;
 
@@ -544,18 +507,18 @@ void InventoryHack::OnRender()
 
 void InventoryHack::FireGameEvent(IGameEvent* pEvent)
 {
-	if (pEvent && !BAD_LOCAL())
+	if (pEvent && !BadLocal())
 	{
-		ITFPlayer* pMe = pLocalPlayer;
+		ITFPlayer* pMe = ILocalPtr();
 
 		if (auto cls = pMe->GetClass())
 			pMe->GetStreaks(ETFStreak::kTFStreak_Kills) = iStreaks[cls - 1];
 	}
 }
 
-HookRes InventoryHack::OnLoad()
+void InventoryHack::OnLoadDLL()
 {
-	g_ItemManager = new ItemManager(".\\Miku\\Items.json");
+	g_ItemManager = new IItemManager();
 	eventmanager->AddListener(this, "localplayer_respawn", false);
 
 	player_data_model = new _PlayerClassData;
@@ -563,23 +526,35 @@ HookRes InventoryHack::OnLoad()
 	InitModels();
 	PrecacheDataModel();
 
-	return HookRes::Continue;
+	using namespace IGlobalVHookPolicy;
+	auto fsn = FrameStageNotify::Hook::QueryHook(FrameStageNotify::Name);
+	fsn->AddPreHook(HookCall::Late,
+		[this](ClientFrameStage_t stage)
+		{
+			if (BadLocal() || !g_ItemManager)
+				return HookRes::Continue;
+
+			if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START && bWeaponEnabled)
+				ProcessWeaponHack();
+
+			return HookRes::Continue;
+		});
+
+	auto li = LevelInit::Hook::QueryHook(LevelInit::Name);
+	li->AddPostHook(HookCall::Any,
+		[](const char*)
+		{
+			PrecacheDataModel();
+			return HookRes::Continue;
+		});
 }
 
-HookRes InventoryHack::OnUnload()
+void InventoryHack::OnUnloadDLL()
 {
 	eventmanager->RemoveListener(this);
 
 	delete g_ItemManager;
 	delete player_data_model;
-	return HookRes::Continue;
-}
-
-
-HookRes InventoryHack::OnLevelInit()
-{
-	PrecacheDataModel();
-	return HookRes::Continue;
 }
 
 
@@ -592,7 +567,7 @@ void InventoryHack::JsonCallback(Json::Value& json, bool read)
 
 		for (uint8_t i = 0; i < SizeOfArray(m_szTFClasses); i++)
 		{
-			PROCESS_JSON_READ(Models, m_szTFClasses[i], String, curName);
+			PROCESS_JSON_READ(Models, m_szTFClasses[i], String, curName); else curName = "";
 			this->Models[i].pos = curName;
 		}
 	}
@@ -610,22 +585,16 @@ HAT_COMMAND(force_fullupdate, "CBaseClientState::ForceFullUpdate")
 	ForceFullUpdate();
 }
 
-HAT_COMMAND(print_weapons, "Print Weapons attributes manager")
+HAT_COMMAND_NOEXCEPT(print_models, "Print Models")
 {
-	for(size_t i = 0; i < 9; i++)
-		g_ItemManager->PrintList(static_cast<TFClass>(i));
-}
-
-HAT_COMMAND(print_models, "Print Models")
-{
-	auto& Models = invmanager.Models.get();
-	for (int i = 0; i < invmanager.Models.size(); i++)
+	auto& Models = *invmanager.Models;
+	for (int i = 0; i < Models.size(); i++)
 	{
 		Msg("Class: %i\n", i);
 		Msg("Current: %s\n\tModels: \n", Models[i].pos.c_str());
-		for (auto& entry : Models[i].models)
+		for (const auto& [name, path] : Models[i].models)
 		{
-			Msg("\t\t\"%s: %s\"\n", entry.first.c_str(), entry.second.c_str());
+			Msg("\t\t\"%s: %s\"\n", name.c_str(), path.c_str());
 		}
 	}
 }
@@ -638,9 +607,7 @@ HAT_COMMAND(custom_models, "")
 	int cls = atoi(args[1]);
 	auto& Models = invmanager.Models[cls - 1];
 
-	std::string set_cur = args[2] + std::string(args[3]);
-
-	Models.pos = set_cur;
+	Models.pos = args[2] + std::string(args[3]);
 
 	const char* mdl = Models.GetCurrent();
 	player_data_model->SetDataModel(cls, mdl);
@@ -659,7 +626,7 @@ HAT_COMMAND(client_spray, "call TE_PlayerDecal")
 	CRecipientFilter filter;
 	filter.AddAllPlayers();
 
-	ITFPlayer* pEnt = pLocalPlayer;
+	ITFPlayer* pEnt = ILocalPtr();
 	int idx = pEnt->entindex();
 
 	Vector begin = pEnt->LocalEyePosition();
@@ -681,12 +648,18 @@ HAT_COMMAND(client_spray, "call TE_PlayerDecal")
 
 void ForceFullUpdate() 
 {
-	if (BAD_LOCAL())
+	if (BadLocal())
 		return;
 
-	void* ClientState = reinterpret_cast<void*>(Library::enginelib.FindPattern("pBaseClientStatePtr"));
+	class MyEmptyClass { };
+	MyEmptyClass* MyClientState = reinterpret_cast<MyEmptyClass*>(Library::enginelib.FindPattern("pBaseClientStatePtr"));
 
-	using ForceFullUpdateFn = void(__thiscall*)(void*);
-	ForceFullUpdateFn forceFullUpdate = reinterpret_cast<ForceFullUpdateFn>(Library::enginelib.FindPattern("ClientState::ForceFullUpdate"));
-	forceFullUpdate(ClientState);
+	union
+	{
+		void(MyEmptyClass::* fn)();
+		uintptr_t ptr;
+	} u;
+	u.ptr = Library::enginelib.FindPattern("ClientState::ForceFullUpdate");
+
+	(MyClientState->*u.fn)();
 }

@@ -33,6 +33,22 @@ namespace Offsets
 			_OFFSET OffsetToModel	= 0x20;
 			_OFFSET	SizeOfModel		= 0x80;
 		}
+
+		namespace HUD
+		{
+			/**
+			 * string: "Could not find Hud Element: %s\n"
+			 * 
+			 * cmp		[edi+28h], esi;		(edi = this) & ([edi + 28h] = CUtlVector::Size)
+			 *
+			 * mov		ecx, [eax+esi*4];	(eax = [edi + 1Ch]) & esi is the index
+			 */
+			namespace Manager
+			{
+				_OFFSET This_To_Vec = 7;
+				_OFFSET This_To_SizeOfVec = 10;
+			}
+		}
 	}
 
 	namespace IBaseEntity
@@ -41,12 +57,21 @@ namespace Offsets
 		{
 			_OFFSET m_pOuter = 392;
 		}
+
+		namespace Dispenser
+		{
+			_OFFSET m_iMiniBombCounter__To__m_hHealingTargets = -32;
+			_OFFSET m_iState__To__m_iAmmoMetal = 4;
+		}
+
 		_OFFSET _VTABLE(IsBaseCombatWeapon) = 137;
 		_OFFSET _VTABLE(GetSlot)			= 327;
 		_OFFSET _VTABLE(DoSwingTrace)		= 454;
 		_OFFSET _VTABLE(GetSwingRange)		= 452;
 		_OFFSET _VTABLE(UpdateGlowEffect)	= 226;
 		_OFFSET _VTABLE(DestroyGlowEffect)	= 227;
+		_OFFSET _VTABLE(GetDataMapDesc)		= 15;
+		_OFFSET _VTABLE(EyePosition)		= 140;
 	}
 
 	namespace D3D

@@ -43,7 +43,7 @@ static bool s_bRegistered = false;
 class CDefaultAccessor : public IConCommandBaseAccessor
 {
 public:
-	virtual bool RegisterConCommandBase(ConCommandBase* pVar)
+	bool RegisterConCommandBase(ConCommandBase* pVar) override
 	{
 		// Link to engine's list instead
 		g_pCVar->RegisterConCommand(pVar);
@@ -1061,11 +1061,11 @@ class CEmptyConVar : public ConVar
 public:
 	CEmptyConVar() : ConVar("", "0") {}
 	// Used for optimal read access
-	virtual void SetValue(const char* pValue) {}
-	virtual void SetValue(float flValue) {}
-	virtual void SetValue(int nValue) {}
-	virtual const char* GetName(void) const { return ""; }
-	virtual bool IsFlagSet(int nFlags) const { return false; }
+	void SetValue(const char* pValue) final {}
+	void SetValue(float flValue) final {}
+	void SetValue(int nValue) final {}
+	const char* GetName(void) const final { return ""; }
+	bool IsFlagSet(int nFlags) const final { return false; }
 };
 
 static CEmptyConVar s_EmptyConVar;

@@ -11,7 +11,7 @@ bool MikuConfig::LoadSettings(const char* path)
 	std::ifstream configDoc(path, std::ifstream::binary);
 	configDoc >> settings;
 
-	for (auto& entry : AutoList<MenuPanel>::List())
+	for (auto& entry : IAutoList<MenuPanel>::List())
 	{
 		entry->JsonCallback(settings, true);
 	}
@@ -24,7 +24,7 @@ bool MikuConfig::SaveSettings(const char* path)
 	Json::Value settings;
 	Json::StyledWriter styledWriter;
 
-	for (auto& entry : AutoList<MenuPanel>::List())
+	for (auto& entry : IAutoList<MenuPanel>::List())
 	{
 		entry->JsonCallback(settings, false);
 	}

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Main.h"
 #include <chrono>
 #include <mutex>
 #include <sstream>
@@ -19,12 +18,12 @@
 		if (!MIKUDebug::m_bDebugging) \
 			REPLY_TO_TARGET(ACTION, "Debug is not ON\n")
 
-enum LogType
+enum class LogType
 {
-	LGENERIC,
-	LDEBUG,
-	LCRITICAL,
-	LCUSTOM
+	Generic,
+	Debug,
+	Critical,
+	Custom
 };
 
 namespace MIKUDebug
@@ -38,32 +37,29 @@ namespace MIKUDebug
 	void Log(LogType type, std::string_view txt);
 
 	inline void LogToFile(std::string_view txt) {
-		Log(LGENERIC, txt);
+		Log(LogType::Generic, txt);
 	}
 
 	inline void LogDebug(std::string_view txt) {
-		Log(LDEBUG, txt);
+		Log(LogType::Debug, txt);
 	}
 
 	inline void LogCritical(std::string_view txt) {
-		Log(LCRITICAL, txt);
+		Log(LogType::Critical, txt);
 	}
 
 	inline void LogCustom(std::string_view txt) {
-		Log(LCUSTOM, txt);
+		Log(LogType::Custom, txt);
 	}
 };
 
 
-static std::mutex format_mutex;
-
-inline void _RFormat(std::stringstream& str)
+inline void _RFormat(std::ostringstream& str)
 {
-
 }
 
 template<typename T, typename ...A>
-void _RFormat(std::stringstream& str, T& var, const A& ...args)
+void _RFormat(std::ostringstream& str, T& var, const A& ...args)
 {
 	str << var;
 	_RFormat(str, args...);
@@ -71,74 +67,12 @@ void _RFormat(std::stringstream& str, T& var, const A& ...args)
 
 
 template<typename ...A>
-[[noinline]] std::string Format(const A& ...args)
+std::string Format(const A& ...args)
 {
-	std::lock_guard format_lock(format_mutex);
-
-	std::stringstream stream;
+	std::ostringstream stream;
 	_RFormat(stream, args...);
-
 	return stream.str();
 }
-
-
-class ScopeLog
-{
-	using sys_clock = std::chrono::system_clock;
-	using time_point = sys_clock::time_point;
-
-	LogType lvl;
-	bool has_began = false;
-	std::string name;
-	time_point start_time;
-
-public:
-	ScopeLog(const ScopeLog&) = delete;
-	explicit ScopeLog(const char* name, LogType lvl = LogType::LDEBUG, bool auto_start = false) : name(name), lvl(lvl)
-	{
-		if (auto_start)
-			Start();
-	}
-	~ScopeLog() { Finish(); }
-
-	void Start();
-	void Finish();
-	const std::chrono::milliseconds Time() const noexcept
-	{
-		using namespace std::chrono;
-		auto end = time_point_cast<milliseconds>(system_clock::now());
-		auto elapsed = end - time_point_cast<milliseconds>(this->start_time);
-		return elapsed;
-	}
-};
-
-
-/*
-enum class ProfType
-{
-	Never,
-	Once,
-	Repeat,
-	Manual,
-	Always,
-};
-
-class ILinkedProf
-{
-	static inline std::list<ILinkedProf*> ProfStorage;
-public:
-
-	virtual ~ILinkedProf() { ProfStorage.remove(this); };
-	virtual const char* QueryProfName() const abstract;
-	virtual ProfType QueryProfType() const abstract;
-	virtual bool ShouldRecord() const abstract;
-};
-
-*/
-
-
-#define PROF_FUNCTION(DBG) \
-		ScopeLog scope_log_func(__FUNCTION__, DBG, true)
 
 //#define MDEBUG MIKUDebug
 namespace MDEBUG = MIKUDebug;

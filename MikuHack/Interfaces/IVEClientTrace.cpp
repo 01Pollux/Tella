@@ -23,7 +23,7 @@ namespace Trace
 					trace_t* results, 
 					ITraceFilterSimple* trace)
 	{
-		static Ray_t ray;
+		Ray_t ray;
 		ray.Init(vec1, vec2);
 
 		std::lock_guard<std::mutex> protect(trace_mutex);
@@ -38,7 +38,7 @@ namespace Trace
 					trace_t* results,
 					ITraceFilterSimple* trace)
 	{
-		static Ray_t ray;
+		Ray_t ray;
 		ray.Init(vec1, vec2, mins, maxs);
 
 		std::lock_guard<std::mutex> protect(trace_mutex);

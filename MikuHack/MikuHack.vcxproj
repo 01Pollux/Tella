@@ -76,6 +76,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>CppCoreCheckClassRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -108,7 +109,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>sdk.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>26812;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -117,7 +118,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <SupportJustMyCode>false</SupportJustMyCode>
@@ -173,18 +174,22 @@
   <ItemGroup>
     <ClInclude Include="Detour\detours.h" />
     <ClInclude Include="Detour\detver.h" />
+    <ClInclude Include="GlobalHook\defines.h" />
+    <ClInclude Include="GlobalHook\detour.h" />
+    <ClInclude Include="GlobalHook\load_routine.h" />
+    <ClInclude Include="GlobalHook\vhook.h" />
     <ClInclude Include="Helpers\AutoItem.h" />
     <ClInclude Include="Helpers\AutoList.h" />
     <ClInclude Include="Helpers\BoneCache.h" />
     <ClInclude Include="Helpers\Commons.h" />
     <ClInclude Include="Helpers\Config.h" />
     <ClInclude Include="Helpers\BytePatch.h" />
+    <ClInclude Include="Helpers\DataMap.h" />
     <ClInclude Include="Helpers\DrawTools.h" />
     <ClInclude Include="Helpers\json.h" />
     <ClInclude Include="Helpers\Library.h" />
     <ClInclude Include="Helpers\NetVars.h" />
     <ClInclude Include="Helpers\Offsets.h" />
-    <ClInclude Include="Helpers\sdk.h" />
     <ClInclude Include="Helpers\D3DX.h" />
     <ClInclude Include="Helpers\SigTools.h" />
     <ClInclude Include="Helpers\Timer.h" />
@@ -202,8 +207,11 @@
     <ClInclude Include="Interfaces\CBaseEntity.h" />
     <ClInclude Include="Interfaces\Glow.h" />
     <ClInclude Include="Interfaces\HatCommand.h" />
+    <ClInclude Include="Interfaces\Huds\HudElement.h" />
+    <ClInclude Include="Interfaces\Huds\TFHuds.h" />
     <ClInclude Include="Interfaces\IBaseClientDLL.h" />
     <ClInclude Include="Interfaces\IClientEntityList.h" />
+    <ClInclude Include="Interfaces\IClientListener.h" />
     <ClInclude Include="Interfaces\IClientMode.h" />
     <ClInclude Include="Interfaces\IFileSystem.h" />
     <ClInclude Include="Interfaces\IVEClientTrace.h" />
@@ -212,14 +220,14 @@
     <ClInclude Include="Interfaces\NetMessage.h" />
     <ClInclude Include="Interfaces\RecipientFilter.h" />
     <ClInclude Include="Interfaces\VGUIS.h" />
-    <ClInclude Include="Source\Aimbot.h" />
+    <ClInclude Include="Profiler\defines.h" />
+    <ClInclude Include="Profiler\mprofiler.h" />
     <ClInclude Include="Source\Debug.h" />
     <ClInclude Include="Source\ESP.h" />
     <ClInclude Include="Source\Hack\BackTrack.h" />
     <ClInclude Include="Source\Hack\Effects.h" />
     <ClInclude Include="Source\Hack\Inventory.h" />
     <ClInclude Include="Source\Main.h" />
-    <ClInclude Include="Source\Visual.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Detour\creatwth.cpp" />
@@ -233,16 +241,16 @@
     <ClCompile Include="Detour\image.cpp" />
     <ClCompile Include="Detour\modules.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="GlobalHook\vhook.cpp" />
+    <ClCompile Include="GlobalHook\vhook_impl.cpp" />
     <ClCompile Include="Helpers\BoneCache.cpp" />
     <ClCompile Include="Helpers\Config.cpp" />
+    <ClCompile Include="Helpers\DataMap.cpp" />
     <ClCompile Include="Helpers\Detour.cpp" />
     <ClCompile Include="Helpers\DrawTools.cpp" />
     <ClCompile Include="Helpers\json.cpp" />
     <ClCompile Include="Helpers\Library.cpp" />
     <ClCompile Include="Helpers\NetVars.cpp" />
-    <ClCompile Include="Helpers\sdk.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sdk.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="Helpers\D3DX.cpp" />
     <ClCompile Include="Helpers\SigTools.cpp" />
     <ClCompile Include="Helpers\Timer.cpp" />
@@ -257,16 +265,16 @@
     <ClCompile Include="Interfaces\ConVar.cpp" />
     <ClCompile Include="Interfaces\Glow.cpp" />
     <ClCompile Include="Interfaces\Hooks\ClientMode.cpp" />
-    <ClCompile Include="Interfaces\Hooks\FSN.cpp">
-      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</PreprocessToFile>
-    </ClCompile>
     <ClCompile Include="Interfaces\Hooks\Paint.cpp" />
+    <ClCompile Include="Interfaces\Huds\TFHuds.cpp" />
+    <ClCompile Include="Interfaces\IClientListener.cpp" />
     <ClCompile Include="Interfaces\IVEClientTrace.cpp" />
     <ClCompile Include="Interfaces\NetMessage.cpp" />
     <ClCompile Include="Interfaces\RecipientFilter.cpp" />
     <ClCompile Include="Interfaces\SDK\KeyValues.cpp" />
     <ClCompile Include="Interfaces\SDK\tier1.cpp" />
     <ClCompile Include="Interfaces\SDK\UtlString.cpp" />
+    <ClCompile Include="Profiler\mprofiler.cpp" />
     <ClCompile Include="Source\Aimbot.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\ESP.cpp" />

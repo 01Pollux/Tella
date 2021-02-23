@@ -5,6 +5,7 @@
 #include "../Helpers/SigTools.h"
 #include <functional>
 
+#include <windows.h>
 
 using CreateInterfaceFn = void* (*)(const char*, int*);
 
@@ -24,38 +25,27 @@ public:
 		Tier0,
 		InputSys,
 		MatSys,
-		FileSys,
-//		GameUI,
-		VGUI2,
 		VGUIMatSys,
 		StudioRender,
 		D3D,
 		Count
 	};
 
-	ILibraryManager() = delete;
-	ILibraryManager(const ILibraryManager&) = delete;
 	explicit ILibraryManager(const char* name, Types type);
 	~ILibraryManager()
 	{
 		if (this->ptr)
-		{
 			FreeLibrary(reinterpret_cast<HMODULE>(this->ptr));
-			this->ptr = nullptr;
-
-			if (m_KeySymbols)
-			{
-				delete m_KeySymbols;
-				m_KeySymbols = nullptr;
-			}
-		}
+		this->ptr = nullptr;
+		m_KeySymbols = nullptr;
 	}
-	const char* GetName() { return this->name; };
+
+public:
+	const char* GetName() const noexcept { return this->name; };
 
 	uintptr_t FindPattern(const char* sym);
 
-	void* GetLibrary() { return this->ptr; }
-	void SetPointer(void* base) { this->ptr = base; }
+	void* GetLibrary() const noexcept		{ return this->ptr; }
 
 	template<typename C>
 	C* FindInterface(const char* name)
@@ -70,16 +60,21 @@ public:
 
 	void LoadSymbols()
 	{
-		m_KeySymbols = new std::unordered_map<std::string, uintptr_t>;
+		m_KeySymbols = std::make_unique<std::unordered_map<std::string, uintptr_t>>();
 	}
 
+public:
+	ILibraryManager(const ILibraryManager&)				= delete;
+	ILibraryManager& operator=(const ILibraryManager&)	= delete;
+	ILibraryManager(ILibraryManager&&)					= delete;
+	ILibraryManager& operator=(ILibraryManager&&)		= delete;
+
 private:
-	std::unordered_map<std::string, uintptr_t>* m_KeySymbols{ };
+	std::unique_ptr<std::unordered_map<std::string, uintptr_t>> m_KeySymbols;
 
 	const char* name = "";
 	Types lib_type = Types::Invalid;
 	void* ptr = nullptr;
-
 };
 
 namespace Library
@@ -96,11 +91,10 @@ namespace Library
 	extern ILibraryManager materialsyslib;
 	extern ILibraryManager filesyslib;
 //	extern ILibraryManager gameuilib;
-	extern ILibraryManager vgui2lib;
+//	extern ILibraryManager vgui2lib;
 	extern ILibraryManager vguimatsurfacelib;
 	extern ILibraryManager studiorenderlib;
 	extern ILibraryManager d3dlib;
 
 	void LoadLibraries();
-	void UnLoadLibraries();
 }

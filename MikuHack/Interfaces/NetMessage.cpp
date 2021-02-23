@@ -21,7 +21,7 @@ void Interfaces::Init()
 
     debugoverlay = Library::enginelib.FindInterface<IVDebugOverlay>(VDEBUG_OVERLAY_INTERFACE_VERSION);
 
-    panel        = Library::vgui2lib.FindInterface<vgui::IPanel>(VGUI_PANEL_INTERFACE_VERSION);
+    panel        = reinterpret_cast<vgui::IPanel*>(Library::clientlib.FindPattern("g_pVGUIPanel"));
 
     surface      = Library::vguimatsurfacelib.FindInterface<vgui::ISurface>(VGUI_SURFACE_INTERFACE_VERSION);
 
@@ -33,10 +33,6 @@ void Interfaces::Init()
 
     clientdll   = Library::clientlib.FindInterface<IBaseClientDLL>(CLIENT_DLL_INTERFACE_VERSION);
 
-    filesystem  = Library::filesyslib.FindInterface<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
-
-    inputsys    = Library::inputsyslib.FindInterface<IInputSystem>(INPUTSYSTEM_INTERFACE_VERSION);
-
     g_pCVar     = Library::libvstd_lib.FindInterface<ICvar>(CVAR_INTERFACE_VERSION);
 
     clienttools = Library::enginelib.FindInterface<IClientTools>(VCLIENTTOOLS_INTERFACE_VERSION);
@@ -44,9 +40,7 @@ void Interfaces::Init()
     GlowManager = reinterpret_cast<IGlowManager*>(Library::clientlib.FindPattern("GlowManager"));
 }
 
-static char s_text[1024];
-
-bool CLC_RespondCvarValue::WriteToBuffer(bf_write& buffer)
+bool CLC_RespondCvarValue::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), NETMSG_TYPE_BITS);
 
@@ -59,7 +53,7 @@ bool CLC_RespondCvarValue::WriteToBuffer(bf_write& buffer)
     return !buffer.IsOverflowed();
 }
 
-bool CLC_RespondCvarValue::ReadFromBuffer(bf_read& buffer)
+bool CLC_RespondCvarValue::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
     m_iCookie = buffer.ReadSBitLong(32);
     m_eStatusCode = static_cast<EQueryCvarValueStatus>(buffer.ReadSBitLong(4));
@@ -73,13 +67,7 @@ bool CLC_RespondCvarValue::ReadFromBuffer(bf_read& buffer)
     return !buffer.IsOverflowed();
 }
 
-const char* CLC_RespondCvarValue::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: status: %d, value: %s, cookie: %d", GetName(), m_eStatusCode, m_szCvarValue, m_iCookie);
-    return s_text;
-}
-
-bool NET_SignonState::WriteToBuffer(bf_write& buffer)
+bool NET_SignonState::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), 6);
     buffer.WriteByte(m_nSignonState);
@@ -88,33 +76,18 @@ bool NET_SignonState::WriteToBuffer(bf_write& buffer)
     return !buffer.IsOverflowed();
 }
 
-bool NET_SignonState::ReadFromBuffer(bf_read& buffer)
+bool NET_SignonState::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
-    /*m_nSignonState = buffer.ReadByte();
+    m_nSignonState = buffer.ReadByte();
     m_nSpawnCount = buffer.ReadLong();
-*/
-    return true;
+
+    return !buffer.IsOverflowed();
 }
 
-const char* NET_SignonState::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: state %i, count %i", GetName(), m_nSignonState, m_nSpawnCount);
-    return s_text;
-}
+static constexpr int NUM_NEW_COMMAND_BITS = 4;
+static constexpr int NUM_BACKUP_COMMAND_BITS = 3;
 
-#define NUM_NEW_COMMAND_BITS 4
-#define MAX_NEW_COMMANDS ((1 << NUM_NEW_COMMAND_BITS) - 1)
-#define Bits2Bytes(b) ((b + 7) >> 3)
-#define NUM_BACKUP_COMMAND_BITS 3
-#define MAX_BACKUP_COMMANDS ((1 << NUM_BACKUP_COMMAND_BITS) - 1)
-
-const char* CLC_VoiceData::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: %i bytes", GetName(), Bits2Bytes(m_nLength));
-    return s_text;
-}
-
-bool CLC_VoiceData::WriteToBuffer(bf_write& buffer)
+bool CLC_VoiceData::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), NETMSG_TYPE_BITS);
     m_nLength = m_DataOut.GetNumBitsWritten();
@@ -123,7 +96,7 @@ bool CLC_VoiceData::WriteToBuffer(bf_write& buffer)
     return buffer.WriteBits(m_DataOut.GetBasePointer(), m_nLength);
 }
 
-bool CLC_VoiceData::ReadFromBuffer(bf_read& buffer)
+bool CLC_VoiceData::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
     m_nLength = buffer.ReadWord(); // length in bits
     m_DataIn = buffer;
@@ -131,7 +104,7 @@ bool CLC_VoiceData::ReadFromBuffer(bf_read& buffer)
     return buffer.SeekRelative(m_nLength);
 }
 
-bool CLC_BaselineAck::WriteToBuffer(bf_write& buffer)
+bool CLC_BaselineAck::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), NETMSG_TYPE_BITS);
     buffer.WriteLong(m_nBaselineTick);
@@ -139,7 +112,7 @@ bool CLC_BaselineAck::WriteToBuffer(bf_write& buffer)
     return !buffer.IsOverflowed();
 }
 
-bool CLC_BaselineAck::ReadFromBuffer(bf_read& buffer)
+bool CLC_BaselineAck::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
 
     m_nBaselineTick = buffer.ReadLong();
@@ -147,20 +120,7 @@ bool CLC_BaselineAck::ReadFromBuffer(bf_read& buffer)
     return !buffer.IsOverflowed();
 }
 
-const char* CLC_BaselineAck::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: tick %i", GetName(), m_nBaselineTick);
-    return s_text;
-}
-
-const char* CLC_Move::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: backup %i, new %i, bytes %i", GetName(),
-        m_nNewCommands, m_nBackupCommands, Bits2Bytes(m_nLength));
-    return s_text;
-}
-
-bool CLC_Move::WriteToBuffer(bf_write& buffer)
+bool CLC_Move::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), NETMSG_TYPE_BITS);
     m_nLength = m_DataOut.GetNumBitsWritten();
@@ -173,7 +133,7 @@ bool CLC_Move::WriteToBuffer(bf_write& buffer)
     return buffer.WriteBits(m_DataOut.GetData(), m_nLength);
 }
 
-bool CLC_Move::ReadFromBuffer(bf_read& buffer)
+bool CLC_Move::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
 
     m_nNewCommands = buffer.ReadUBitLong(NUM_NEW_COMMAND_BITS);
@@ -183,7 +143,7 @@ bool CLC_Move::ReadFromBuffer(bf_read& buffer)
     return buffer.SeekRelative(m_nLength);
 }
 
-bool NET_SetConVar::WriteToBuffer(bf_write& buffer)
+bool NET_SetConVar::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), 6);
     buffer.WriteByte(1);
@@ -192,7 +152,7 @@ bool NET_SetConVar::WriteToBuffer(bf_write& buffer)
     return !buffer.IsOverflowed();
 }
 
-bool NET_SetConVar::ReadFromBuffer(bf_read& buffer)
+bool NET_SetConVar::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
     int numvars = buffer.ReadByte();
 
@@ -208,29 +168,14 @@ bool NET_SetConVar::ReadFromBuffer(bf_read& buffer)
     return !buffer.IsOverflowed();
 }
 
-
-const char* NET_SetConVar::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: \"%s\"=\"%s\"",
-        GetName(), convar.name, convar.value);
-    return s_text;
-}
-
-bool NET_StringCmd::WriteToBuffer(bf_write& buffer)
+bool NET_StringCmd::WriteToBuffer(bf_write& buffer) noexcept(false)
 {
     buffer.WriteUBitLong(GetType(), 6);
     return buffer.WriteString(m_szCommand ? m_szCommand : " NET_StringCmd NULL");
 }
 
-bool NET_StringCmd::ReadFromBuffer(bf_read& buffer)
+bool NET_StringCmd::ReadFromBuffer(bf_read& buffer) noexcept(false)
 {
     m_szCommand = m_szCommandBuffer;
     return buffer.ReadString(m_szCommandBuffer, sizeof(m_szCommandBuffer));
 }
-
-const char* NET_StringCmd::ToString(void) const
-{
-    Q_snprintf(s_text, sizeof(s_text), "%s: \"%s\"", GetName(), m_szCommand);
-    return s_text;
-}
-

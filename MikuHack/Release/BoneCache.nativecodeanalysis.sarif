@@ -1,0 +1,4486 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CTimeScope', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier0/fasttimer.h"
+                },
+                "region": {
+                  "startLine": 123,
+                  "startColumn": 21,
+                  "endLine": 123,
+                  "endColumn": 21
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CTimeScope@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CTimeAdder', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier0/fasttimer.h"
+                },
+                "region": {
+                  "startLine": 149,
+                  "startColumn": 21,
+                  "endLine": 149,
+                  "endColumn": 21
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CTimeAdder@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CAverageTimeMarker', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier0/fasttimer.h"
+                },
+                "region": {
+                  "startLine": 484,
+                  "startColumn": 29,
+                  "endLine": 484,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CAverageTimeMarker@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CScopeMsg', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier0/dbg.h"
+                },
+                "region": {
+                  "startLine": 549,
+                  "startColumn": 3,
+                  "endLine": 549,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CScopeMsg@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class ReentrancyVerifier', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier0/threadtools.h"
+                },
+                "region": {
+                  "startLine": 574,
+                  "startColumn": 10,
+                  "endLine": 574,
+                  "endColumn": 10
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1ReentrancyVerifier@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class Vector2D', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector2d.h"
+                },
+                "region": {
+                  "startLine": 224,
+                  "startColumn": 18,
+                  "endLine": 224,
+                  "endColumn": 18
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0Vector2D@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class VectorByValue', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+                },
+                "region": {
+                  "startLine": 339,
+                  "startColumn": 2,
+                  "endLine": 339,
+                  "endColumn": 2
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0VectorByValue@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'VectorAligned::operator=' hides a non-virtual function 'Vector::operator=' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+                },
+                "region": {
+                  "startLine": 397,
+                  "startColumn": 17,
+                  "endLine": 397,
+                  "endColumn": 17
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4VectorAligned@@QAEAAV0@ABVVector@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class Vector', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+                },
+                "region": {
+                  "startLine": 578,
+                  "startColumn": 24,
+                  "endLine": 578,
+                  "endColumn": 24
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4Vector@@QAEAAV0@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'QuaternionAligned::operator=' hides a non-virtual function 'Quaternion::operator=' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+                },
+                "region": {
+                  "startLine": 1648,
+                  "startColumn": 21,
+                  "endLine": 1648,
+                  "endColumn": 21
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4QuaternionAligned@@QAEAAV0@ABVQuaternion@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class QAngleByValue', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+                },
+                "region": {
+                  "startLine": 1849,
+                  "startColumn": 2,
+                  "endLine": 1849,
+                  "endColumn": 2
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0QAngleByValue@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class QAngle', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+                },
+                "region": {
+                  "startLine": 1945,
+                  "startColumn": 24,
+                  "endLine": 1945,
+                  "endColumn": 24
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4QAngle@@QAEAAV0@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class FPExceptionDisabler', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/mathlib.h"
+                },
+                "region": {
+                  "startLine": 54,
+                  "startColumn": 3,
+                  "endLine": 54,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1FPExceptionDisabler@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class FPExceptionEnabler', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/mathlib.h"
+                },
+                "region": {
+                  "startLine": 83,
+                  "startColumn": 3,
+                  "endLine": 83,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1FPExceptionEnabler@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CMemAllocAttributeAlloction', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier0/memalloc.h"
+                },
+                "region": {
+                  "startLine": 371,
+                  "startColumn": 3,
+                  "endLine": 371,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CMemAllocAttributeAlloction@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CStrAutoEncode', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/strtools.h"
+                },
+                "region": {
+                  "startLine": 849,
+                  "startColumn": 3,
+                  "endLine": 849,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CStrAutoEncode@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class IBaseInterface', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/interface.h"
+                },
+                "region": {
+                  "startLine": 58,
+                  "startColumn": 11,
+                  "endLine": 58,
+                  "endColumn": 11
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1IBaseInterface@@UAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26435",
+          "message": {
+            "text": "Function 'CDefaultUniformRandomStream::SetSeed' should specify exactly one of 'virtual', 'override', or 'final' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/vstdlib/random.h"
+                },
+                "region": {
+                  "startLine": 106,
+                  "startColumn": 15,
+                  "endLine": 106,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?SetSeed@CDefaultUniformRandomStream@@UAEXH@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26436",
+          "message": {
+            "text": "The type 'class CDefaultUniformRandomStream' with a virtual function needs either public virtual or protected non-virtual destructor (c.35)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/vstdlib/random.h"
+                },
+                "region": {
+                  "startLine": 106,
+                  "startColumn": 15,
+                  "endLine": 106,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?SetSeed@CDefaultUniformRandomStream@@UAEXH@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26435",
+          "message": {
+            "text": "Function 'CDefaultUniformRandomStream::RandomFloat' should specify exactly one of 'virtual', 'override', or 'final' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/vstdlib/random.h"
+                },
+                "region": {
+                  "startLine": 107,
+                  "startColumn": 16,
+                  "endLine": 107,
+                  "endColumn": 16
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?RandomFloat@CDefaultUniformRandomStream@@UAEMMM@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26435",
+          "message": {
+            "text": "Function 'CDefaultUniformRandomStream::RandomInt' should specify exactly one of 'virtual', 'override', or 'final' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/vstdlib/random.h"
+                },
+                "region": {
+                  "startLine": 108,
+                  "startColumn": 15,
+                  "endLine": 108,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?RandomInt@CDefaultUniformRandomStream@@UAEHHH@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26435",
+          "message": {
+            "text": "Function 'CDefaultUniformRandomStream::RandomFloatExp' should specify exactly one of 'virtual', 'override', or 'final' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/vstdlib/random.h"
+                },
+                "region": {
+                  "startLine": 109,
+                  "startColumn": 16,
+                  "endLine": 109,
+                  "endColumn": 16
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?RandomFloatExp@CDefaultUniformRandomStream@@UAEMMMM@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CUtlStringList::PurgeAndDeleteElements' hides a non-virtual function 'CUtlVector<char *,CUtlMemory<char *,int> >::PurgeAndDeleteElements' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 1238,
+                  "startColumn": 14,
+                  "endLine": 1238,
+                  "endColumn": 14
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?PurgeAndDeleteElements@CUtlStringList@@QAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlStringList', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 1247,
+                  "startColumn": 3,
+                  "endLine": 1247,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CUtlStringList@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CDatadescGeneratedNameHolder', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/datamap.h"
+                },
+                "region": {
+                  "startLine": 428,
+                  "startColumn": 3,
+                  "endLine": 428,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CDatadescGeneratedNameHolder@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class IHandleEntity', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/ihandleentity.h"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 11,
+                  "endLine": 21,
+                  "endColumn": 11
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1IHandleEntity@@UAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CBaseHandle', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/basehandle.h"
+                },
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 21,
+                  "endLine": 78,
+                  "endColumn": 21
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0CBaseHandle@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class Vector4D', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector4d.h"
+                },
+                "region": {
+                  "startLine": 230,
+                  "startColumn": 18,
+                  "endLine": 230,
+                  "endColumn": 18
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0Vector4D@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'struct BGRA8888_t', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/bitmap/imageformat.h"
+                },
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 21,
+                  "endLine": 174,
+                  "endColumn": 21
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4BGRA8888_t@@QAEAAU0@ABU0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class VPlane', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vplane.h"
+                },
+                "region": {
+                  "startLine": 101,
+                  "startColumn": 24,
+                  "endLine": 101,
+                  "endColumn": 24
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4VPlane@@QAEAAV0@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class IVTFTexture', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/vtf/vtf.h"
+                },
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 11,
+                  "endLine": 174,
+                  "endColumn": 11
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1IVTFTexture@@UAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class FourVectors', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/ssemath.h"
+                },
+                "region": {
+                  "startLine": 2587,
+                  "startColumn": 2,
+                  "endLine": 2587,
+                  "endColumn": 2
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0FourVectors@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26436",
+          "message": {
+            "text": "The type 'class IMatRenderContext' with a virtual function needs either public virtual or protected non-virtual destructor (c.35)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1302,
+                  "startColumn": 15,
+                  "endLine": 1302,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?Unused3@IMatRenderContext@@UAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CMatRenderDataReference', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1589,
+                  "startColumn": 34,
+                  "endLine": 1589,
+                  "endColumn": 34
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CMatRenderDataReference@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CMatRenderContextPtr', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1742,
+                  "startColumn": 3,
+                  "endLine": 1742,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CMatRenderContextPtr@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CMatRenderContextPtr::operator=' hides a non-virtual function 'CRefPtr<IMatRenderContext>::operator=' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1744,
+                  "startColumn": 21,
+                  "endLine": 1744,
+                  "endColumn": 21
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4CMatRenderContextPtr@@QAEPAVIMatRenderContext@@PAV1@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CMatRenderContextPtr::SafeRelease' hides a non-virtual function 'CRefPtr<IMatRenderContext>::SafeRelease' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1746,
+                  "startColumn": 7,
+                  "endLine": 1746,
+                  "endColumn": 7
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?SafeRelease@CMatRenderContextPtr@@QAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CMatRenderContextPtr::AssignAddRef' hides a non-virtual function 'CRefPtr<IMatRenderContext>::AssignAddRef' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1747,
+                  "startColumn": 7,
+                  "endLine": 1747,
+                  "endColumn": 7
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?AssignAddRef@CMatRenderContextPtr@@QAEXPAVIMatRenderContext@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class PIXEvent', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+                },
+                "region": {
+                  "startLine": 1773,
+                  "startColumn": 3,
+                  "endLine": 1773,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1PIXEvent@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CMDLCacheCriticalSection', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/datacache/imdlcache.h"
+                },
+                "region": {
+                  "startLine": 272,
+                  "startColumn": 3,
+                  "endLine": 272,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CMDLCacheCriticalSection@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'float16_with_assign::operator=' hides a non-virtual function 'float16::operator=' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/compressed_vector.h"
+                },
+                "region": {
+                  "startLine": 507,
+                  "startColumn": 11,
+                  "endLine": 507,
+                  "endColumn": 11
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4float16_with_assign@@QAEAAVfloat16@@ABV1@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'float16_with_assign::operator=' hides a non-virtual function 'float16::operator=' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/mathlib/compressed_vector.h"
+                },
+                "region": {
+                  "startLine": 508,
+                  "startColumn": 11,
+                  "endLine": 508,
+                  "endColumn": 11
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4float16_with_assign@@QAEAAVfloat16@@ABM@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlSymbol', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlsymbol.h"
+                },
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 2,
+                  "endLine": 42,
+                  "endColumn": 2
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??0CUtlSymbol@@QAE@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CUtlSymbolTableMT::AddString' hides a non-virtual function 'CUtlSymbolTable::AddString' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlsymbol.h"
+                },
+                "region": {
+                  "startLine": 182,
+                  "startColumn": 13,
+                  "endLine": 182,
+                  "endColumn": 13
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?AddString@CUtlSymbolTableMT@@QAE?AVCUtlSymbol@@PBD@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CUtlSymbolTableMT::Find' hides a non-virtual function 'CUtlSymbolTable::Find' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlsymbol.h"
+                },
+                "region": {
+                  "startLine": 190,
+                  "startColumn": 13,
+                  "endLine": 190,
+                  "endColumn": 13
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?Find@CUtlSymbolTableMT@@QBE?AVCUtlSymbol@@PBD@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CUtlSymbolTableMT::String' hides a non-virtual function 'CUtlSymbolTable::String' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlsymbol.h"
+                },
+                "region": {
+                  "startLine": 198,
+                  "startColumn": 14,
+                  "endLine": 198,
+                  "endColumn": 14
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?String@CUtlSymbolTableMT@@QBEPBDVCUtlSymbol@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'mstudiovertanim_wrinkle_t::GetDeltaFixed' hides a non-virtual function 'mstudiovertanim_t::GetDeltaFixed' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/studio.h"
+                },
+                "region": {
+                  "startLine": 1088,
+                  "startColumn": 18,
+                  "endLine": 1088,
+                  "endColumn": 18
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetDeltaFixed@mstudiovertanim_wrinkle_t@@QAE?AVVector4D@@M@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'mstudiovertanim_wrinkle_t::GetDeltaFixed4DAligned' hides a non-virtual function 'mstudiovertanim_t::GetDeltaFixed4DAligned' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/studio.h"
+                },
+                "region": {
+                  "startLine": 1093,
+                  "startColumn": 14,
+                  "endLine": 1093,
+                  "endColumn": 14
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetDeltaFixed4DAligned@mstudiovertanim_wrinkle_t@@QAEXPAVVector4DAligned@@M@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CStudioHdr', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/studio.h"
+                },
+                "region": {
+                  "startLine": 2356,
+                  "startColumn": 3,
+                  "endLine": 2356,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CStudioHdr@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CStudioHdr::CActivityToSequenceMapping', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/studio.h"
+                },
+                "region": {
+                  "startLine": 2596,
+                  "startColumn": 4,
+                  "endLine": 2596,
+                  "endColumn": 4
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CActivityToSequenceMapping@CStudioHdr@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::IsTwoPass' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 191,
+                  "startColumn": 19,
+                  "endLine": 191,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?IsTwoPass@CDefaultClientRenderable@@UAE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::OnThreadedDrawSetup' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 192,
+                  "startColumn": 19,
+                  "endLine": 192,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?OnThreadedDrawSetup@CDefaultClientRenderable@@UAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::UsesPowerOfTwoFrameBufferTexture' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 193,
+                  "startColumn": 19,
+                  "endLine": 193,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?UsesPowerOfTwoFrameBufferTexture@CDefaultClientRenderable@@UAE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::UsesFullFrameBufferTexture' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 194,
+                  "startColumn": 19,
+                  "endLine": 194,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?UsesFullFrameBufferTexture@CDefaultClientRenderable@@UAE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetShadowHandle' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 196,
+                  "startColumn": 31,
+                  "endLine": 196,
+                  "endColumn": 31
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetShadowHandle@CDefaultClientRenderable@@UBEGXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::RenderHandle' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 201,
+                  "startColumn": 32,
+                  "endLine": 201,
+                  "endColumn": 32
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?RenderHandle@CDefaultClientRenderable@@UAEAAGXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetBody' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 206,
+                  "startColumn": 19,
+                  "endLine": 206,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetBody@CDefaultClientRenderable@@UAEHXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetSkin' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 207,
+                  "startColumn": 19,
+                  "endLine": 207,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetSkin@CDefaultClientRenderable@@UAEHXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::UsesFlexDelayedWeights' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 208,
+                  "startColumn": 19,
+                  "endLine": 208,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?UsesFlexDelayedWeights@CDefaultClientRenderable@@UAE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetModel' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 210,
+                  "startColumn": 27,
+                  "endLine": 210,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetModel@CDefaultClientRenderable@@UBEPBUmodel_t@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::DrawModel' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 211,
+                  "startColumn": 19,
+                  "endLine": 211,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?DrawModel@CDefaultClientRenderable@@UAEHH@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::ComputeFxBlend' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 212,
+                  "startColumn": 19,
+                  "endLine": 212,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?ComputeFxBlend@CDefaultClientRenderable@@UAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetFxBlend' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 213,
+                  "startColumn": 19,
+                  "endLine": 213,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetFxBlend@CDefaultClientRenderable@@UAEHXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::LODTest' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 214,
+                  "startColumn": 19,
+                  "endLine": 214,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?LODTest@CDefaultClientRenderable@@UAE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::SetupBones' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 215,
+                  "startColumn": 19,
+                  "endLine": 215,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?SetupBones@CDefaultClientRenderable@@UAE_NPAUmatrix3x4_t@@HHM@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::SetupWeights' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 216,
+                  "startColumn": 19,
+                  "endLine": 216,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?SetupWeights@CDefaultClientRenderable@@UAEXPBUmatrix3x4_t@@HPAM1@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::DoAnimationEvents' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 19,
+                  "endLine": 217,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?DoAnimationEvents@CDefaultClientRenderable@@UAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetPVSNotifyInterface' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 218,
+                  "startColumn": 25,
+                  "endLine": 218,
+                  "endColumn": 25
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetPVSNotifyInterface@CDefaultClientRenderable@@UAEPAVIPVSNotify@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetRenderBoundsWorldspace' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 219,
+                  "startColumn": 19,
+                  "endLine": 219,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetRenderBoundsWorldspace@CDefaultClientRenderable@@UAEXAAVVector@@0@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetColorModulation' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 222,
+                  "startColumn": 15,
+                  "endLine": 222,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetColorModulation@CDefaultClientRenderable@@UAEXPAM@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::ShouldReceiveProjectedTextures' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 229,
+                  "startColumn": 15,
+                  "endLine": 229,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?ShouldReceiveProjectedTextures@CDefaultClientRenderable@@UAE_NH@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetShadowCastDistance' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 235,
+                  "startColumn": 15,
+                  "endLine": 235,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetShadowCastDistance@CDefaultClientRenderable@@UBE_NPAMW4ShadowType_t@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetShadowCastDirection' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 236,
+                  "startColumn": 15,
+                  "endLine": 236,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetShadowCastDirection@CDefaultClientRenderable@@UBE_NPAVVector@@W4ShadowType_t@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetShadowRenderBounds' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 238,
+                  "startColumn": 15,
+                  "endLine": 238,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetShadowRenderBounds@CDefaultClientRenderable@@UAEXAAVVector@@0W4ShadowType_t@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::IsShadowDirty' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 243,
+                  "startColumn": 15,
+                  "endLine": 243,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?IsShadowDirty@CDefaultClientRenderable@@UAE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::MarkShadowDirty' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 244,
+                  "startColumn": 15,
+                  "endLine": 244,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?MarkShadowDirty@CDefaultClientRenderable@@UAEX_N@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetShadowParent' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 245,
+                  "startColumn": 29,
+                  "endLine": 245,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetShadowParent@CDefaultClientRenderable@@UAEPAVIClientRenderable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::FirstShadowChild' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 246,
+                  "startColumn": 29,
+                  "endLine": 246,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?FirstShadowChild@CDefaultClientRenderable@@UAEPAVIClientRenderable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::NextShadowPeer' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 29,
+                  "endLine": 247,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?NextShadowPeer@CDefaultClientRenderable@@UAEPAVIClientRenderable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::ShadowCastType' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 248,
+                  "startColumn": 23,
+                  "endLine": 248,
+                  "endColumn": 23
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?ShadowCastType@CDefaultClientRenderable@@UAE?AW4ShadowType_t@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::CreateModelInstance' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 249,
+                  "startColumn": 15,
+                  "endLine": 249,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?CreateModelInstance@CDefaultClientRenderable@@UAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetModelInstance' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 250,
+                  "startColumn": 32,
+                  "endLine": 250,
+                  "endColumn": 32
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetModelInstance@CDefaultClientRenderable@@UAEGXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::LookupAttachment' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 253,
+                  "startColumn": 14,
+                  "endLine": 253,
+                  "endColumn": 14
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?LookupAttachment@CDefaultClientRenderable@@UAEHPBD@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetAttachment' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 254,
+                  "startColumn": 15,
+                  "endLine": 254,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetAttachment@CDefaultClientRenderable@@UAE_NHAAVVector@@AAVQAngle@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetAttachment' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 255,
+                  "startColumn": 15,
+                  "endLine": 255,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetAttachment@CDefaultClientRenderable@@UAE_NHAAUmatrix3x4_t@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetRenderClipPlane' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 258,
+                  "startColumn": 17,
+                  "endLine": 258,
+                  "endColumn": 17
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetRenderClipPlane@CDefaultClientRenderable@@UAEPAMXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::RecordToolMessage' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 260,
+                  "startColumn": 15,
+                  "endLine": 260,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?RecordToolMessage@CDefaultClientRenderable@@UAEXXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::IgnoresZBuffer' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 261,
+                  "startColumn": 15,
+                  "endLine": 261,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?IgnoresZBuffer@CDefaultClientRenderable@@UBE_NXZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::SetRefEHandle' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 265,
+                  "startColumn": 15,
+                  "endLine": 265,
+                  "endColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?SetRefEHandle@CDefaultClientRenderable@@UAEXABVCBaseHandle@@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetRefEHandle' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 266,
+                  "startColumn": 29,
+                  "endLine": 266,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetRefEHandle@CDefaultClientRenderable@@UBEABVCBaseHandle@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetIClientUnknown' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 268,
+                  "startColumn": 27,
+                  "endLine": 268,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetIClientUnknown@CDefaultClientRenderable@@UAEPAVIClientUnknown@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetCollideable' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 269,
+                  "startColumn": 25,
+                  "endLine": 269,
+                  "endColumn": 25
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetCollideable@CDefaultClientRenderable@@UAEPAVICollideable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetClientRenderable' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 270,
+                  "startColumn": 29,
+                  "endLine": 270,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetClientRenderable@CDefaultClientRenderable@@UAEPAVIClientRenderable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetClientNetworkable' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 271,
+                  "startColumn": 30,
+                  "endLine": 271,
+                  "endColumn": 30
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetClientNetworkable@CDefaultClientRenderable@@UAEPAVIClientNetworkable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetIClientEntity' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 272,
+                  "startColumn": 26,
+                  "endLine": 272,
+                  "endColumn": 26
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetIClientEntity@CDefaultClientRenderable@@UAEPAVIClientEntity@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetBaseEntity' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 273,
+                  "startColumn": 25,
+                  "endLine": 273,
+                  "endColumn": 25
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetBaseEntity@CDefaultClientRenderable@@UAEPAVC_BaseEntity@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26433",
+          "message": {
+            "text": "Function 'CDefaultClientRenderable::GetClientThinkable' should be marked with 'override' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+                },
+                "region": {
+                  "startLine": 274,
+                  "startColumn": 28,
+                  "endLine": 274,
+                  "endColumn": 28
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "?GetClientThinkable@CDefaultClientRenderable@@UAEPAVIClientThinkable@@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CRefCountedModelIndex', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/engine/ivmodelinfo.h"
+                },
+                "region": {
+                  "startLine": 64,
+                  "startColumn": 3,
+                  "endLine": 64,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1CRefCountedModelIndex@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class IVModelInfo', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/engine/ivmodelinfo.h"
+                },
+                "region": {
+                  "startLine": 104,
+                  "startColumn": 17,
+                  "endLine": 104,
+                  "endColumn": 17
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1IVModelInfo@@UAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class IModelLoadCallback', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/engine/ivmodelinfo.h"
+                },
+                "region": {
+                  "startLine": 228,
+                  "startColumn": 29,
+                  "endLine": 228,
+                  "endColumn": 29
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1IModelLoadCallback@@IAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class Color', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/Color.h"
+                },
+                "region": {
+                  "startLine": 92,
+                  "startColumn": 9,
+                  "endLine": 92,
+                  "endColumn": 9
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4Color@@QAEAAV0@ABV0@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26434",
+          "message": {
+            "text": "Function 'CRefPtr<IMatRenderContext>::operator=' hides a non-virtual function 'CBaseAutoPtr<IMatRenderContext>::operator=' (c.128)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/refcount.h"
+                },
+                "region": {
+                  "startLine": 178,
+                  "startColumn": 5,
+                  "endLine": 178,
+                  "endColumn": 5
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??4?$CRefPtr@VIMatRenderContext@@@@QAEPAVIMatRenderContext@@PAV1@@Z",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CRefPtr<class IMatRenderContext>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/refcount.h"
+                },
+                "region": {
+                  "startLine": 173,
+                  "startColumn": 3,
+                  "endLine": 173,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CRefPtr@VIMatRenderContext@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlVectorAutoPurge<char *>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 1214,
+                  "startColumn": 3,
+                  "endLine": 1214,
+                  "endColumn": 3
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlVectorAutoPurge@PAD@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlVector<char *,class CUtlMemory<char *,int> >', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 572,
+                  "startColumn": 27,
+                  "endLine": 572,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlVector@PADV?$CUtlMemory@PADH@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlVector<int,class CUtlMemory<int,int> >', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 572,
+                  "startColumn": 27,
+                  "endLine": 572,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlVector@HV?$CUtlMemory@HH@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlRBTree<class CUtlSymbolTable::CStringPoolIndex,unsigned short,class CUtlSymbolTable::CLess,class CUtlMemory<struct UtlRBTreeNode_t<class CUtlSymbolTable::CStringPoolIndex,unsigned short>,unsigned short> >', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlrbtree.h"
+                },
+                "region": {
+                  "startLine": 402,
+                  "startColumn": 33,
+                  "endLine": 402,
+                  "endColumn": 33
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlRBTree@VCStringPoolIndex@CUtlSymbolTable@@GVCLess@2@V?$CUtlMemory@U?$UtlRBTreeNode_t@VCStringPoolIndex@CUtlSymbolTable@@G@@G@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlVector<struct studiohdr_t const *,class CUtlMemory<struct studiohdr_t const *,int> >', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 572,
+                  "startColumn": 27,
+                  "endLine": 572,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlVector@PBUstudiohdr_t@@V?$CUtlMemory@PBUstudiohdr_t@@H@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlHash<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,class CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs,class CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlhash.h"
+                },
+                "region": {
+                  "startLine": 119,
+                  "startColumn": 24,
+                  "endLine": 119,
+                  "endColumn": 24
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlHash@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@VHashFuncs@123@V4123@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlMemory<char *,int>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+                },
+                "region": {
+                  "startLine": 446,
+                  "startColumn": 19,
+                  "endLine": 446,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlMemory@PADH@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlMemory<int,int>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+                },
+                "region": {
+                  "startLine": 446,
+                  "startColumn": 19,
+                  "endLine": 446,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlMemory@HH@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlMemory<struct UtlRBTreeNode_t<class CUtlSymbolTable::CStringPoolIndex,unsigned short>,unsigned short>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+                },
+                "region": {
+                  "startLine": 446,
+                  "startColumn": 19,
+                  "endLine": 446,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlMemory@U?$UtlRBTreeNode_t@VCStringPoolIndex@CUtlSymbolTable@@G@@G@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlMemory<struct studiohdr_t const *,int>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+                },
+                "region": {
+                  "startLine": 446,
+                  "startColumn": 19,
+                  "endLine": 446,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlMemory@PBUstudiohdr_t@@H@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlVector<class CUtlVector<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,class CUtlMemory<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,int> >,class CUtlMemory<class CUtlVector<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,class CUtlMemory<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,int> >,int> >', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 572,
+                  "startColumn": 27,
+                  "endLine": 572,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlVector@V?$CUtlVector@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@V?$CUtlMemory@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@H@@@@V?$CUtlMemory@V?$CUtlVector@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@V?$CUtlMemory@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@H@@@@H@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlMemory<class CUtlVector<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,class CUtlMemory<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,int> >,int>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+                },
+                "region": {
+                  "startLine": 446,
+                  "startColumn": 19,
+                  "endLine": 446,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlMemory@V?$CUtlVector@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@V?$CUtlMemory@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@H@@@@H@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlVector<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,class CUtlMemory<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,int> >', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+                },
+                "region": {
+                  "startLine": 572,
+                  "startColumn": 27,
+                  "endLine": 572,
+                  "endColumn": 27
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlVector@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@V?$CUtlMemory@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@H@@@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        },
+        {
+          "ruleId": "C26432",
+          "message": {
+            "text": "If you define or delete any default operation in the type 'class CUtlMemory<struct CStudioHdr::CActivityToSequenceMapping::HashValueType,int>', define or delete them all (c.21)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+                },
+                "region": {
+                  "startLine": 446,
+                  "startColumn": 19,
+                  "endLine": 446,
+                  "endColumn": 19
+                }
+              },
+              "logicalLocations": [
+                {
+                  "decoratedName": "??1?$CUtlMemory@UHashValueType@CActivityToSequenceMapping@CStudioHdr@@H@@QAE@XZ",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "suppressions": []
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.28.29337.0"
+        }
+      },
+      "invocations": [
+        {
+          "commandLine": "\"D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX86\\x86\\c1xx.dll\" -ACf{1F7B090C-16DB-4822-966A-A93D26ED4681} -ACpmspft140.dll -Alint -D_PREFAST_ -D_AST_FE_ -Analyze -zm0x00ADB1D0 -il C:\\Users\\Yassine\\AppData\\Local\\Temp\\_CL_9e6b4fbaast -typedil -f Helpers\\BoneCache.cpp -Ze -D_MSC_EXTENSIONS -Zp8 -Gs -pc \\:/ -D_MSC_VER=1928 -D_MSC_FULL_VER=192829337 -D_MSC_BUILD=0 -D_WIN32 -D_M_IX86=600 -D_M_IX86_FP=2 -GR -D_CPPRTTI -I C:\\Users\\Yassine\\source\\repos -I C:\\Users\\Yassine\\source\\repos\\MikuHack -I C:\\Users\\Yassine\\source\\repos\\MikuHack\\MikuHack\\Source -I D:\\SDK2013\\mp\\src\\ -I D:\\SDK2013\\mp\\src\\public -I D:\\SDK2013\\mp\\src\\mathlib -I D:\\SDK2013\\mp\\src\\common -I D:\\SDK2013\\mp\\src\\public\\tier1 -I D:\\SDK2013\\mp\\src\\public\\tier0 -I D:\\SDK2013\\mp\\src\\tier1 -nologo -W 0 -diagnostics:column -D_GUARDOVERFLOW_CRT_ALLOCATORS=1 -GF -Og -Oi -Ot -ltcg -DCODE_ANALYSIS -DWIN32 -DNDEBUG -D_WINDOWS -D_USRDLL -D_WINDLL -D_MBCS -EHs -D_CPPUNWIND -EHc -MD -D_MT -D_DLL -GS -D_M_FP_PRECISE -permissive- -Zc:wchar_t -Zc:forScope -std:c++latest -FoRelease\\BoneCache.obj -FdRelease\\vc142.pdb -Gd -wd 26812 -wd 26495 -analyze:projectdirectory C:\\Users\\Yassine\\source\\repos\\MikuHack\\MikuHack -analyze:rulesetdirectory ;D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Team Tools\\Static Analysis Tools\\\\Rule Sets; -analyze:ruleset D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Team Tools\\Static Analysis Tools\\Rule Sets\\CppCoreCheckClassRules.ruleset -analyze:quiet -analyze:plugin D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX86\\x86\\EspXEngine.dll -FC -errorreport:prompt -I D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\include -I D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\atlmfc\\include -I D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Auxiliary\\VS\\include -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\um -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\shared -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\winrt -I C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\cppwinrt -I C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\Include\\um",
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///C:/Users/Yassine/source/repos/MikuHack/MikuHack/Helpers/json.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/library.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/library.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/autolist.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/sigtools.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/source/debug.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///C:/Users/Yassine/source/repos/MikuHack/MikuHack/Helpers/json.cpp"
+          },
+          "roles": [
+            "analysisTarget",
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///C:/Users/Yassine/source/repos/MikuHack/MikuHack/ImGui/imgui.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier0/fasttimer.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier0/dbg.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier0/threadtools.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector2d.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/Color.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/strtools.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/interface.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/mathlib.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier0/memalloc.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/vstdlib/random.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlvector.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/vgui/IImage.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/bitmap/imageformat.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/vgui/IVguiMatInfoVar.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/vgui/IVguiMatInfo.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/datamap.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/igameevents.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/networkstringtabledefs.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///C:/Users/Yassine/source/repos/MikuHack/MikuHack/Source/Main.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vplane.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/vector4d.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlmemory.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/drawtools.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/drawtools.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/imgui/imconfig.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/imgui/imgui_helper.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/d3dx.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/imgui/imgui_impl_dx9.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/basetypes.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/commonmacros.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/platform.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/wchartypes.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/valve_off.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/valve_on.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/valve_minmax_on.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/annotations.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/protected_things.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/xbox_codeline_defines.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/dbgflag.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/vcrmode.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/vcr_shared.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/mathlib/math_pfns.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/minmax.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/vguis.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/ipanel.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/vgui.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/mem.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/memdbgon.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier0/memdbgoff.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/utlblockmemory.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vstdlib/vstdlib.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/isurface.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/ihtml.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/mousecode.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/inputsystem/buttoncode.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/inputsystem/inputenums.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/keycode.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vgui/cursor.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/appframework/iappsystem.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/inputsystem/iinputsystem.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/inputsystem/analogcode.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/ivengineclient.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/cdll_int.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/const.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/checksum_crc.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/bitbuf.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/modes.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/common/xbox/xboxstubs.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/autoitem.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/mathlib/vmatrix.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///C:/Users/Yassine/source/repos/MikuHack/MikuHack/Helpers/BytePatch.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/detour.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/ihandleentity.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/basehandle.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/vtf/vtf.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/ssemath.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/materialsystem/imaterialsystem.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/datacache/imdlcache.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/mathlib/compressed_vector.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlsymbol.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/studio.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/iclientrenderable.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/engine/ivmodelinfo.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlstring.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/icvar.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/engine/IEngineTrace.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/ispatialpartition.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/gametrace.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/refcount.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlrbtree.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///D:/SDK2013/mp/src/public/tier1/utlhash.h"
+          },
+          "roles": [
+            "resultFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/datamap.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/cbaseentity.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/netvars.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/datamap.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/icliententitylist.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/icliententitylist.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/icliententity.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/iclientunknown.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/client_render_handle.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/engine/ivmodelrender.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/istudiorender.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/utlbuffer.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/byteswap.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/materialsystem/imaterial.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/texture_group_names.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/materialsystem/deformations.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/materialsystem/imaterialsystemhardwareconfig.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/materialsystem/icolorcorrection.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/mathlib/lightdesc.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/utllinkedlist.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/utlfixedmemory.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/generichash.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/localflexcontroller.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/iclientnetworkable.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/iclientthinkable.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/engine/icollideable.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/globalvars_base.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/bonecache.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/string_t.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/offsets.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/commons.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/timer.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/hatcommand.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/convar.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/tier1/iconvar.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/ibaseclientdll.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/toolframework/itoolentity.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/engine/ishadowmgr.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/interfaces/iveclienttrace.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/cmodel.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/trace.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/bspflags.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/vcollide.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/worldsize.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///d:/sdk2013/mp/src/public/engine/ivdebugoverlay.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/config.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/config.h"
+          },
+          "roles": [
+            "responseFile"
+          ]
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/yassine/source/repos/mikuhack/mikuhack/helpers/bonecache.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ]
+        }
+      ]
+    }
+  ]
+}

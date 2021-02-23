@@ -1,188 +1,246 @@
 #include "BackTrack.h"
 
-#if 0
+#include <inetchannel.h>
+#include "../Interfaces/IVEClientTrace.h"
+
+#include "../Interfaces/IClientMode.h"
+
 #define SIMULATION_TIME_PROP "m_flSimulationTime"
 
 static IBackTrackHack track_hack;
 
-void QueryBackTrackTicks(int index, IBackTrackInfo::FilterCallback callback);
+struct {
+	ITFPlayer* player;
+	const IBackTrackData* data;
+
+	constexpr operator bool() noexcept
+	{
+		return data != nullptr && player;
+	}
+
+	void set(ITFPlayer* player, const IBackTrackData* data) noexcept
+	{
+		this->player = player;
+		this->data = data;
+	}
+
+	void reset() noexcept
+	{
+		player = nullptr;
+		data = nullptr;
+	}
+} backtrack_data;
 
 
-inline void ProcessCurrentData(ITFPlayer* pEnt, const IBackTrackData* data)
+inline float GetLatency()
 {
-	if (!pEnt)
-	{
-		MIKUDebug::LogCritical("Entity is nullptr");
-		return;
-	}
-	else if (!data)
-	{
-		MIKUDebug::LogCritical("Data is nullptr");
-		return;
-	}
-
-	int was = Globals::m_pUserCmd->tick_count;
-	Globals::m_pUserCmd->tick_count = data->tick;
-	*pEnt->GetEntProp<float>(SIMULATION_TIME_PROP) = data->simtime;
-
-	*pEnt->GetEntProp<Vector>("m_vecOrigin") = data->origin;
-	*pEnt->GetEntProp<QAngle>("m_vecAngles") = data->angles;
+	INetChannel* nci = static_cast<INetChannel*>(engineclient->GetNetChannelInfo());
+	return nci ? nci->GetLatency(FLOW_OUTGOING) + nci->GetLatency(FLOW_INCOMING) : 0.f;
 }
 
 
-void OnBacktrackAimbot(ITFPlayer* pPlayer, Vector& vecTarget, QAngle& angView)
+HookRes IBackTrackHack::OnCreateMove(CUserCmd* cmd)
 {
-	if (!track_hack.bEnable)
-		return;
+	if (!cmd || !cmd->command_number)
+		return HookRes::BreakImmediate;
 
-	ITFPlayer* pMe = pLocalPlayer;
-	if (!pMe || !engineclient->IsInGame() || pMe->GetLifeState() != LIFE_STATE::ALIVE)
-		return;
+	if (!bEnable)
+		return HookRes::Continue;
 
-	if(!(Globals::m_pUserCmd->buttons & IN_ATTACK))
-		return;
+	ITFPlayer* pMe = ILocalPtr();
+	if (pMe->GetLifeState() != LIFE_STATE::ALIVE)
+		return HookRes::Continue;
 
-	Vector mypos = pMe->LocalEyePosition();
-	Vector pos;
-	float bestFOV = track_hack.flTrackFOV;
-	const IBackTrackData* best_data = nullptr;
+	int tick = cmd->tick_count;
+	int cur_tick = tick % SizeOfBacktrack;
 
-	int index = pPlayer->entindex();
+	float best_fov = flTrackFOV;
+	const float cur_time = gpGlobals->curtime;
+	float correct_time = GetLerpTime() + GetLatency();
+	correct_time = Clamp(correct_time, 0.0f, 1.0f);
 
-	auto ProcessFilterPlayer = [&pPlayer, &best_data, &bestFOV](int client, const IBackTrackData& current) {
-		Vector pos = pPlayer->GetAbsOrigin();
-		float cur = GetLocalFOV(pos);
+	const IBackTrackData* best_data{ };
+	ITFPlayer* best_ent{ };
 
-		if (cur < bestFOV)
+	auto ProcessSingleData = [&best_data, &best_fov, &best_ent, 
+							  tick, correct_time, cmd]
+		(ITFPlayer* player, const IBackTrackData& data)
+	{
+		float delta_time = correct_time - (gpGlobals->curtime - TicksToTime(data.tick));
+
+		if (fabsf(delta_time) > 0.2f)
+			return;
+
+		float cur = GetLocalFOV(cmd->viewangles, data.origin);
+		if (cur < best_fov)
 		{
-			bestFOV = cur;
-			best_data = &current;
+			best_ent = player;
+			best_fov = cur;
+			best_data = &data;
 		}
 	};
 
-	QueryBackTrackTicks(index, ProcessFilterPlayer);
-	if (!best_data)
-		return;
 
-	ProcessCurrentData(pPlayer, best_data);
-}
-
-
-void IBackTrackHack::OnCreateMove(bool& ret)
-{
-	if (!bEnable)
-		return;
-
-	int tick = Globals::m_pUserCmd->tick_count;
-	size_t cur = tick % SIZE_OF_BACKTRACK;
-
-	ITFPlayer* pPlayer;
-
-	for (uint8_t i = 1; i < gpGlobals->maxClients; i++)
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
 	{
-		pPlayer = reinterpret_cast<ITFPlayer*>(GetClientEntityW(i));
+		ITFPlayer* pPlayer = ::GetITFPlayer(i);
 		IBackTrackInfo& data = backtrack[i - 1];
 
-		if (!pPlayer || pPlayer->GetLifeState() != LIFE_STATE::ALIVE)
+		if (BadEntity(pPlayer) || pPlayer->GetLifeState() != LIFE_STATE::ALIVE || pPlayer->GetTeam() == pMe->GetTeam())
 		{
 			data.reset();
 			continue;
 		}
 
 		if (!data)
-		{
-			printf("Init: %i (tick, %i)\n", i, tick);
 			data.init();
-		}
 
-		IBackTrackData& info = data[cur];
+		IBackTrackData& info = data[cur_tick];
 
 		info.tick = tick;
-		info.simtime = *pPlayer->GetEntProp<float>(SIMULATION_TIME_PROP);
+		info.simulation_time = *pPlayer->GetEntProp<float, PropType::Recv>(SIMULATION_TIME_PROP);
 		info.origin = pPlayer->GetAbsOrigin();
 		info.angles = pPlayer->GetAbsAngles();
+
+		for (int i = 0; i <= SizeOfBacktrack; i++)
+		{
+			int pos = (cur_tick - i) % SizeOfBacktrack;
+			const IBackTrackData& old_data = data[pos];
+
+			if (old_data)
+				ProcessSingleData(pPlayer, old_data);
+		}
 	}
+
+	backtrack_data.set(best_ent, best_data);
+
+	return HookRes::Continue;
 }
 
-
-void QueryBackTrackTicks(int index, IBackTrackInfo::FilterCallback callback)
+/*
+HookRes IBackTrackHack::OnAimbotResolvePlayer(QAngle& angle, const Vector* player_pos)
 {
-	IBackTrackInfo& data = track_hack.backtrack[index - 1];
+	backtrack_data.reset();
+
+	if (!bEnable)
+		return HookRes::Continue;
+
+	ITFPlayer* pMe = ::ILocalPtr();
+	ITFPlayer* pPlayer = Hook::GetReturnInfo();
+
+	const IBackTrackData* best_data = nullptr;
+
+	int index = pPlayer->entindex();
+
+	IBackTrackInfo& data = backtrack[index - 1];
+
 	if (!data)
-		return;
+		return HookRes::Continue;
 
-	size_t cur_tick = Globals::m_pUserCmd->tick_count;
-	uint8_t pos;
+	float bestFOV = flTrackFOV;
+	const int cur_tick = current_cmd->tick_count;
+	const float cur_time = gpGlobals->curtime;
+	float correct_time = GetLerpTime() + GetLatency();
+	correct_time = Clamp(correct_time, 0.0f, 1.0f);
 
-	for (uint8_t i = 0; i < SIZE_OF_BACKTRACK - 1; i++)
+
+	auto ProcessSingleData = [&best_data, &bestFOV, cur_tick,
+							cur_time, correct_time, this]
+	(const IBackTrackData& data)
 	{
-		pos = (cur_tick - i) % SIZE_OF_BACKTRACK;
-		
-		IBackTrackData& info = data[pos];
-		if (info.valid())
-			callback(index, info);
+		float delta_time = correct_time - (cur_time - TicksToTime(data.tick));
+
+		if (fabsf(delta_time) > 0.2f)
+			return;
+
+		float cur = GetLocalFOV(current_cmd->viewangles, data.origin);
+		if (cur < bestFOV)
+		{
+			bestFOV = cur;
+			best_data = &data;
+		}
+	};
+
+	for (int i = 0; i < SizeOfBacktrack; i++)
+	{
+		// travel backward
+		int pos = (cur_tick - i) % SizeOfBacktrack;
+
+		const IBackTrackData& info = data[pos];
+		if (info)
+			ProcessSingleData(info);
 	}
+
+	should_reset = false;
+	backtrack_data.set(pPlayer, best_data);
+
+	if (best_data)
+		angle = GetAimAngle(best_data->origin);
+	
+	return HookRes::Changed;
+}
+*/
+
+void IBackTrackHack::OnLoadDLL()
+{
+	using namespace IGlobalVHookPolicy;
+
+	auto createmove = CreateMove::Hook::QueryHook(CreateMove::Name);
+	createmove->AddPreHook(HookCall::VeryEarly, std::bind(&IBackTrackHack::OnCreateMove, this, std::placeholders::_2));
+	createmove->AddPostHook(HookCall::Late,
+		[this](float, CUserCmd* cmd)
+		{
+			if (!cmd || !cmd->command_number)
+				return HookRes::BreakImmediate;
+
+			if (!bEnable)
+				return HookRes::Continue;
+			
+			static Timer timer_update_lines;
+
+			if (const auto& [player, data] = backtrack_data; backtrack_data)
+			{
+				ITFPlayer* pMe = ILocalPtr();
+
+				int was = cmd->tick_count;
+
+				cmd->tick_count = data->tick;
+				*player->GetEntProp<float, PropType::Recv>(SIMULATION_TIME_PROP) = data->simulation_time;
+
+				Vector& origin = *player->GetEntProp<Vector, PropType::Recv>("m_vecOrigin");
+				Vector old{ origin };
+
+				origin = data->origin;
+//				*player->GetEntProp<QAngle>("m_vecAngles") = data->angles;
+
+				if (timer_update_lines.trigger_if_elapsed(1800ms))
+				{
+					auto col = player->GetCollideable();
+					const auto& mins = col->OBBMins();
+					const auto& maxs = col->OBBMaxs();
+
+					debugoverlay->AddBoxOverlay(origin, mins, maxs, { 0, 90.0f, 0 }, 0, 255, 0, 255, 2.0f);
+					debugoverlay->AddBoxOverlay(old, mins, maxs, { 0, 90.0f, 0 }, 255, 0, 0, 255, 2.0f);
+
+					std::cout << "Was: " << was << " Now: " << cmd->tick_count << "  Intern: " << data->tick << '\n';
+				}
+			}
+			return HookRes::Continue;
+		});
 }
 
-
-void IBackTrackHack::OnLoad()
+void IBackTrackHack::OnRenderExtra()
 {
-//	AddAimHook(OnAimbotEnable);
-}
-
-void IBackTrackHack::OnUnload()
-{
-//	RemoveAimHook(OnAimbotEnable);
+	if (ImGui::CollapsingHeader("BackTrack"))
+	{
+		ImGui::Checkbox("Enable", &bEnable);
+		ImGui::DragFloat("FOV", &flTrackFOV, 1.f, 0.0f, 90.f);
+	}
 }
 
 HAT_COMMAND(backtrack_toggle, "Toggles backtrack")
 {
-	track_hack.bEnable = !track_hack.bEnable;
-	REPLY_TO_TARGET("BackTrack is now \"%s\"", track_hack.bEnable ? "ON":"OFF");
+	AutoBool enable("BackTrack::bEnabled");
+	enable = !enable;
+	REPLY_TO_TARGET("BackTrack is now \"%s\"", enable ? "ON":"OFF");
 }
-
-#include "../Detour/detours.h"
-union attribute_data_union_t
-{
-	float		asFloat;
-	uint32		asUint32;
-	uint8_t*	asBlobPointer;
-};
-
-struct static_attrib_t
-{
-	uint16_t	iDefIndex;
-	attribute_data_union_t 
-				m_value;
-	bool		bForceGCToGenerate;
-	KeyValues*	m_pKVCustomData;
-};
-
-struct lootlist_attrib_t
-{
-	static_attrib_t	m_staticAttrib;
-	float	m_flWeight;
-};
-
-struct random_attrib_t
-{
-	float			m_flChanceOfRandomAttribute;
-	float			m_flTotalAttributeWeight;
-	bool			m_bPickAllAttributes;
-	CUtlVector<lootlist_attrib_t>
-					m_RandomAttributes;
-};
-
-struct LootListInfo
-{
-	uint32_t unk1;
-	uint32_t unk2;
-	uint32_t unk3;
-	uint32_t count;
-};
-
-class IEconItemInterface;
-using PEconItemInterface = IEconItemInterface*;
-
-
-#endif

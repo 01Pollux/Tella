@@ -1,23 +1,24 @@
 #pragma once
 
-/*#include "../Helpers/sdk.h"
+#include "Main.h"
 #include "../Helpers/Commons.h"
-#include "../Helpers/VTable.h"
+#include "../GlobalHook/vhook.h"
+#include "../GlobalHook/load_routine.h"
 
 #include <memory>
 #include <array>
 
-constexpr size_t SIZE_OF_BACKTRACK = 67U;
+constexpr size_t SizeOfBacktrack = 67U;
 
 struct IBackTrackData
 {
 	int			tick{ };
-	float		simtime;
+	float		simulation_time;
 
 	Vector		origin;
 	QAngle		angles;
 
-	bool valid()
+	constexpr operator bool() const noexcept
 	{
 		return tick != 0;
 	}
@@ -26,14 +27,14 @@ struct IBackTrackData
 
 class IBackTrackInfo
 {
-	std::unique_ptr<IBackTrackData[]> data;
+	std::unique_ptr<IBackTrackData[]> data{ };
 
 public:
 	using FilterCallback = std::function<void(int, const IBackTrackData&)>;
 
 	void init()
 	{
-		data = std::make_unique<IBackTrackData[]>(SIZE_OF_BACKTRACK);
+		data = std::make_unique<IBackTrackData[]>(SizeOfBacktrack);
 	}
 
 	IBackTrackData& operator[](size_t pos) const
@@ -46,36 +47,28 @@ public:
 		return data != nullptr;
 	}
 
-	void reset()
+	void reset() noexcept
 	{
 		data = nullptr;
 	}
 };
 
 
-
-class IBackTrackHack	//: public MenuPanel
+class CUserCmd;
+class IBackTrackHack : public ExtraPanel, public IMainRoutine
 {
-public: //InventoryHack
-	AutoBool bEnable	{ "BackTrack::bEnabled", true };
-	AutoFloat flTrackFOV{ "BackTrack::flTrackFOV", 90.f };
+	AutoBool bEnable		{ "BackTrack::bEnabled", false };
+	AutoBool should_reset	{ "BackTrack::Reset", false };
+	AutoFloat flTrackFOV	{ "BackTrack::flTrackFOV", 90.f };
 	IBackTrackInfo backtrack[MAX_PLAYERS]{};
 
-public:
-	IBackTrackHack()
-	{
-//		IGlobalEvent::CreateMove::Hook::Register(std::bind(&IBackTrackHack::OnPaintTraverse, this));
-		IGlobalEvent::LoadDLL::Hook::Register(std::bind(&IBackTrackHack::OnLoad, this));
-		IGlobalEvent::UnloadDLL::Hook::Register(std::bind(&IBackTrackHack::OnUnload, this));
-	};
+public:	//	IBackTrackHack
+	HookRes OnCreateMove(CUserCmd*);
 
-//	HookRes OnCreateMove(bool&);
-	HookRes OnLoad();
-	HookRes OnUnload();
-
-public:	//MenuPanel
-//	void OnRender() override;
+public:	//	ExtraPanel
+	void OnRenderExtra() override;
 //	void JsonCallback(Json::Value& json, bool read) override;
-};
 
-*/
+public: //	IMainRoutine
+	void OnLoadDLL() override;
+};

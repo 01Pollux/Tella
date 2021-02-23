@@ -1,8 +1,10 @@
 #include "Glow.h"
+
 #include "../Helpers/Library.h"
+#include "../Helpers/Commons.h"
 
 IGlowManager* GlowManager;
-auto GlowContainer = new std::unordered_map<IClientShared*, IGlowObject*>;
+static auto GlowContainer = new std::unordered_map<IClientShared*, IGlowObject*>;
 
 IGlowObject* IClientShared::AllocateVirtualGlowObject(const Color& color, bool create)
 {
@@ -44,7 +46,7 @@ static bool toggle = true;
 HAT_COMMAND(glow_toggle_self, "Toggle glow effect (local player)")
 {
 	using namespace DrawTools::ColorTools;
-	ITFPlayer* pMe = pLocalPlayer;
+	ITFPlayer* pMe = ::ILocalPtr();
 
 	if (toggle)
 	{

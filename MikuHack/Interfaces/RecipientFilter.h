@@ -3,28 +3,34 @@
 #include <irecipientfilter.h>
 #include <vector>
 
-class IClientEntity;
+class IClientShared;
 class CRecipientFilter : public IRecipientFilter
 {
 public:
-	CRecipientFilter();
-	virtual			~CRecipientFilter();
+	CRecipientFilter()					= default;
+	~CRecipientFilter()					override = default;
 
-	virtual bool	IsReliable(void) const;
+	bool	IsReliable()				const noexcept override;
 
-	virtual int		GetRecipientCount(void) const;
-	virtual int		GetRecipientIndex(int slot) const;
+	int		GetRecipientCount(void)		const noexcept override;
+	int		GetRecipientIndex(int slot) const override;
 
-	virtual bool	IsInitMessage(void) const { return false; };
+	bool	IsInitMessage(void)			const noexcept override { return false; };
 
 public:
 	void			AddAllPlayers(void);
-	void			AddRecipient(IClientEntity* player);
-	void			RemoveRecipient(IClientEntity* player);
+	void			AddRecipient(IClientShared* player);
+	void			RemoveRecipient(IClientShared* player);
 
-	bool				m_bReliable;
-	bool				m_bInitMessage;
-	std::vector<int>	m_Recipients;
+	bool				is_reliable{ };
+	bool				is_init_msg{ };
+	std::vector<int>	recipients;
+
+public:
+	CRecipientFilter(const CRecipientFilter&)				= default;
+	CRecipientFilter& operator=(const CRecipientFilter&)	= default;
+	CRecipientFilter(CRecipientFilter&&)					= default;
+	CRecipientFilter& operator=(CRecipientFilter&&)			= default;
 };
 
 class CLocalFilter : public CRecipientFilter

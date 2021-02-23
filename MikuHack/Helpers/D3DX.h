@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Helpers/sdk.h"
 #include "../ImGui/imgui_helper.h"
 
 #include <d3d9.h>

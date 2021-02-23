@@ -5,10 +5,10 @@
 #define _01_USE_VECTORED_HANDLER
 
 #include "Helpers/DrawTools.h"
-#include "Helpers/sdk.h"
 #include "Interfaces/HatCommand.h"
 #include "Interfaces/Main.h"
-#include "Helpers/VTable.h"
+#include "GlobalHook/vhook.h"
+#include "GlobalHook/load_routine.h"
 
 #include "Helpers/NetVars.h"
 #include "Helpers/Config.h"
@@ -16,6 +16,8 @@
 #include <convar.h>
 
 #include <thread>
+#include <iomanip>
+
 #include <minidumpapiset.h>
 
 
@@ -24,7 +26,6 @@ IVEngineClient* engineclient;
 INetworkStringTableContainer* nstcontainer;
 IBaseClientDLL* clientdll;
 IClientTools* clienttools;
-IFileSystem* filesystem;
 IGameEventManager2* eventmanager;
 CGlobalVarsBase* gpGlobals;
 IVModelInfo* modelinfo;
@@ -32,6 +33,20 @@ vgui::ISurface* surface;
 
 static LPVOID hMod;
 
+static void ReleaseAllProfilers()
+{
+    time_t this_time; time(&this_time);
+    tm* time_info = localtime(&this_time);
+    auto time = std::put_time(time_info, "__%h_%d_%H_%M_%S");
+
+    for (size_t i = 0; i < static_cast<size_t>(M0PROFILER_GROUP::COUNT); ++i)
+    {
+        std::string path(Format(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], time, ".txt"));
+        std::ofstream output(path, std::ios::app | std::ios::out);
+
+        M0Profiler::OutputToFile(static_cast<M0PROFILER_GROUP>(i), output);
+    }
+}
 
 
 #if defined _01_USE_VECTORED_HANDLER
@@ -41,12 +56,12 @@ LONG WINAPI OnExceptionHandle(_In_ PEXCEPTION_POINTERS ExceptionInfo)
     {
         HMODULE Module{ };
     public:
-        explicit AUTOLIB(LPCSTR Name)
+        explicit AUTOLIB(LPCSTR Name) noexcept
         {
             Module = LoadLibraryA(Name);
         }
 
-        operator bool()
+        constexpr operator bool() noexcept
         {
             return Module != NULL;
         }
@@ -63,6 +78,10 @@ LONG WINAPI OnExceptionHandle(_In_ PEXCEPTION_POINTERS ExceptionInfo)
                 Module = NULL;
             }
         }
+        AUTOLIB(AUTOLIB&) = delete;
+        AUTOLIB operator=(const AUTOLIB&) = delete;
+        AUTOLIB(AUTOLIB&&) = delete;
+        AUTOLIB operator=(AUTOLIB&&) = delete;
     };
 
     AUTOLIB DBGHelp("DBGHelp.dll");
@@ -112,7 +131,7 @@ LONG WINAPI OnExceptionHandle(_In_ PEXCEPTION_POINTERS ExceptionInfo)
         HANDLE File{ INVALID_HANDLE_VALUE };
 
     public:
-        AUTOFILE()
+        AUTOFILE() noexcept
         {
             CHAR Buffer[256];
             time_t this_time; time(&this_time);
@@ -122,7 +141,7 @@ LONG WINAPI OnExceptionHandle(_In_ PEXCEPTION_POINTERS ExceptionInfo)
             File = CreateFileA(Buffer, GENERIC_WRITE, NULL, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
         }
 
-        CONST HANDLE operator*() CONST noexcept
+        constexpr HANDLE operator*() const noexcept
         {
             return File;
         }
@@ -135,18 +154,24 @@ LONG WINAPI OnExceptionHandle(_In_ PEXCEPTION_POINTERS ExceptionInfo)
                 File = INVALID_HANDLE_VALUE;
             }
         }
+
+        AUTOFILE(const AUTOFILE&) = delete;
+        AUTOFILE& operator=(const AUTOFILE&)    = delete;
+        AUTOFILE(AUTOFILE&&)                    = delete;
+        AUTOFILE& operator=(AUTOFILE&&)         = delete;
     } AutoFile;
+
+    ReleaseAllProfilers();
 
     MINIDUMP_EXCEPTION_INFORMATION MiniDumpInfo {
             .ThreadId = GetCurrentThreadId(),
             .ExceptionPointers = ExceptionInfo,
             .ClientPointers = FALSE };
 
-
     if (WriteDump(GetCurrentProcess(),
                   GetCurrentProcessId(), 
                   *AutoFile,
-                  MINIDUMP_TYPE(MiniDumpWithUnloadedModules | MiniDumpWithFullMemoryInfo), 
+                  MINIDUMP_TYPE(MiniDumpWithUnloadedModules | MiniDumpWithFullMemoryInfo | MiniDumpWithCodeSegs),
                   &MiniDumpInfo, 
                   NULL, 
                   NULL))
@@ -159,7 +184,7 @@ LONG WINAPI OnExceptionHandle(_In_ PEXCEPTION_POINTERS ExceptionInfo)
 #endif
 
 
-static _declspec(noreturn) void FreeMappedDllAndExitThread()
+static _declspec(noreturn) void FreeMappedDllAndExitThread() noexcept
 {
     _asm {
         push NULL
@@ -196,18 +221,23 @@ VOID MainThread(LPVOID)
 #endif
 
 
-#pragma region Init_
+#pragma region("Load DLL")
     {
         Interfaces::Init();
         ConVar_Register();
 
-        IGlobalEvent::LoadDLL::Hook::RunAllHooks();
-        IGlobalEvent::LoadDLL::Hook::Clear();
+        IGlobalVHookManager::Init();
 
-        InitializeRecvProp();
+        for (auto& list = IMainRoutine::List();
+            IMainRoutine* callback: list)
+        {
+            callback->OnLoadDLL();
+        }
+
         DrawTools::Init();
 
         g_pCVar->ConsoleColorPrintf(DrawTools::ColorTools::FromArray(DrawTools::ColorTools::Cyan<char8_t>), "Miku Miku~\n");
+        Sleep(1000);
     }
 #pragma region
 
@@ -222,16 +252,22 @@ VOID MainThread(LPVOID)
         Sleep(10000);
     }
 
-#pragma region Unload_
+#pragma region("Unload DLL")
     {
-        IGlobalEvent::UnloadDLL::Hook::RunAllHooks();
+        IGlobalVHookManager::Shutdown();
+
+        for (auto& list = IMainRoutine::List();
+            IMainRoutine* callback: list)
+        {
+            callback->OnUnloadDLL();
+        }
 
         ConVar_Unregister();
 
-        DrawTools::Destroy();
-        Interfaces::Delete();
+        ReleaseAllProfilers();
 
-        CleanupRecvProp();
+        DrawTools::Destroy();
+        MIKUDebug::Shutdown();
 
 #ifdef _01_ALLOC_CONSOLE
         fclose(_std_cout);
@@ -241,9 +277,12 @@ VOID MainThread(LPVOID)
 #pragma region
 
 #ifdef _01_USE_VECTORED_HANDLER
-    RemoveVectoredExceptionHandler(VecHandler);
+    if (VecHandler)
+        RemoveVectoredExceptionHandler(VecHandler);
 #endif
 
+
+    Sleep(1000);
 #ifdef _01_MANUALMAPPED_DLL
     FreeMappedDllAndExitThread();
 #else
@@ -270,6 +309,7 @@ HAT_COMMAND(shutdown_dll, "Shutdown DLL")
     DrawTools::MarkForDeletion();
 }
 
+#include "Main.h"
 HAT_COMMAND(toggle_miku_menu, "Toggle Menu Hack")
 {
     Mmain.m_bIsActive = !Mmain.m_bIsActive;

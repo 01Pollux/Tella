@@ -1,0 +1,177 @@
+{
+   "Aimbot" : {
+      "AimKey" : 46,
+      "AimLock" : true,
+      "Effects" : {
+         "Glow Color" : {
+            "a" : 255,
+            "b" : 247,
+            "g" : 231,
+            "r" : 51
+         },
+         "Type" : 2
+      },
+      "Enabled" : true,
+      "FOV" : 45,
+      "HitboxPriority" : 2,
+      "KeyLock" : false,
+      "Miss-Chance" : 21,
+      "Smooth" : 29,
+      "TargetPriority" : 1,
+      "Zoom-only" : true
+   },
+   "ESP" : {
+      "Building Manager" : {
+         "BLU" : {
+            "Active" : false,
+            "Draw Ammo" : false,
+            "Draw Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Draw Distance" : false,
+            "Draw Health" : false,
+            "Draw Level" : false,
+            "Draw Name" : false,
+            "Draw Owner" : false,
+            "Draw State" : false,
+            "Draw Team" : false,
+            "Font Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Max Distance" : 0,
+            "bits Draw" : 0
+         },
+         "RED" : {
+            "Active" : false,
+            "Draw Ammo" : false,
+            "Draw Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Draw Distance" : false,
+            "Draw Health" : false,
+            "Draw Level" : false,
+            "Draw Name" : false,
+            "Draw Owner" : false,
+            "Draw State" : false,
+            "Draw Team" : false,
+            "Font Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Max Distance" : 0,
+            "bits Draw" : 0
+         }
+      },
+      "Object Manager" : {
+         "Active" : false,
+         "Draw Color" : {
+            "a" : 0,
+            "b" : 0,
+            "g" : 0,
+            "r" : 0
+         },
+         "Draw Distance" : false,
+         "Draw Name" : false,
+         "Draw Packs" : false,
+         "Draw Rockets" : false,
+         "Draw Stickies" : false,
+         "Font Color" : {
+            "a" : 0,
+            "b" : 0,
+            "g" : 0,
+            "r" : 0
+         },
+         "Max Distance" : 0,
+         "bits Draw" : 0
+      },
+      "Player Manager" : {
+         "BLU" : {
+            "Active" : false,
+            "Draw Class" : false,
+            "Draw Cloaked" : false,
+            "Draw Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Draw Conditions" : false,
+            "Draw Distance" : false,
+            "Draw Health" : false,
+            "Draw Name" : false,
+            "Draw Team" : false,
+            "Draw UberCharge" : false,
+            "Font Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Max Distance" : 0,
+            "bits Draw" : 0
+         },
+         "RED" : {
+            "Active" : false,
+            "Draw Class" : false,
+            "Draw Cloaked" : false,
+            "Draw Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Draw Conditions" : false,
+            "Draw Distance" : false,
+            "Draw Health" : false,
+            "Draw Name" : false,
+            "Draw Team" : false,
+            "Draw UberCharge" : false,
+            "Font Color" : {
+               "a" : 0,
+               "b" : 0,
+               "g" : 0,
+               "r" : 0
+            },
+            "Max Distance" : 0,
+            "bits Draw" : 0
+         }
+      }
+   },
+   "Extra" : {
+      "Auto-Backstab" : {
+         "Enabled" : true
+      },
+      "Auto-Detonate" : {
+         "Enabled" : true
+      }
+   },
+   "Models" : {
+      "Demoman" : "",
+      "Engineer" : "",
+      "Heavy" : "",
+      "Medic" : "",
+      "Pyro" : "",
+      "Scout" : "",
+      "Sniper" : "",
+      "Soldier" : "",
+      "Spy" : ""
+   },
+   "Visuals" : {
+      "Clean Screenshot" : true,
+      "NoScope" : false,
+      "Spec X" : 12,
+      "Spec Y" : 130,
+      "SpecList" : true
+   }
+}

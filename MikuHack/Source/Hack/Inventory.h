@@ -1,10 +1,14 @@
 #pragma once
 
 #include "../Main.h"
-#include "../Helpers/VTable.h"
-#include "../Helpers/sdk.h"
+#include "../GlobalHook/load_routine.h"
+#include "../GlobalHook/vhook.h"
+
 #include "../Interfaces/CAttributes.h"
+#include "../Interfaces/CBaseEntity.h"
+
 #include <unordered_map>
+#include <igameevents.h>
 
 struct PlayerModelInfo
 {
@@ -26,32 +30,18 @@ struct PlayerModelInfo
 	}
 };
 
-class InventoryHack : public MenuPanel, public IGameEventListener2
+class InventoryHack : public MenuPanel, public IMainRoutine, public IGameEventListener2
 {
 public: //InventoryHack
 	AutoBool bWeaponEnabled{ "InventoryHack::bWeaponEnabled", false };
 	AutoBool bModelEnabled{ "InventoryHack::bModelEnabled", false };
-	AutoArray<int, 9>			 iStreaks{ "InventoryHack::iStreaks", 10 };
-	AutoArray<PlayerModelInfo, 9>Models{ "InventoryHack::Models" };
+	IAutoArray<int, 9>				iStreaks{ "InventoryHack::iStreaks", { 10, 10, 10, 10, 10, 10, 10, 10, 10 } };
+	IAutoArray<PlayerModelInfo, 9>	Models{ "InventoryHack::Models" };
 
 public:
-	InventoryHack()
-	{
-		using namespace IGlobalEvent;
-		using std::bind;
+	void OnLoadDLL() override;
+	void OnUnloadDLL() override;
 
-		LoadDLL::Hook::Register(bind(&InventoryHack::OnLoad, this));
-		UnloadDLL::Hook::Register(bind(&InventoryHack::OnUnload, this));
-		LevelInit::Hook::Register(bind(&InventoryHack::OnLevelInit, this));
-		FrameStageNotify::Hook::Register(bind(&InventoryHack::OnFrameStageNotify, this, std::placeholders::_1));
-	};
-
-	HookRes OnLoad();
-	HookRes OnUnload();
-
-	HookRes OnLevelInit();
-
-	HookRes OnFrameStageNotify(ClientFrameStage_t);
 	void ProcessWeaponHack();
 
 public:	//MenuPanel
@@ -71,33 +61,34 @@ struct WeaponInfo
 	std::string m_szDisplayName = "Unknown";
 };
 
-class ItemManager
+class IItemManager
 {
 public:
 	using AttributeMap = std::unordered_map<int, float>;
 	using ItemsList = std::unordered_map<int, WeaponInfo>;
 
-	ItemManager() = delete;
-	ItemManager(const char* path): m_szPath(path)
+	IItemManager()
 	{
 		for (int i = 0; i < 9; i++)
 			(m_Classes[i]).clear();
-
 		InitFromFile();
 	}
 
-	ItemsList& GetItemsList(TFClass cls) { return m_Classes[cls]; }
-	WeaponInfo* GetWeaponInfo(TFClass cls, int index);
+	ItemsList& GetItemsList(TFClass cls) noexcept { return m_Classes[cls]; }
+	WeaponInfo* GetWeaponInfo(TFClass cls, int index) noexcept;
 
 	void InitFromFile();
 	void SaveToFile();
 
 	void Register(TFClass cls, int index, int new_index, std::string display_name, AttributeMap& map);
-	void PrintList(TFClass cls);
+
+	static constexpr const char* GetPath()
+	{
+		return ".\\Miku\\Items.json";
+	}
 
 private:
 	ItemsList m_Classes[9];
-	std::string m_szPath;
 };
 
-extern ItemManager* g_ItemManager;
+extern IItemManager* g_ItemManager;

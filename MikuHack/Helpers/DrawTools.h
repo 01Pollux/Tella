@@ -3,8 +3,11 @@
 #include "AutoList.h"
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_helper.h"
+
+#include <mathlib/vector.h>
 #include <Color.h>
 #include <array>
+
 
 namespace DrawTools
 {
@@ -69,7 +72,7 @@ namespace DrawTools
 
 		inline const Color& FromArray(const std::array<char8_t, 4>& arr)
 		{
-			return *(Color*)(arr.data());
+			return *reinterpret_cast<const Color*>(arr.data());
 		}
 	}
 
@@ -85,7 +88,6 @@ namespace DrawTools
 
 	void Update();
 
-	void DrawHelp(const char* fmt);
 	void DrawString(int x, int y, const Color& c, std::string& str);
 	void Line(int x, int y, int x1, int y1, const Color& c);
 	void Rect(int x, int y, int w, int h, const Color& clr);

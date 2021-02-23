@@ -18,14 +18,5 @@
 namespace Interfaces
 {
 	void Init();
-
-	inline void Delete()
-	{
-		gpGlobals = nullptr;
-
-		Library::UnLoadLibraries();
-
-		MIKUDebug::Shutdown();
-	}
 }
 

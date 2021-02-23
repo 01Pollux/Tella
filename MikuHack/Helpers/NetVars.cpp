@@ -1,124 +1,85 @@
-#include "sdk.h"
+
 #include "NetVars.h"
 #include "../Interfaces/IBaseClientDLL.h"
 #include "../Interfaces/HatCommand.h"
+#include "../Source/Debug.h"
+
+#include <iomanip>
+#include <fstream>
 
 using namespace std;
 
-using ClassHash = unordered_map<const char*, ClientClass*>;
-ClassHash m_pClasses;
 using RecvPropHash = unordered_map<string, recvprop_info_t>;
-RecvPropHash m_pRecvHash;
+RecvPropHash m_RecvHash;
 
-ClientClass* LookupClientClassHash(const char* classname)
+
+static bool _FindInRecvTable(RecvTable* pTable, const char* target_name, recvprop_info_t* info)
 {
-	auto iter = m_pClasses.find(classname);
-	if (iter == m_pClasses.end())
+	for (int i = 0; i < pTable->m_nProps; i++)
 	{
-		ClientClass* pClass;
-		pClass = clientdll->GetAllClasses();
-		while (pClass)
+		RecvProp* prop = &pTable->m_pProps[i];
+		const char* name = prop->m_pVarName;
+
+		if (name && !strcmp(name, target_name))
 		{
-			if (!strcmp(classname, pClass->m_pNetworkName))
-			{
-				m_pClasses.insert(iter, make_pair(classname, pClass));
-				return pClass;
-			}
-			pClass = pClass->m_pNext;
-		}
-		m_pClasses.insert(iter, make_pair(classname, static_cast<ClientClass*>(NULL)));
-		return NULL;
-	}
-
-	return iter->second;
-}
-
-bool FindInRecvTable(RecvTable* pTable, const char* szName, recvprop_info_t* info, uint offset)
-{
-	const char* name;
-	int props = pTable->m_nProps;
-	RecvProp* pProp;
-
-	for (int i = 0; i < props; i++)
-	{
-		pProp = &pTable->m_pProps[i];
-		name = pProp->m_pVarName;
-
-		if (name && !strcmp(name, szName))
-		{
-			info->offset = offset + pProp->m_Offset;
-			info->pProp = pProp;
+			info->pProp = prop;
+			info->offset = prop->m_Offset;
 			return true;
 		}
 
-		if (pProp->m_pDataTable)
+		if (prop->m_pDataTable)
 		{
-			if (FindInRecvTable(pProp->m_pDataTable, szName, info, offset + pProp->m_Offset))
-			{
-				return true;
-			}
+			if (!_FindInRecvTable(prop->m_pDataTable, target_name, info))
+				continue;
+
+			info->offset += prop->m_Offset;
+			return true;
 		}
 	}
 	return false;
 }
 
-
-bool LookupRecvPropC(ClientClass* pClass, const char* offset, recvprop_info_t* info)
+bool LookupRecvPropC(ClientClass* pClass, const char* name, recvprop_info_t* info)
 {
 	if (!pClass || !pClass->m_pNetworkName)
 		return false;
 
-	string actual = pClass->m_pNetworkName + string("::") + offset;
+	string actual = pClass->m_pNetworkName + string("::") + name;
 
-	auto iter = m_pRecvHash.find(actual);
-	if (iter == m_pRecvHash.end())
+	auto iter = m_RecvHash.find(actual);
+	if (iter == m_RecvHash.end())
 	{
-		recvprop_info_t temp;
-		if (!FindInRecvTable(pClass->m_pRecvTable, offset, &temp, 0))
-		{
-			temp.valid = false;
-			Msg("RECVTABLE: Failed to find %s\n", actual.c_str());
-		}
+		if (!_FindInRecvTable(pClass->m_pRecvTable, name, info))
+			info->valid = false;
+		else info->valid = true;
 
-		m_pRecvHash.insert(std::make_pair(actual, temp));
-
-		*info = temp;
-		return temp.valid;
+		m_RecvHash.insert(std::make_pair(actual, *info));
 	}
+	else *info = iter->second;
 
-	*info = iter->second;
 	return info->valid;
 }
 
-bool LookupRecvProp(const char* classname, const char* offset, recvprop_info_t* info)
+static bool LookupRecvProp(const char* class_name, const char* prop_name, recvprop_info_t* info)
 {
-	ClientClass* pClass = LookupClientClassHash(classname);
-	return LookupRecvPropC(pClass, offset, info);
-#if 0
-	if (!pClass)
-		return false;
-
-	string actual = string(classname) + "::" + string(offset);
-
-	auto iter = m_pRecvHash.find(actual);
-	if (iter == m_pRecvHash.end())
+	for (ClientClass* cc = clientdll->GetAllClasses(); cc != nullptr; cc = cc->m_pNext)
 	{
-		recvprop_info_t temp;
-		if (!FindInRecvTable(pClass->m_pRecvTable, offset, &temp, 0))
-		{
-			Warning("RECVTABLE: Failed to find %s\n", actual.c_str());
-			temp.valid = false;
-		}
-
-		m_pRecvHash.insert(std::make_pair(actual, temp));
-
-		*info = temp;
-		return temp.valid;
+		if (!strcmp(class_name, cc->m_pNetworkName))
+			return LookupRecvPropC(cc, prop_name, info);
 	}
+	return false;
+}
 
-	*info = iter->second;
-	return info->valid;
-#endif
+
+NetVarHook::NetVarHook(const char* class_name, const char* prop_name, RecvVarProxyFn callback)
+{
+	recvprop_info_t info;
+	if (!LookupRecvProp(class_name, prop_name, &info))
+	{
+		std::string str = "Cannot NetVar Hook " + std::string(class_name) + "::" + prop_name;
+		throw std::runtime_error(str);
+	}
+	this->Init(info.pProp, callback);
 }
 
 
@@ -139,7 +100,14 @@ static char* UTIL_SendFlagsToString(int flags, SendPropType type)
 		}
 	}
 
-	static unordered_map<int, const char*> flagsname = {
+	class FlagAndName {
+	public:
+		int flag;
+		std::string_view name;
+
+		constexpr FlagAndName(int flag, std::string_view name): flag(flag), name(name) { }
+	};
+	constexpr FlagAndName flagsname[] = {
 		{SPROP_UNSIGNED,			"Unsigned|"},
 		{SPROP_COORD,				"Coord|"},
 		{SPROP_NOSCALE,				"NoScale|"},
@@ -159,10 +127,8 @@ static char* UTIL_SendFlagsToString(int flags, SendPropType type)
 
 	for (auto i : flagsname)
 	{
-		if (flags & i.first)
-		{
-			str += i.second;
-		}
+		if (flags & i.flag)
+			str += i.name;
 	}
 
 	return (char*)str.c_str();
@@ -187,87 +153,59 @@ static const char* GetDTTypeName(SendPropType type)
 	return i->second;
 }
 
-static bool Dump_RecvTable(FILE* file, RecvTable* pTable, uint offset)
+static bool DumpRecvTable(std::fstream& file, RecvTable* pTable, uint32_t offset)
 {
-	int props = pTable->m_nProps;
-	RecvProp* pProp;
-	const char* type;
-
-	for (int i = 0; i < props; i++)
+	for (int i = 0; i < pTable->m_nProps; i++)
 	{
-		pProp = &pTable->m_pProps[i];
+		RecvProp* pProp = &pTable->m_pProps[i];
 		if (pProp->m_pDataTable)
 		{
-			fprintf(file, "%*sTable: %s (offset %d) (type %s)\n",
-				offset, "",
-				pProp->m_pVarName,
-				pProp->m_Offset,
-				pProp->m_pDataTable->m_pNetTableName);
+			file << std::setw(offset) << "Table: " << pProp->m_pVarName << 
+										" (offset " << pProp->m_Offset << 
+										") (type " << pProp->m_pDataTable->m_pNetTableName << ")\n";
 
-			Dump_RecvTable(file, pProp->m_pDataTable, offset + 1);
+			DumpRecvTable(file, pProp->m_pDataTable, offset + 1);
 		}
 		else 
 		{
-			type = GetDTTypeName(pProp->m_RecvType);
+			const char* type = GetDTTypeName(pProp->m_RecvType);
 
-			if (type != NULL)
+			if (type)
 			{
-				fprintf(file, "%*sMember: %s (offset %d) (type %s) (bits %d) (%s)\n",
-					offset, "",
-					pProp->m_pVarName,
-					pProp->m_Offset,
-					type,
-					pProp->m_ElementStride,
-					UTIL_SendFlagsToString(pProp->m_Flags, pProp->m_RecvType));
+				file << std::setw(offset) << "Member: " << pProp->m_pVarName << 
+											" (offset "<< pProp->m_Offset << 
+											") (type " << type << 
+											") (stride " << pProp->m_ElementStride << ") (" 
+										  << UTIL_SendFlagsToString(pProp->m_Flags, pProp->m_RecvType) <<")\n";
 			}
 			else
 			{
-				fprintf(file, "%*sMember: %s (offset %d) (type %d) (bits %d) (%s)\n",
-					offset, "",
-					pProp->m_pVarName,
-					pProp->m_Offset,
-					pProp->m_RecvType,
-					pProp->m_ElementStride,
-					UTIL_SendFlagsToString(pProp->m_Flags, pProp->m_RecvType));
+				file << std::setw(offset) << "Member: " << pProp->m_pVarName << 
+											" (offset " << pProp->m_Offset << 
+											") (type " << static_cast<int>(pProp->m_RecvType) << ") (" 
+										  << UTIL_SendFlagsToString(pProp->m_Flags, pProp->m_RecvType) << ")\n";
 			}
 		}
 	}
 	return false;
 }
 
-static void DumpCBaseEntityTable()
+static void DumpAllRecvTables(const char* path0)
 {
-	const char* path = "";
-	if (!path)
-		return;
-	char actual[MAX_PATH];
-	FILE* file;
-
 	for (ClientClass* cc = clientdll->GetAllClasses(); cc != nullptr; cc = cc->m_pNext)
 	{
-		snprintf(actual, sizeof(actual), "%s\\%s.txt", path, cc->m_pNetworkName);
-		file = fopen(actual, "wt");
+		std::string path = path0 + std::string(cc->m_pNetworkName) + ".txt";
+		std::fstream file(path);
 		if (!file)
-		{
-			printf("Invalid File Path: \"%s\"\n", actual);
 			break;
-		}
 
-		printf("Dumping: \"%s\"\n", cc->m_pNetworkName);
-		fprintf(file, "// Dump for \"%s\"\n\n\n", cc->m_pNetworkName);
-		Dump_RecvTable(file, cc->m_pRecvTable, 0);
-		fclose(file);
+		file << "Dump for: \"" << cc->m_pNetworkName << "\"\n\n\n";
+		DumpRecvTable(file, cc->m_pRecvTable, 0);
+		file << std::flush;
 	}
 }
 
-
-void InitializeRecvProp()
+HAT_COMMAND(dump_recvtable, "DumpDataTable")
 {
-	CleanupRecvProp();
-}
-
-void CleanupRecvProp()
-{
-	m_pClasses.clear();
-	m_pRecvHash.clear();
+	DumpAllRecvTables(args.ArgS());
 }

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Windows.h>
+
 #include <unordered_map>
 #include <string>
+#include <stdexcept>
 
 class RecvProp;
 class RecvTable;
@@ -98,18 +99,17 @@ public:
 	int				m_ClassID;
 };
 
+
 struct recvprop_info_t
 {
-	RecvProp*	pProp;
-	uint		offset = 0;
-	bool		valid = true;
+	RecvProp*	pProp{ };
+	uint32_t	offset{ };
+	bool		valid{ false };
 };
 
 
-void InitializeRecvProp();
 bool LookupRecvPropC(ClientClass* pClass, const char* offset, recvprop_info_t* info);
-bool LookupRecvProp(const char* classname, const char* offset, recvprop_info_t* info);
-void CleanupRecvProp();
+
 
 class NetVarHook
 {
@@ -124,23 +124,13 @@ class NetVarHook
 	}
 
 public:
-	NetVarHook(const char* szClass, const char* pProp, RecvVarProxyFn pCallback)
+	explicit NetVarHook(const char* class_name, const char* prop_name, RecvVarProxyFn callback);
+	explicit NetVarHook(RecvProp* prop, RecvVarProxyFn callback) noexcept
 	{
-		recvprop_info_t infos;
-		if (!LookupRecvProp(szClass, pProp, &infos))
-		{
-			Warning("Cannot NetVar Hook %s::%s\n", szClass, pProp);
-			return;
-		}
-		this->Init(infos.pProp, pCallback);
+		this->Init(prop, callback);
 	}
 
-	NetVarHook(RecvProp* pProp, RecvVarProxyFn pCallback)
-	{
-		this->Init(pProp, pCallback);
-	}
-
-	void Execute(const CRecvProxyData* pData, void* pStruct, void* pOut)
+	void Execute(const CRecvProxyData* pData, void* pStruct, void* pOut) const noexcept
 	{
 		(this->pActual)(pData, pStruct, pOut);
 	}
@@ -149,7 +139,14 @@ public:
 	{
 		this->pProp->m_ProxyFn = pActual;
 	}
+
+public:
+	NetVarHook(const NetVarHook&)			= delete;
+	NetVarHook& operator=(const NetVarHook&)= delete;
+	NetVarHook(NetVarHook&&)				= delete;
+	NetVarHook& operator=(NetVarHook&&)		= delete;
 };
+
 
 
 #define SPROP_UNSIGNED			(1<<0)					// Unsigned integer data.
@@ -175,6 +172,7 @@ public:
 #define SPROP_COORD_MP_LOWPRECISION 	(1<<14)			// Like SPROP_COORD, but special handling for multiplayer games where the fractional component only gets a 3 bits instead of 5
 #define SPROP_COORD_MP_intEGRAL			(1<<15)			// SPROP_COORD_MP, but coordinates are rounded to integral boundaries
 #define SPROP_VARint					SPROP_NORMAL	// reuse existing flag so we don't break demo. note you want to include SPROP_UNSIGNED if needed, its more efficient
+
 
 enum ClassID
 {

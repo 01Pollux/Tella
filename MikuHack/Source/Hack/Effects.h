@@ -36,63 +36,31 @@ struct te_tf_particle_effects_control_point_t
 class CEffectData
 {
 public:
-	Vector m_vOrigin;
-	Vector m_vStart;
-	Vector m_vNormal;
-	QAngle m_vAngles;
-	int		m_fFlags;
-	IBaseHandle m_hEntity;
-	float	m_flScale;
-	float	m_flMagnitude;
-	float	m_flRadius;
-	int		m_nAttachmentIndex;
-	short	m_nSurfaceProp;
+	Vector		origin{ };
+	Vector		start{ };
+	Vector		normal{ };
+	QAngle		angles{ };
+	int			flags{ };
+	IBaseHandle entity{ INVALID_EHANDLE_INDEX };
+	float		scale{ 1.f };
+	float		magnitude{ };
+	float		radius{ };
+	int			attachement_index{ };
+	short		surface_prop{ };
 
-	// Some TF2 specific things
-	int		m_nMaterial;
-	int		m_nDamageType;
-	int		m_nHitBox;
+	int			matriel{ };
+	int			dmg_type{ };
+	int			hitbox{ };
 
-	unsigned char	m_nColor;
+	unsigned char	color{ };
 
-	bool							m_bCustomColors;
-	te_tf_particle_effects_colors_t	m_CustomColors;
+	bool							has_custom_colors{ };
+	te_tf_particle_effects_colors_t	custom_colors{ };
 
-	bool									m_bControlPoint1;
-	te_tf_particle_effects_control_point_t	m_ControlPoint1;
+	bool									has_control_point{ };
+	te_tf_particle_effects_control_point_t	control_point{ };
 
-	int m_iEffectName;
-
-	CEffectData()
-	{
-		m_vOrigin.Init();
-		m_vStart.Init();
-		m_vNormal.Init();
-		m_vAngles.Init();
-
-		m_fFlags = 0;
-		m_hEntity = INVALID_EHANDLE_INDEX;
-		m_flScale = 1.f;
-		m_nAttachmentIndex = 0;
-		m_nSurfaceProp = 0;
-
-		m_flMagnitude = 0.0f;
-		m_flRadius = 0.0f;
-
-		m_nMaterial = 0;
-		m_nDamageType = 0;
-		m_nHitBox = 0;
-
-		m_nColor = 0;
-
-		m_bCustomColors = false;
-		m_CustomColors.m_vecColor1.Init();
-		m_CustomColors.m_vecColor2.Init();
-
-		m_bControlPoint1 = false;
-		m_ControlPoint1.m_eParticleAttachment = PATTACH_ABSORIGIN;
-		m_ControlPoint1.m_vecOffset.Init();
-	}
+	int			effect_name;
 };
 
 inline void DispatchParticleEffect(IClientShared* pEnt, const char* particle, Vector vecOrigin, QAngle vecAngles)
@@ -107,30 +75,63 @@ class CTFParticle;
 class CTFParticleFactory
 {
 public:
-	static CTFParticleFactory* ParticleProp(IClientShared* pEnt = pLocalPlayer)
+	static CTFParticleFactory* ParticleProp(IClientShared* pEnt)
 	{
 		if (!pEnt)
 			return nullptr;
-		return pEnt->GetEntProp<CTFParticleFactory>("m_flElasticity", -32);
+		return pEnt->GetEntProp<CTFParticleFactory, PropType::Recv>("m_flElasticity", -32);
 	}
 
 	CTFParticle* Create(const char* pszParticleName, ParticleAttachment_t iAttachType, int iAttachmentPoint = 0, Vector vecOriginOffset = vec3_origin)
 	{
 		union {
 			CTFParticle* (CTFParticleFactory::*fn)(const char*, ParticleAttachment_t, int, Vector);
-			void* ptr = reinterpret_cast<void*>(Library::clientlib.FindPattern("CreateParticle"));
-		} static u;
+			void* ptr;
+		} static u{ .ptr = reinterpret_cast<void*>(Library::clientlib.FindPattern("CreateParticle")) };
 
 		return (this->*u.fn)(pszParticleName, iAttachType, iAttachmentPoint, vecOriginOffset);
 	}
 
-	void StopEmission(CTFParticle* pEffect = NULL, bool bWakeOnStop = false, bool bDestroyAsleepSystems = false)
+	void StopEmission(CTFParticle* pEffect = NULL, bool bWakeOnStop = false, bool bDestroyAsleepSystems = false) noexcept(false)
 	{
 		union {
 			CTFParticle* (CTFParticleFactory::* fn)(CTFParticle*, bool, bool);
-			void* ptr = reinterpret_cast<void*>(Library::clientlib.FindPattern("StopParticleEmission"));
-		} static u;
+			void* ptr;
+		} static u{ .ptr = reinterpret_cast<void*>(Library::clientlib.FindPattern("StopParticleEmission")) };
 
 		(this->*u.fn)(pEffect, bWakeOnStop, bDestroyAsleepSystems);
 	}
+};
+
+class ITFParticleData
+{
+	CTFParticleFactory* owner;
+	CTFParticle* particle;
+
+public:
+	explicit ITFParticleData(ITFPlayer* pPlayer, const char* particle_name, ParticleAttachment_t attach_type, int attach_pt = 0, Vector offset = vec3_origin)
+	{
+		owner = CTFParticleFactory::ParticleProp(pPlayer);
+		if (owner)
+			particle = owner->Create(particle_name, attach_type, attach_pt, offset);
+	}
+
+	~ITFParticleData()
+	{
+		try
+		{
+			if (owner)
+				owner->StopEmission(particle);
+			owner = nullptr;
+		}
+		catch (...)
+		{
+			owner = nullptr;
+		}
+	}
+
+	ITFParticleData(const ITFParticleData&)				= delete;
+	ITFParticleData& operator=(const ITFParticleData&)	= delete;
+	ITFParticleData(ITFParticleData&&)					= delete;
+	ITFParticleData& operator=(ITFParticleData&&)		= delete;
 };

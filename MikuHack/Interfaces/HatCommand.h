@@ -11,3 +11,8 @@
 		static void NAME( const CCommand &args ); \
 		static ConCommand NAME##_command( CMD_TAG###NAME, NAME, DESC ); \
 		static void NAME( const CCommand &args )
+
+#define HAT_COMMAND_NOEXCEPT(NAME, DESC) \
+		static void NAME( const CCommand &args ) noexcept; \
+		static ConCommand NAME##_command( CMD_TAG###NAME, NAME, DESC ); \
+		static void NAME( const CCommand &args ) noexcept

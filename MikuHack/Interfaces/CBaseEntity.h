@@ -1,9 +1,7 @@
 #pragma once
 
-#include "../Source/Debug.h"
-
 #include "../Helpers/NetVars.h"
-#include "../Helpers/sdk.h"
+#include "../Helpers/DataMap.h"
 
 #include "IClientEntityList.h"
 #include "Color.h"
@@ -14,68 +12,9 @@
 
 #define MAX_PLAYERS 32
 
-
 using IBaseHandle = CBaseHandle;
 
-
-enum class LIFE_STATE
-{
-	ALIVE,
-	DYING,
-	DEAD
-};
-
-enum TFClass
-{
-	UNKNOWN,
-
-	Scout,
-	Sniper,
-	Soldier,
-	Demoman,
-	Medic,
-	Heavy,
-	Pyro,
-	Spy,
-	Engineer,
-
-	MAX_CLASS
-};
-
-static const char* m_szTFClasses[] =
-{
-	"Scout",
-	"Sniper",
-	"Soldier",
-	"Demoman",
-	"Medic",
-	"Heavy",
-	"Pyro",
-	"Spy",
-	"Engineer"
-};
-
-enum EntFlag
-{
-	EF_INVALID,
-	EF_PLAYER,
-	EF_BUILDING,
-	EF_EXTRA
-};
-
-enum TFTeam
-{
-	UNASSIGNED,
-	SPECTATOR,
-	RED,
-	BLUE,
-
-	MAX_TEAMS
-};
-
-extern const char* m_szTeams[];
-
-enum ETFCond
+enum ETFCond : int
 {
 	TF_COND_INVALID = -1,
 
@@ -212,31 +151,108 @@ enum ETFCond
 	TF_COND_COUNT,
 };
 
+struct TFCondAndName
+{
+	using CondName = const char*;
+
+	ETFCond		Cond;
+	CondName	Name;
+
+	constexpr TFCondAndName(const ETFCond& cond, const CondName& name) : Cond(cond), Name(name) { };
+};
+
+constexpr TFCondAndName TFCondMap[] =
+{
+	{ TF_COND_MEDIGUN_UBER_BLAST_RESIST,	"Blast Resist" },
+	{ TF_COND_FEIGN_DEATH,					"Dead Ringer"},
+	{ TF_COND_MEDIGUN_UBER_FIRE_RESIST,		"Fire Resist"},
+	{ TF_COND_BLAST_IMMUNE,					"Blast Resist"},
+	{ TF_COND_BULLET_IMMUNE,				"Bullet Resist"},
+	{ TF_COND_INVULNERABLE,					"Uber"},
+	{ TF_COND_TELEPORTED,					"Teleported"},
+	{ TF_COND_SPEED_BOOST,					"Speed Boosted"},
+	{ TF_COND_CRITBOOSTED,					"Crit Boosted"},
+	{ TF_COND_CRITBOOSTED_DEMO_CHARGE,		"Charging"},
+	{ TF_COND_DEFENSEBUFF,					"Defense Buff"},
+	{ TF_COND_DEFENSEBUFF_HIGH,				"Defense Buff HIGH"},
+	{ TF_COND_DEFENSEBUFF_NO_CRIT_BLOCK,	"Defense Buff CRIT"},
+	{ TF_COND_URINE,						"Jarated"},
+	{ TF_COND_TAUNTING,						"Taunting"}
+};
+
+
+static const char* m_szTFClasses[] =
+{
+	"Scout",
+	"Sniper",
+	"Soldier",
+	"Demoman",
+	"Medic",
+	"Heavy",
+	"Pyro",
+	"Spy",
+	"Engineer"
+};
+
+enum class LIFE_STATE: uint8_t
+{
+	ALIVE,
+	DYING,
+	DEAD
+};
+
+enum TFClass
+{
+	TF_UNKNOWN,
+
+	TF_Scout,
+	TF_Sniper,
+	TF_Soldier,
+	TF_Demoman,
+	TF_Medic,
+	TF_Heavy,
+	TF_Pyro,
+	TF_Spy,
+	TF_Engineer,
+
+	TF_MAX_CLASS
+};
+
+
+enum TFTeam
+{
+	UNASSIGNED,
+	SPECTATOR,
+	RED,
+	BLUE,
+
+	MAX_TEAMS
+};
+
+extern const char* m_szTeams[];
+
+
 enum ETFStreak
 {
 	kTFStreak_Kills = 0,
-	kTFStreak_KillsAll = 1,	// Counts all kills not just attr based killstreak.  For Data collection purposes
+	kTFStreak_KillsAll = 1,
 	kTFStreak_Ducks = 2,
 	kTFStreak_Duck_levelup = 3,
 	kTFStreak_COUNT = 4,
 };
 
+enum class PropType: char8_t
+{
+	Recv,
+	Data
+};
+template<PropType prop>
+using NoPropTypeOverride = std::enable_if<prop == PropType::Recv || prop == PropType::Data>;
+
+
 class IBaseObject;
 class IAttributeList;
 class ITFPlayer;
-
-inline int FindRecvOffset(const char* cls, const char* name)
-{
-	recvprop_info_t infos;
-
-	if (!LookupRecvProp(cls, name, &infos))
-	{
-		Warning("Failed to Find offset for \"%s::%s\"\n", cls, name);
-		return 0;
-	}
-
-	return infos.offset;
-}
 
 class IGlowObject;
 class IClientShared: public IClientEntity
@@ -250,16 +266,16 @@ public:
 
 	int		GetTeam();
 
-	void	UpdateGlowEffect();
+	void	UpdateGlowEffect() noexcept;
 
-	void	DestroyGlowEffect();
+	void	DestroyGlowEffect() noexcept;
 
 	bool&	HasGlow()
 	{
-		return *this->GetEntProp<bool>("m_bGlowEnabled");
+		return *GetEntProp<bool, PropType::Recv>("m_bGlowEnabled");
 	}
 
-	Color GetTeamColor()
+	const Color&& GetTeamColor()
 	{
 		switch (static_cast<TFTeam>(this->GetTeam()))
 		{
@@ -269,38 +285,46 @@ public:
 		}
 	}
 
-	bool IsAmmoPack()
+	bool IsAmmoPack() noexcept
 	{
 		return this->IsClassID(ClassID_CTFAmmoPack);
 	}
 
-	bool IsHealthPack()
+	bool IsHealthPack() noexcept
 	{
 		const char* model_name = modelinfo->GetModelName(this->GetModel());
 		return std::strstr(model_name, "medkit") != nullptr;
 	}
 
-	bool IsClassID(ClassID cls)
+	bool IsClassID(ClassID cls) noexcept
 	{
-		if (!this->GetClientClass())
-			return -1;
-
-		return (this->GetClientClass()->m_ClassID == cls);
+		if (ClientClass* cc = this->GetClientClass())
+		{
+			return cc->m_ClassID == cls;
+		} else return false;
 	}
 
-	template<typename _ReturnType>
+	template<typename _ReturnType, PropType type, typename = NoPropTypeOverride<type>>
 	_ReturnType* GetEntProp(const char* prop, int extra_offset = 0)
 	{
-		recvprop_info_t info;
-		LookupRecvPropC(this->GetClientClass(), prop, &info);
-
-		return reinterpret_cast<_ReturnType*>(reinterpret_cast<uintptr_t>(this) + info.offset + extra_offset);
+		if constexpr (type == PropType::Recv)
+		{
+			recvprop_info_t info;
+			return LookupRecvPropC(this->GetClientClass(), prop, &info) ?
+				reinterpret_cast<_ReturnType*>(reinterpret_cast<uintptr_t>(this) + info.offset + extra_offset) : nullptr;
+		}
+		else
+		{
+			datamap_info_t info;
+			return LookupDataMap(this, prop, &info, DataMapType::DataMap) ?
+				reinterpret_cast<_ReturnType*>(reinterpret_cast<uintptr_t>(this) + info.offset + extra_offset) : nullptr;
+		}
 	}
 
+	template<PropType type>
 	bool HasEntProp(const char* prop)
 	{
-		static recvprop_info_t info;
-		return LookupRecvPropC(this->GetClientClass(), prop, &info);
+		return GetEntProp<void, type>(prop) != nullptr;
 	}
 
 	bool GetHitbox(int id, IBoneCache* pCache)
@@ -310,7 +334,7 @@ public:
 
 	int HitboxSet()
 	{
-		return *this->GetEntProp<int>("m_nHitboxSet");
+		return *this->GetEntProp<int, PropType::Recv>("m_nHitboxSet");
 	}
 
 	void SetModel(int);
@@ -333,9 +357,10 @@ public:
 		if (!this->Hndl.IsValid())	pRes = Update();
 		else						pRes = clientlist->GetClientEntityFromHandle(this->Hndl);
 
-		int offset = FindRecvOffset("CTFPlayerResource", prop);
+		recvprop_info_t info;
+		LookupRecvPropC(pRes->GetClientClass(), prop, &info);
 
-		return *reinterpret_cast<_ReturnType*>(reinterpret_cast<uintptr_t>(pRes) + offset + pEnt->entindex() * 4);
+		return *reinterpret_cast<_ReturnType*>(reinterpret_cast<uintptr_t>(pRes) + info.offset + pEnt->entindex() * 4);
 	}
 };
 extern CTFPlayerResource ctfresource;
@@ -345,7 +370,7 @@ class ITFPlayer: public IClientShared
 {
 public:
 	void*					GetShared();
-	static ITFPlayer*		FromShared(const void* shared);
+	static ITFPlayer*		FromShared(const void* shared) noexcept;
 
 	void*					m_PlayerClass();
 	Vector					EyePosition();
@@ -366,7 +391,17 @@ public:
 
 	Vector					LocalEyePosition()
 	{
-		return this->GetAbsOrigin() + *this->GetEntProp<Vector>("m_vecViewOffset[0]");
+		return this->GetAbsOrigin() + *this->GetEntProp<Vector, PropType::Recv>("m_vecViewOffset[0]");
+	}
+	Vector				EyePosTest() noexcept
+	{
+		void** vtable = *reinterpret_cast<void***>(this);
+		union
+		{
+			Vector (ITFPlayer::* fn)();
+			void* ptr;
+		} u{ .ptr = vtable[140] };
+		return (this->*u.fn)();
 	}
 };
 
@@ -374,13 +409,13 @@ public:
 class IBaseObject: public IClientShared
 {
 public:
-	bool					IsBaseCombatWeapon();
+	bool					IsBaseCombatWeapon() noexcept;
 	IBaseHandle&			GetOwnerEntity();
-	int						GetWeaponSlot();
+	int						GetWeaponSlot() noexcept;
 	int&					GetItemDefinitionIndex();
 	IAttributeList*			GetAttributeList();
 
-	bool					Melee_DoSwingTrace(trace_t& trace);
+	bool					Melee_DoSwingTrace(trace_t& trace) noexcept;
 	float					Melee_GetSwingRange();
 
 	int						GetUpgradeLvl();
@@ -389,40 +424,6 @@ public:
 	int						GetBuildingMaxHealth();
 };
 
-
-
-enum class HookRes: char8_t;
-
-struct MyClientCacheList
-{
-	IClientShared*	pEnt;
-	EntFlag			flag;
-};
-
-
-class IEntityCached: public IClientEntityListener
-{
-	bool m_bLoaded{ };
-
-public:
-	~IEntityCached() { OnDLLDetach(); }
-	IEntityCached();
-
-	const std::forward_list<MyClientCacheList>& GetInfos() const { return m_EntInfos; }
-
-public:
-	HookRes OnDLLAttach();
-	HookRes OnDLLDetach();
-
-public:	//IClientEntityListener
-	void OnEntityCreated(IClientShared* pEnt) override;
-	void OnEntityDeleted(IClientShared* pEnt) override;
-
-private:
-	std::forward_list<MyClientCacheList> m_EntInfos;
-};
-
-extern IEntityCached ent_infos;
 
 
 
@@ -458,9 +459,11 @@ inline void ClampAngle(QAngle& ang)
 
 QAngle GetAimAngle(const Vector& vecTarget, bool useLocalPunchAng = false);
 float GetFOV(ITFPlayer* pViewer, const Vector& vecEnd);
-float GetLocalFOV(const Vector& vecEnd);
+float GetLocalFOV(const QAngle& angles, const Vector& vecEnd);
+float GetLerpTime();
 
 string_t AllocPooledString(const char*);
+
 
 using IBaseCombatCharacter	= IBaseObject;
 using IBaseCombatWeapon		= IBaseObject;

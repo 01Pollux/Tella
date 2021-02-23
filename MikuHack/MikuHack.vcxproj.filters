@@ -59,9 +59,6 @@
     <ClInclude Include="Helpers\NetVars.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="Helpers\sdk.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="Helpers\SigTools.h">
       <Filter>Helpers</Filter>
     </ClInclude>
@@ -116,9 +113,6 @@
     <ClInclude Include="Source\Main.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Visual.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="Interfaces\IClientMode.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
@@ -150,7 +144,6 @@
       <Filter>Detour</Filter>
     </ClInclude>
     <ClInclude Include="Interfaces\NetMessage.h" />
-    <ClInclude Include="Source\Aimbot.h" />
     <ClInclude Include="Helpers\BoneCache.h" />
     <ClInclude Include="Helpers\BytePatch.h">
       <Filter>Helpers</Filter>
@@ -162,6 +155,16 @@
     <ClInclude Include="Source\Hack\BackTrack.h" />
     <ClInclude Include="Interfaces\Glow.h" />
     <ClInclude Include="Helpers\VTable.h" />
+    <ClInclude Include="Interfaces\IClientListener.h" />
+    <ClInclude Include="Helpers\DataMap.h" />
+    <ClInclude Include="GlobalHook\vhook.h" />
+    <ClInclude Include="GlobalHook\load_routine.h" />
+    <ClInclude Include="GlobalHook\detour.h" />
+    <ClInclude Include="Interfaces\Huds\TFHuds.h" />
+    <ClInclude Include="Interfaces\Huds\HudElement.h" />
+    <ClInclude Include="Profiler\defines.h" />
+    <ClInclude Include="Profiler\mprofiler.h" />
+    <ClInclude Include="GlobalHook\defines.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -177,9 +180,6 @@
       <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Helpers\NetVars.cpp">
-      <Filter>Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Helpers\sdk.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
     <ClCompile Include="Helpers\SigTools.cpp">
@@ -232,9 +232,6 @@
     </ClCompile>
     <ClCompile Include="Interfaces\CAttributes.cpp">
       <Filter>Interfaces</Filter>
-    </ClCompile>
-    <ClCompile Include="Interfaces\Hooks\FSN.cpp">
-      <Filter>Interfaces\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="Interfaces\CBaseEntity.cpp">
       <Filter>Interfaces</Filter>
@@ -318,6 +315,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Interfaces\Glow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interfaces\IClientListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\DataMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\vhook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\vhook_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interfaces\Huds\TFHuds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\mprofiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

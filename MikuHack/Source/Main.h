@@ -2,13 +2,11 @@
 
 #include "../Helpers/AutoList.h"
 #include "../ImGui/imgui_helper.h"
-#include "Debug.h"
 
-#include "../Interfaces/CBaseEntity.h"
 #include "../Helpers/json.h"
 #include "../Helpers/AutoItem.h"
 
-class MenuPanel: public AutoList<MenuPanel>
+class MenuPanel: public IAutoList<MenuPanel>
 {
 public:
 	virtual void OnRender() { }
@@ -32,8 +30,8 @@ extern MainMenu Mmain;
 class ExtraPanel : public MenuPanel
 {
 public:
-	void OnMenuInit() override final { };
-	void OnRender() override final { };
+	void OnMenuInit() final { };
+	void OnRender() final { };
 
 	void JsonCallback(Json::Value& json, bool read) override { };
 	void OnRenderExtra() override { };

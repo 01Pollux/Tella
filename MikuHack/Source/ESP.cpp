@@ -1,13 +1,15 @@
 #pragma once
 
-#include "../Interfaces/CBaseEntity.h"
+#include "../Helpers/Commons.h"
 #include "../Helpers/DrawTools.h"
 #include "ESP.h"
 
 #include <algorithm>
 #include <mutex>
 
+#include "../Interfaces/IClientListener.h"
 #include "../Helpers/Timer.h"
+#include "../Interfaces/VGUIS.h"
 
 ESPMenu EMenu;
 
@@ -97,14 +99,14 @@ void ESPMenu::OnRender()
 						ImGui::Text("Modes:");
 						if (ImGui::BeginCombo("##MODES", display_str[i].c_str()))
 						{
-							static const char* modes[] = { "Box", "Box 3D" };
-							static bool enabled[IM_ARRAYSIZE(modes)];
+							constexpr const char* modes[] = { "Box", "Box 3D" };
+							static bool enabled[SizeOfArray(modes)]{ };
 							static int actual = 0;
 
 							static std::vector<const char*> vec;
 							vec.clear();
 
-							for (uint x = 0; x < IM_ARRAYSIZE(modes); x++)
+							for (uint x = 0; x < SizeOfArray(modes); x++)
 							{
 								ImGui::Selectable(modes[x], &enabled[x], ImGuiSelectableFlags_DontClosePopups);
 								if (enabled[x])
@@ -129,7 +131,7 @@ void ESPMenu::OnRender()
 							ImGui::EndCombo();
 						}
 						ImGui::SameLine();
-						DrawTools::DrawHelp("Select display type");
+						ImGui::DrawHelp("Select display type");
 						ImGui::Separator();
 					}
 
@@ -137,7 +139,7 @@ void ESPMenu::OnRender()
 					{
 						ImGui::Dummy(ImVec2(0, 10));
 
-						DrawTools::DrawHelp("Select what to display");
+						ImGui::DrawHelp("Select what to display");
 
 						ImGui::Dummy(ImVec2(0, 10));
 
@@ -200,7 +202,7 @@ void ESPMenu::OnRender()
 						if (ImGui::BeginCombo("##MODES", display_str[i].c_str()))
 						{
 							static const char* modes[] = { "Box", "Box 3D"};
-							static bool enabled[IM_ARRAYSIZE(modes)];
+							static bool enabled[SizeOfArray(modes)]{ };
 							static int actual = 0;
 
 							static std::vector<const char*> vec;
@@ -231,7 +233,7 @@ void ESPMenu::OnRender()
 							ImGui::EndCombo();
 						}
 						ImGui::SameLine();
-						DrawTools::DrawHelp("Select display type");
+						ImGui::DrawHelp("Select display type");
 						ImGui::Separator();
 					}
 
@@ -239,7 +241,7 @@ void ESPMenu::OnRender()
 					{
 						ImGui::Dummy(ImVec2(0, 10));
 
-						DrawTools::DrawHelp("Select what to display");
+						ImGui::DrawHelp("Select what to display");
 
 						ImGui::Dummy(ImVec2(0, 10));
 
@@ -296,7 +298,7 @@ void ESPMenu::OnRender()
 				if (ImGui::BeginCombo("##MODES", display_str.c_str()))
 				{
 					static const char* modes[] = { "Box", "Box 3D" };
-					static bool enabled[IM_ARRAYSIZE(modes)];
+					static bool enabled[SizeOfArray(modes)]{ };
 					static int actual = 0;
 
 					static std::vector<const char*> vec;
@@ -328,7 +330,7 @@ void ESPMenu::OnRender()
 					ImGui::EndCombo();
 				}
 				ImGui::SameLine();
-				DrawTools::DrawHelp("Select display type");
+				ImGui::DrawHelp("Select display type");
 				ImGui::Separator();
 			}
 
@@ -336,7 +338,7 @@ void ESPMenu::OnRender()
 			{
 				ImGui::Dummy(ImVec2(0, 10));
 
-				DrawTools::DrawHelp("Select what to display");
+				ImGui::DrawHelp("Select what to display");
 
 				ImGui::Dummy(ImVec2(0, 10));
 
@@ -361,33 +363,39 @@ void ESPMenu::OnRender()
 }
 
 
-HookRes ESPMenu::OnPaintTraverse()
+HookRes ESPMenu::OnPaintTraverse(uint pId)
 {
-	if (BAD_LOCAL())
+	if (pId != PID_FocusOverlay)
 		return HookRes::Continue;
-	
+
+	if (::BadLocal())
+		return HookRes::Continue;
+
 	static std::mutex esp_mutex;
 	std::lock_guard<std::mutex> mutex(esp_mutex);
 
 	static bool m_bBeginDraw = false;
 	static Timer timer_check;
 
-	if (timer_check.trigger_if_elapsed(2500))
+	if (timer_check.trigger_if_elapsed(2500ms))
 		m_bBeginDraw = IsActive();
 
 	if (!m_bBeginDraw)
 		return HookRes::Continue;
 
 	CollectEntities();
+
+	M0Profiler watch_esp("ESPMenu::OnPaintTraverse::DrawEntities", M0PROFILER_GROUP::CHEAR_PROFILE);
 	for (auto& data : espdata)
 		DrawEntities(data);
+
 	return HookRes::Continue;
 }
 
 void ESPMenu::DrawEntities(ESPData& data)
 {
 	IClientShared* pEnt = data.pEnt;
-	static Vector origin;
+	Vector origin;
 
 	if (!DrawTools::WorldToScreen(pEnt->GetAbsOrigin(), origin))
 		return;
@@ -395,8 +403,8 @@ void ESPMenu::DrawEntities(ESPData& data)
 	if (!DrawBox(data))
 		return;
 
-	ESPType_t type = data.type;
-	static bool m_bDrawHealth = false;
+	const ESPType_t& type = data.type;
+	bool m_bDrawHealth = false;
 	switch (type)
 	{
 	case ESPType_t::Player: 
@@ -410,10 +418,10 @@ void ESPMenu::DrawEntities(ESPData& data)
 
 	//Draw Health Bar + Strings
 	{
-		const int max_x = data.collide_max.x;
-		const int max_y = data.collide_max.y;
-		const int min_x = data.collide_max.x;
-		const int min_y = data.collide_min.y;
+		const int& max_x = data.collide_max.x;
+		const int& max_y = data.collide_max.y;
+		const int& min_x = data.collide_max.x;
+		const int& min_y = data.collide_min.y;
 
 		short color_offs = data.color_offset;
 
@@ -434,8 +442,7 @@ void ESPMenu::DrawEntities(ESPData& data)
 			
 			int hbw = static_cast<int>((max_y - min_y - 2) * min(static_cast<float>(health) / static_cast<float>(max_health), 1.0f));
 
-			static Color color;
-			color = DrawTools::ColorTools::GetHealth(health, max_health);
+			Color color = DrawTools::ColorTools::GetHealth(health, max_health);
 
 			DrawTools::OutlinedRect(min_x, min_y - 6, max_x - min_x + 1, 7, DrawTools::ColorTools::FromArray(DrawTools::ColorTools::White<char8_t>));
 			DrawTools::Rect(min_x + hbw, min_y - 5, -hbw, 5, color);
@@ -445,10 +452,10 @@ Draw_Text:
 		{
 			int m_iDrawOffset = 0;
 
-			static Color color[2][3];
+			static Color color[2][3]{};
 			{
 				static Timer update_color[2][3];
-				if (update_color[color_offs][type].trigger_if_elapsed(3000))
+				if (update_color[color_offs][type].trigger_if_elapsed(3s))
 				{
 					int* colors;
 					GET_RANDOM(colors, base.m_iFontColor);
@@ -471,9 +478,10 @@ bool ESPMenu::DrawBox(ESPData& data)
 	IClientShared* pEnt = data.pEnt;
 	Color& color = data.color;
 
-	Vector origin = pEnt->GetCollideable()->GetCollisionOrigin();
-	Vector mins = pEnt->GetCollideable()->OBBMins() + origin;
-	Vector maxs = pEnt->GetCollideable()->OBBMaxs() + origin;
+	ICollideable* pCol = pEnt->GetCollideable();
+	const Vector& origin = pCol->GetCollisionOrigin();
+	const Vector& mins = pCol->OBBMins() + origin;
+	const Vector& maxs = pCol->OBBMaxs() + origin;
 
 	
 	static Vector points[8];
@@ -485,15 +493,15 @@ bool ESPMenu::DrawBox(ESPData& data)
 		float y = maxs.y - mins.y;
 		float z = maxs.z - mins.z;
 
-		Vector corners[8];
-		corners[0] = mins;
-		corners[1] = mins + Vector(x, 0, 0);
-		corners[2] = mins + Vector(x, y, 0);
-		corners[3] = mins + Vector(0, y, 0);
-		corners[4] = mins + Vector(0, 0, z);
-		corners[5] = mins + Vector(x, 0, z);
-		corners[6] = mins + Vector(x, y, z);
-		corners[7] = mins + Vector(0, y, z);
+		Vector corners[8]{ mins, mins, mins, mins, mins, mins, mins, mins };
+
+		corners[1] += Vector(x, 0, 0);
+		corners[2] += Vector(x, y, 0);
+		corners[3] += Vector(0, y, 0);
+		corners[4] += Vector(0, 0, z);
+		corners[5] += Vector(x, 0, z);
+		corners[6] += Vector(x, y, z);
+		corners[7] += Vector(0, y, z);
 
 		for (uint i = 0; i < 8; i++)
 			if (!DrawTools::WorldToScreen(corners[i], points[i]))
@@ -512,11 +520,11 @@ bool ESPMenu::DrawBox(ESPData& data)
 				min_y = points[i].y;
 		}
 
-		data.collide_max = Vector(max_x, max_y, 0.0f);
-		data.collide_min = Vector(min_y, min_y, 0.0f);
+		data.collide_max.Init(max_x, max_y, 0.0f);
+		data.collide_min.Init(min_y, min_y, 0.0f);
 	}
 
-	static ESPStruct::ESPMode bits;
+	ESPStruct::ESPMode bits;
 
 	GET_RANDOM(bits, base.m_bitsDrawMode);
 
@@ -569,8 +577,10 @@ bool ESPMenu::DrawBox(ESPData& data)
 
 void ESPMenu::CollectEntities()
 {
+	M0Profiler watch_esp("ESPMenu::OnPaintTraverse::CollectEntities", M0PROFILER_GROUP::CHEAR_PROFILE);
+
 	espdata.clear();
-	Vector myOrg = pLocalPlayer->GetAbsOrigin();
+	const Vector& myOrg = ::ILocalPtr()->GetAbsOrigin();
 	
 	for (const auto& infos = ent_infos.GetInfos(); 
 		const auto& cache : infos)
@@ -749,11 +759,10 @@ void ESPMenu::JsonCallback(Json::Value& json, bool read)
 
 static void ProcessPlayer(ESPData& data, ITFPlayer* pPlayer)
 {
-	auto& players = EMenu.player_esp[pPlayer->GetTeam() - 2];
-
 	if (pPlayer->GetLifeState() != LIFE_STATE::ALIVE)
 		return;
 
+	auto& players = EMenu.player_esp[pPlayer->GetTeam() - 2];
 	//Draw Name
 	{
 		static player_info_t infos;
@@ -769,66 +778,44 @@ static void ProcessPlayer(ESPData& data, ITFPlayer* pPlayer)
 
 	//Draw Uber
 	{
-		if (pPlayer->GetClass() == TFClass::Medic)
+		if (pPlayer->GetClass() == TF_Medic)
 		{
-			static IBaseHandle* pWeaponList;
-			static IBaseObject* pMedigun;
-
-			pWeaponList = pPlayer->GetWeaponList();
+			IBaseHandle* pWeaponList = pPlayer->GetWeaponList();
 			for (uint i = 0; pWeaponList[i].IsValid() && i < 3; i++)
 			{
-				pMedigun = reinterpret_cast<IBaseObject*>(clientlist->GetClientEntityFromHandle(pWeaponList[i]));
+				IBaseObject* pMedigun = reinterpret_cast<IBaseObject*>(clientlist->GetClientEntityFromHandle(pWeaponList[i]));
 				if (pMedigun && pMedigun->IsClassID(ClassID_CWeaponMedigun))
 				{
-					float flcharge = floor(*pMedigun->GetEntProp<float>("m_flChargeLevel") * 100.0);
+					float flcharge = floor(*pMedigun->GetEntProp<float, PropType::Recv>("m_flChargeLevel") * 100.0);
 					std::string charge = std::to_string(static_cast<int>(flcharge));
 
-					if (*pMedigun->GetEntProp<int>("m_iItemDefinitionIndex") != 998)
+					if (*pMedigun->GetEntProp<int, PropType::Recv>("m_iItemDefinitionIndex") != 998) // The Vaccinator
 						ADD_STRING(players, Uber, charge + "% Uber");
 					else ADD_STRING(players, Uber, charge + "% Uber | Charges: " + std::to_string(floor(flcharge / 0.25)));
 					
 					break;
 				}
 			}
-//			static IBaseObject* pMedicgun = reinterpret_cast<IBaseObject*>((pPlayer->GetWeaponList()[2]));
+//			IBaseObject* pMedicgun = reinterpret_cast<IBaseObject*>((pPlayer->GetWeaponList()[2]));
 		}
 	}
 
 	//Draw Conds
 	{
-		static const std::unordered_map<ETFCond, const char*> m_CondMap = {
-		{ TF_COND_FEIGN_DEATH,					"Dead Ringer"},
-		{ TF_COND_MEDIGUN_UBER_FIRE_RESIST,		"Fire Resist"},
-		{ TF_COND_BLAST_IMMUNE,					"Blast Resist"},
-		{ TF_COND_BULLET_IMMUNE,				"Bullet Resist"},
-		{ TF_COND_INVULNERABLE,					"Ubered"},
-		{ TF_COND_TELEPORTED,					"Teleported"},
-		{ TF_COND_SPEED_BOOST,					"Speed Boosted"},
-		{ TF_COND_CRITBOOSTED,					"Crit Boosted"},
-		{ TF_COND_CRITBOOSTED_DEMO_CHARGE,		"Charging"},
-		{ TF_COND_DEFENSEBUFF,					"Defense Buff"},
-		{ TF_COND_DEFENSEBUFF_HIGH,				"Defense Buff HIGH"},
-		{ TF_COND_DEFENSEBUFF_NO_CRIT_BLOCK,	"Defense Buff CRIT"},
-		{ TF_COND_URINE,						"Jarated!"},
-		{ TF_COND_TAUNTING,						"Taunting"}
-		};
 		if (players.m_bDrawCond)
 		{
-			for (auto& cond : m_CondMap)
-				if (pPlayer->InCond(cond.first))
-					data.AddEntityString(cond.second);
+			for (auto&& [cond, name] : TFCondMap)
+				if (pPlayer->InCond(cond))
+					data.AddEntityString(name);
 		}
 	}
-
-	
 
 	data.color.SetColor(players.base.m_iDrawColor[0], 
 						players.base.m_iDrawColor[1],
 						players.base.m_iDrawColor[2],
 						players.base.m_iDrawColor[3]);
 
-	espdata.push_back(data);
-	return;
+	espdata.push_back(std::move(data));
 }
 
 static void ProcessBuilding(ESPData& data, IBaseObject* pObject, int classid)
@@ -836,22 +823,22 @@ static void ProcessBuilding(ESPData& data, IBaseObject* pObject, int classid)
 	auto& buildings = EMenu.building_esp[pObject->GetTeam() - 2];
 
 	int level = pObject->GetUpgradeLvl();
-	bool IsMini = *pObject->GetEntProp<uint8_t>("m_bMiniBuilding");
-	bool sapped = *pObject->GetEntProp<uint8_t>("m_bHasSapper");
+	bool IsMini = *pObject->GetEntProp<uint8_t, PropType::Recv>("m_bMiniBuilding");
+	bool sapped = *pObject->GetEntProp<uint8_t, PropType::Recv>("m_bHasSapper");
 
-	if(!IsMini) ADD_STRING(buildings, Level, "Lvl " + std::to_string(level));
-	else		ADD_STRING(buildings.base, Name, "<Mini>");
+	if (!IsMini) ADD_STRING(buildings, Level, "Lvl " + std::to_string(level));
+	else		 ADD_STRING(buildings.base, Name, "<Mini>");
 
 	if (sapped)
 		ADD_STRING(buildings, State, "<SAPPED>");
 
-	if(*pObject->GetEntProp<bool>("m_bCarried"))
+	if(*pObject->GetEntProp<bool, PropType::Recv>("m_bCarried"))
 	{
 		ADD_STRING(buildings, State, "Carried");
 		espdata.push_back(data);
 		return;
 	}
-	else if (*pObject->GetEntProp<bool>("m_bBuilding"))
+	else if (*pObject->GetEntProp<bool, PropType::Recv>("m_bBuilding"))
 	{
 		ADD_STRING(buildings, State, "Building");
 		espdata.push_back(data);
@@ -864,60 +851,72 @@ static void ProcessBuilding(ESPData& data, IBaseObject* pObject, int classid)
 	{
 	case ClassID_CObjectTeleporter:
 	{
-		int state = *pObject->GetEntProp<int>("m_iState");
+		int state = *pObject->GetEntProp<int, PropType::Recv>("m_iState");
 		switch (state)
 		{
 		case 0: //Building
+		{
 			ADD_STRING(buildings, State, "Building...");
 			break;
+		}
 
 		case 2:	//Ready
+		{
 			ADD_STRING(buildings, State, "Ready");
 			break;
+		}
 
 		case 6:	//Recharging
-			float m_flRechargeTime = *pObject->GetEntProp<float>("m_flRechargeTime");
+		{
+			float m_flRechargeTime = *pObject->GetEntProp<float, PropType::Recv>("m_flRechargeTime");
 			float flPercent = m_flRechargeTime - gpGlobals->curtime;
 
 			ADD_STRING(buildings, State, std::string("Charging: " + std::to_string(flPercent) + "s"));
-
 			break;
 		}
+
+		default:
+			break;
+		}
+
+		break;
 	}
-	break;
 
 	case ClassID_CObjectSentrygun:
 	{
-		bool m_bPlayerControlled = *pObject->GetEntProp<bool>("m_bPlayerControlled");
-		int m_iAmmoShells = *pObject->GetEntProp<int>("m_iAmmoShells"), m_iAmmoRockets = *pObject->GetEntProp<int>("m_iAmmoRockets");
-		int m_iMaxAmmoShells = *pObject->GetEntProp<int>("m_iAmmoShells", 4);
+		bool m_bPlayerControlled = *pObject->GetEntProp<bool, PropType::Recv>("m_bPlayerControlled");
+		int m_iAmmoShells = *pObject->GetEntProp<int, PropType::Recv>("m_iAmmoShells"), m_iAmmoRockets = *pObject->GetEntProp<int, PropType::Recv>("m_iAmmoRockets");
+		int m_iMaxAmmoShells = *pObject->GetEntProp<int, PropType::Recv>("m_iAmmoShells", 4);
 
 		if (m_bPlayerControlled)
 			ADD_STRING(buildings, State, "Wrangled");
 
 		ADD_STRING(buildings, Ammo, "Ammo: " + std::to_string(m_iAmmoShells) + " / " + std::to_string(m_iMaxAmmoShells));
 
-		if(level == 3)
+		if (level == 3)
 			ADD_STRING(buildings, Ammo, "Rockets: " + std::to_string(m_iAmmoRockets) + " / 20");
-	}
 	break;
+	}
 
 	case ClassID_CObjectDispenser:
 	{
-		auto& m_hHealingTargets = *pObject->GetEntProp<CUtlVector<IBaseHandle>>("m_iMiniBombCounter", -32);
+		using namespace Offsets::IBaseEntity::Dispenser;
 
-		if (m_hHealingTargets.Count())
-			ADD_STRING(buildings, State, "Healing: " + std::to_string(m_hHealingTargets.Count()) + " Players");
+		auto m_hHealingTargets = pObject->GetEntProp<CUtlVector<IBaseHandle>, PropType::Recv>("m_iMiniBombCounter", m_iMiniBombCounter__To__m_hHealingTargets);
 
-		int m_iAmmoMetal = *pObject->GetEntProp<int>("m_iState", 4);
-		ADD_STRING(buildings, State, "Ammo: " + std::to_string(m_iAmmoMetal));
+		if (int num_players = m_hHealingTargets->Count())
+			ADD_STRING(buildings, State, "Healing: " + std::to_string(num_players) + " Players");
+
+		int num_ammo = *pObject->GetEntProp<int, PropType::Recv>("m_iState", m_iState__To__m_iAmmoMetal);
+		ADD_STRING(buildings, State, "Ammo: " + std::to_string(num_ammo));
+		break;
 	}
-	break;
+
+	default:
+		break;
 	}
 
-	espdata.push_back(data);
-	return;
-
+	espdata.push_back(std::move(data));
 }
 
 void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
@@ -929,15 +928,11 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 	const Vector& org = pEnt->GetAbsOrigin();
 	float dist = org.DistTo(myOrg);
 
-	ESPData data{ };
-	data.pEnt = pEnt;
-	data.dist = dist;
-
 	EntFlag flag = cache.flag;
 
 	switch (flag)
 	{
-	case EntFlag::EF_PLAYER:
+	case EntFlag::Player:
 	{
 		int team = pEnt->GetTeam() - 2;
 		if (team < 0)
@@ -953,6 +948,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 		if (PlayerESP.m_bIgnoreCloak && reinterpret_cast<ITFPlayer*>(pEnt)->InCond(TF_COND_STEALTHED))
 			return;
 
+		ESPData data{ };
+		data.pEnt = pEnt;
+		data.dist = dist;
+
 		ADD_STRING(PlayerESP.base, Distance, "Distance: " + std::to_string(dist) + " HU");
 		ADD_STRING(PlayerESP, Team, m_szTeams[team]);
 
@@ -963,7 +962,7 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 		return;
 	}
 	[[fallthrough]];
-	case EntFlag::EF_BUILDING:
+	case EntFlag::Building:
 	{
 		ClassID id = static_cast<ClassID>(pEnt->GetClientClass()->m_ClassID);
 		switch (id)
@@ -980,6 +979,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 
 			if (BuildingESP.base.m_flMaxDist > 50.0f && BuildingESP.base.m_flMaxDist < dist)
 				break;
+
+			ESPData data{ };
+			data.pEnt = pEnt;
+			data.dist = dist;
 
 			ADD_STRING(BuildingESP, Team, m_szTeams[team]);
 			ADD_STRING(BuildingESP.base, Name, "Dispenser");
@@ -1004,6 +1007,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 			if (BuildingESP.base.m_flMaxDist > 50.0f && BuildingESP.base.m_flMaxDist < dist)
 				break;
 
+			ESPData data{ };
+			data.pEnt = pEnt;
+			data.dist = dist;
+
 			ADD_STRING(BuildingESP, Team, m_szTeams[team]);
 			ADD_STRING(BuildingESP.base, Name, "Teleporter");	//TODO : m_iObjectMode!
 
@@ -1027,6 +1034,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 			if (BuildingESP.base.m_flMaxDist > 50.0f && BuildingESP.base.m_flMaxDist < dist)
 				break;
 
+			ESPData data{ };
+			data.pEnt = pEnt;
+			data.dist = dist;
+
 			ADD_STRING(BuildingESP, Team, m_szTeams[team]);
 			ADD_STRING(BuildingESP.base, Name, "Sentrygun");
 
@@ -1040,7 +1051,7 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 		return;
 	}
 	[[fallthrough]];
-	case EntFlag::EF_EXTRA:
+	case EntFlag::Extra:
 	{
 		ClassID id = static_cast<ClassID>(pEnt->GetClientClass()->m_ClassID);
 		switch (id)
@@ -1054,6 +1065,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 
 			if (objects.base.m_flMaxDist > 50.0f && objects.base.m_flMaxDist < dist)
 				break;
+
+			ESPData data{ };
+			data.pEnt = pEnt;
+			data.dist = dist;
 
 			data.color.SetColor(objects.base.m_iDrawColor[0],
 				objects.base.m_iDrawColor[1],
@@ -1071,8 +1086,12 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 			if (!objects.base.m_bActive || !objects.m_bDrawStickies)
 				break;
 
-			if (*pEnt->GetEntProp<int>("m_iType") != 1)
+			if (*pEnt->GetEntProp<int, PropType::Recv>("m_iType") != 1)
 				break;
+
+			ESPData data{ };
+			data.pEnt = pEnt;
+			data.dist = dist;
 
 			data.color.SetColor(objects.base.m_iDrawColor[0],
 				objects.base.m_iDrawColor[1],
@@ -1095,6 +1114,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 
 	if (pEnt->IsAmmoPack())
 	{
+		ESPData data{ };
+		data.pEnt = pEnt;
+		data.dist = dist;
+
 		ADD_STRING(EMenu.objects_esp.base, Name, "Ammo pack");
 
 		data.color.SetColor(objects.base.m_iDrawColor[0],
@@ -1106,6 +1129,10 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 	}
 	else if (pEnt->IsHealthPack())
 	{
+		ESPData data{ };
+		data.pEnt = pEnt;
+		data.dist = dist;
+
 		ADD_STRING(EMenu.objects_esp.base, Name, "Healthkit");
 
 		data.color.SetColor(objects.base.m_iDrawColor[0],
@@ -1115,6 +1142,4 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 
 		espdata.push_back(data);
 	}
-
-	return;
 }

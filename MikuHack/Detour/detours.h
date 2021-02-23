@@ -1204,6 +1204,11 @@ public:
         is_set = DetourTransactionCommit() == ERROR_SUCCESS;
     }
 
+    void* OriginalFunction()
+    {
+        return actual;
+    }
+
     ~IDetour()
     {
         if (!is_set)
@@ -1213,6 +1218,14 @@ public:
         DetourDetach(&actual, callback);
         is_set = !(DetourTransactionCommit() == ERROR_SUCCESS);
     }
+
+    bool operator==(const IDetour&) const = default;
+
+public:
+    IDetour(const IDetour&) = delete;
+    IDetour& operator=(const IDetour&) = delete;
+    IDetour(IDetour&&) = delete;
+    IDetour& operator=(IDetour&&) = delete;
 };
 
 #endif // _DETOURS_H_

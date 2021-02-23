@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Helpers/sdk.h"
 #include <cdll_int.h>
 #include <igameevents.h>
 #include <networkstringtabledefs.h>

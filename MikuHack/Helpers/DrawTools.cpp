@@ -1,14 +1,18 @@
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 #include "DrawTools.h"
 #include "../Interfaces/VGUIS.h"
+#include "../Interfaces/IVEngineClient.h"
 
 #include "Main.h"
 #include <codecvt>
+#include <mathlib/vmatrix.h>
 
-bool make_close = false;
-static bool init = false;
+static bool make_close = false;
 
-std::pair<int, int> DrawTools::m_ScreenSize = {1280, 720};
+std::pair<int, int> DrawTools::m_ScreenSize { 1280, 720 };
 
 struct SurfaceTools
 {
@@ -20,7 +24,7 @@ struct SurfaceTools
 		surface->SetFontGlyphSet(this->Arial, "Arial", DrawTools::m_iStringOffset, 500, 0, 0, vgui::ISurface::FONTFLAG_ANTIALIAS);
 
 		iWhiteTexture = surface->CreateNewTextureID();
-		unsigned char colorBuffer[4] = { 255, 255, 255, 255 };
+		const uint8_t colorBuffer[] { 255, 255, 255, 255 };
 		surface->DrawSetTextureRGBA(iWhiteTexture, colorBuffer, 1, 1, false, true);
 	}
 };
@@ -48,21 +52,6 @@ void DrawTools::Update()
 	engineclient->GetScreenSize(m_ScreenSize.first, m_ScreenSize.second);
 }
 
-void DrawTools::DrawHelp(const char* fmt)
-{
-	ImGui::TextDisabled("(?)");
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-
-		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(fmt);
-		ImGui::PopTextWrapPos();
-
-		ImGui::EndTooltip();
-	}
-}
-
 bool DrawTools::WorldToScreen(const Vector& origin, Vector& screen)
 {
 	const VMatrix& worldToScreen = engineclient->WorldToScreenMatrix();
@@ -72,8 +61,17 @@ bool DrawTools::WorldToScreen(const Vector& origin, Vector& screen)
 	if (w > 0.001) 
 	{
 		float fl1DBw = 1 / w;
-		screen.x = (m_ScreenSize.first / 2) + (0.5 * ((worldToScreen[0][0] * origin[0] + worldToScreen[0][1] * origin[1] + worldToScreen[0][2] * origin[2] + worldToScreen[0][3]) * fl1DBw) * m_ScreenSize.first + 0.5);
-		screen.y = (m_ScreenSize.second / 2) - (0.5 * ((worldToScreen[1][0] * origin[0] + worldToScreen[1][1] * origin[1] + worldToScreen[1][2] * origin[2] + worldToScreen[1][3]) * fl1DBw) * m_ScreenSize.second + 0.5);
+		screen.x = (static_cast<const double>(m_ScreenSize.first) / 2) + (0.5 * ((	static_cast<const double>(worldToScreen[0][0]) * origin[0] +
+																					static_cast<const double>(worldToScreen[0][1]) * origin[1] +
+																					static_cast<const double>(worldToScreen[0][2]) * origin[2] +
+																					static_cast<const double>(worldToScreen[0][3])) * fl1DBw) *
+																					static_cast<const double>(m_ScreenSize.first) + 0.5);
+
+		screen.y = (static_cast<const double>(m_ScreenSize.second) / 2) - (0.5 * ((	static_cast<const double>(worldToScreen[1][0]) * origin[0] +
+																					static_cast<const double>(worldToScreen[1][1]) * origin[1] +
+																					static_cast<const double>(worldToScreen[1][2]) * origin[2] +
+																					static_cast<const double>(worldToScreen[1][3])) * fl1DBw) *
+																					static_cast<const double>(m_ScreenSize.second) + 0.5);
 		return true;
 	}
 
@@ -106,16 +104,17 @@ void DrawTools::Rect(int x, int y, int w, int h, const Color& clr)
 	surface->DrawSetColor(clr);
 	surface->DrawSetTexture(surfacetools.iWhiteTexture);
 
-	vgui::Vertex_t vertices[4];
-	vertices[0].m_Position = Vector2D(x, y);
-	vertices[1].m_Position = Vector2D(x, y + h);
-	vertices[2].m_Position = Vector2D(x + w, y + h);
-	vertices[3].m_Position = Vector2D(x + w, y);
+	vgui::Vertex_t vertices[]{
+		{ { static_cast<float>(x),		static_cast<float>(y)		} },
+		{ { static_cast<float>(x),		static_cast<float>(y + h)	} },
+		{ { static_cast<float>(x + w),	static_cast<float>(y + h)	} },
+		{ { static_cast<float>(x + w),	static_cast<float>(y)		} }
+	};
 
 	surface->DrawTexturedPolygon(4, vertices);
 }
 
-void DrawTools::OutlinedRect(int x, int y, int w, int h, const  Color& clr)
+void DrawTools::OutlinedRect(int x, int y, int w, int h, const Color& clr)
 {
 	Rect(x, y, w, 1, clr);
 	Rect(x, y, 1, h, clr);

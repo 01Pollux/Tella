@@ -1,18 +1,24 @@
 
-#include "../Helpers/DrawTools.h"
-
 #include "Main.h"
-#include "ESP.h"
-#include "Visual.h"
-#include "../Helpers/Config.h"
-
 #include "Debug.h"
+
+#include "../Helpers/Config.h"
+#include "../Helpers/DrawTools.h"
+#include "../Helpers/Commons.h"
+
+#include "../Interfaces/IVEngineClient.h"
+#include "../Profiler/mprofiler.h"
+
+#include <fstream>
+#include <iomanip>
 
 MainMenu Mmain;
 
+
 static void OpenStyleManager(bool* open);
-static void OpenColorManager(bool* open);
+static void OpenProfileManager(bool* open);
 static void OpenDebugControl(bool* open);
+
 
 //
 void MainMenu::DoRender()
@@ -32,12 +38,12 @@ void MainMenu::DoRender()
 
 		if (ImGui::BeginTabBar("##MAIN_TAB", ImGuiTabBarFlags_Reorderable))
 		{
-			for (auto& entry : AutoList<MenuPanel>::List())
+			for (auto& entry : IAutoList<MenuPanel>::List())
 				entry->OnRender();
 
 			if (ImGui::BeginTabItem("Extra##EXTRA"))
 			{
-				for (auto& entry : AutoList<MenuPanel>::List())
+				for (auto& entry : IAutoList<MenuPanel>::List())
 				{
 					entry->OnRenderExtra();
 					ImGui::Separator();
@@ -61,15 +67,15 @@ void MainMenu::RenderMenuBar()
 	if (ImGui::BeginMenuBar())
 	{
 		static bool style_is_open = false;
-		static bool color_is_open = false;
 		static bool debug_is_open = false;
+		static bool profiler_is_open = false;
 		static bool begin_shutdown = false;
 
 		if (style_is_open)
 			OpenStyleManager(&style_is_open);
 
-		if (color_is_open)
-			OpenColorManager(&color_is_open);
+		if (profiler_is_open)
+			OpenProfileManager(&profiler_is_open);
 
 		if (debug_is_open)
 			OpenDebugControl(&debug_is_open);
@@ -85,17 +91,8 @@ void MainMenu::RenderMenuBar()
 				ImGui::Dummy({ 10, 0 });
 				if (ImGui::Button("Yes", { 50, 0 }))
 				{
-					try
-					{
-						MikuConfig::SaveSettings(".\\Miku\\Config.json");
-						ImGui::SaveIniSettingsToDisk(".\\Miku\\IMGui.ini");
-					}
-					catch (...)
-					{
-						MessageBox(NULL, "Miku-Miku failed to save your config. It may be outdated.\nClick okay to reset your config", "Error", MB_OKCANCEL);
-						if (remove(".\\Miku\\Config.json"))
-							MessageBox(NULL, "Failed to delete Miku-Miku's config.", "Fatal!", MB_OKCANCEL);
-					}
+					MikuConfig::SaveSettings(".\\Miku\\Config.json");
+					ImGui::SaveIniSettingsToDisk(".\\Miku\\IMGui.ini");
 
 					begin_shutdown = false;
 					DrawTools::MarkForDeletion();
@@ -130,11 +127,11 @@ void MainMenu::RenderMenuBar()
 
 			ImGui::MenuItem("Change Style", NULL, &style_is_open);
 
-			ImGui::MenuItem("Change Color", NULL, &color_is_open);
+			ImGui::MenuItem("Profiler", NULL, &profiler_is_open);
 
 			ImGui::MenuItem("Debug Control", NULL, &debug_is_open);
 
-			if(ImGui::MenuItem("Update Screen"))
+			if (ImGui::MenuItem("Update Screen"))
 			{
 				engineclient->GetScreenSize(DrawTools::m_ScreenSize.first, DrawTools::m_ScreenSize.second);
 			}
@@ -146,33 +143,15 @@ void MainMenu::RenderMenuBar()
 		{
 			if (ImGui::MenuItem("Load"))
 			{
-				try
-				{
-					MikuConfig::LoadSettings(".\\Miku\\Config.json");
-					ImGui::LoadIniSettingsFromDisk(".\\Miku\\IMGui.ini");
-				}
-				catch (...)
-				{
-					MessageBox(NULL, "Miku-Miku failed to save your config. It may be outdated.\nClick okay to reset your config", "Error", MB_OKCANCEL);
-					if (remove(".\\Miku\\Config.json"))
-						MessageBox(NULL, "Failed to delete Miku-Miku's config.", "Fatal!", MB_OKCANCEL);
-				}
+				MikuConfig::LoadSettings(".\\Miku\\Config.json");
+				ImGui::LoadIniSettingsFromDisk(".\\Miku\\IMGui.ini");
 			}
 
 			if (ImGui::MenuItem("Save"))
 			{
-				try
-				{
-					MikuConfig::SaveSettings(".\\Miku\\Config.json");
-					ImGui::SaveIniSettingsToDisk(".\\Miku\\IMGui.ini");
-					ImGui::GetIO().WantSaveIniSettings = false;
-				}
-				catch (...)
-				{
-					MessageBox(NULL, "Miku-Miku failed to save your config. It may be outdated.\nClick okay to reset your config", "Error", MB_OKCANCEL);
-					if (remove(".\\Miku\\Config.json"))
-						MessageBox(NULL, "Failed to delete Miku-Miku's config.", "Fatal!", MB_OKCANCEL);
-				}
+				MikuConfig::SaveSettings(".\\Miku\\Config.json");
+				ImGui::SaveIniSettingsToDisk(".\\Miku\\IMGui.ini");
+				ImGui::GetIO().WantSaveIniSettings = false;
 			}
 
 			ImGui::EndMenu();
@@ -187,32 +166,9 @@ void MainMenu::RenderMenuBar()
 void OpenStyleManager(bool* open)
 {
 	ImGui::Begin("Style Editor", open);
+
 	ImGui::SetWindowSize(ImVec2{ 750, 426 });
 	ImGui::ShowStyleEditor();
-	ImGui::End();
-}
-
-void OpenColorManager(bool* open)
-{
-	ImGui::Begin("Color Editor", open);
-
-	ImGui::SetWindowSize(ImVec2{ 400, 400 });
-
-	static constexpr ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoSidePreview 
-												| ImGuiColorEditFlags_AlphaBar 
-												| ImGuiColorEditFlags_PickerHueWheel 
-												| ImGuiColorEditFlags_DisplayHex;
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	static ImVec4 colors{ style.Colors->x, style.Colors->y, style.Colors->z, style.Colors->w };
-
-	if (ImGui::ColorPicker4("Color Picker", (float*)(&colors), flags))
-	{
-		style.Colors->x = Mmain.m_flColor[0] = colors.x;
-		style.Colors->y = Mmain.m_flColor[1] = colors.y;
-		style.Colors->z = Mmain.m_flColor[2] = colors.z;
-		style.Colors->w = Mmain.m_flColor[3] = colors.w;
-	}
 
 	ImGui::End();
 }
@@ -223,10 +179,56 @@ void OpenDebugControl(bool* open)
 	ImGui::SetWindowSize(ImVec2{ 750, 426 });
 
 	AutoBool Debugging("MIKUDebug.m_bDebugging");
-	ImGui::Checkbox("Debugging", Debugging.get());
+	ImGui::Checkbox("Debugging", &Debugging);
 
 	AutoBool UserMsgDebug("MIKUDebug.UserMsgDebug");
-	ImGui::Checkbox("User Message", UserMsgDebug.get());
+	ImGui::Checkbox("User Message", &UserMsgDebug);
+
+	ImGui::End();
+}
+
+void OpenProfileManager(bool* open)
+{
+	ImGui::Begin("Profiler Manager", open, ImGuiWindowFlags_NoResize);
+
+	ImGui::SetWindowSize(ImVec2{ 870, 640 });
+
+	static bool should_record[SizeOfArray(M0PROFILE_NAMES)]{ };
+
+	for (size_t i = 0; i < SizeOfArray(M0PROFILE_NAMES); i++)
+	{
+		if (ImGui::TreeNode(M0PROFILE_NAMES[i]))
+		{
+			const M0PROFILER_GROUP group =static_cast<M0PROFILER_GROUP>(i);
+
+			if (ImGui::Checkbox("Enable", &should_record[i]))
+			{
+				if (should_record[i])	M0Profiler::Start(group);
+				else					M0Profiler::Stop(group);
+			}
+			
+			ImGui::SameLine();
+			static  bool output_all = false;
+			ImGui::Checkbox("Output All", &output_all);
+
+			ImGui::SameLine();
+			if (ImGui::Button("Export"))
+			{
+				M0Profiler::Stop(group);
+				should_record[i] = false;
+
+				time_t this_time; time(&this_time);
+				tm* time_info = localtime(&this_time);
+
+				std::string path(Format(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], std::put_time(time_info, "__%h_%d_%H_%M_%S"), ".txt"));
+				std::ofstream output(path, std::ios::app | std::ios::out);
+
+				M0Profiler::OutputToFile(group, output, output_all ? M0PROFILER_FLAGS::RESULTS_ONLY : M0PROFILER_FLAGS::EMPTY);
+
+				M0Profiler::Reset(group);
+			}
+		}
+	}
 
 	ImGui::End();
 }

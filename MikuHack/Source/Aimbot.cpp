@@ -1,21 +1,39 @@
 
-#include "Aimbot.h"
+#include "Main.h"
+
 #include "../Interfaces/IVEClientTrace.h"
-#include "../Helpers/Commons.h"
+#include "../Interfaces/IClientListener.h"
 #include "../Interfaces/IClientMode.h"
+
 #include "../Helpers/DrawTools.h"
-#include "../Helpers/VTable.h"
+#include "../GlobalHook/vhook.h"
+#include "../GlobalHook/load_routine.h"
 
 #include "Hack/Effects.h"
 #include "../Interfaces/Glow.h"
 
-#include <thread>
-#include <regex>
-#include <set>
+#include "../Profiler/mprofiler.h"
+
+
+class IAimbotHack : public MenuPanel, public IMainRoutine
+{
+    IGlobalVHook<bool, float, CUserCmd*>* CreateMove;
+
+public:
+    void OnLoadDLL() override;
+    void OnUnloadDLL() override;
+    HookRes OnCreateMove(CUserCmd* cmd);
+
+public:	// MenuPanel
+
+    void OnRender() override;
+    void JsonCallback(Json::Value& json, bool read) override;
+} static dummy_aimbot;
+
 
 
 static IBaseHandle pHndl;
-AutoVar<ITFPlayer*> pLastEnt{ "Aimbot::CurEntity" };
+static ITFPlayer* pLastEnt = nullptr;
 static bool m_bFoundTarget = false;
 static bool m_bCanSnap = false;
 
@@ -48,7 +66,7 @@ struct _AimDataInfo
 
     AutoBool bDrawParticles{ "Aimbot::DrawParticles", true };
     AutoBool bUseGlow{ "Aimbot::UseGlow",           false };
-    AutoColor cAimGlow{ "Aimbot::GlowColor"};
+    AutoColor cAimGlow{ "Aimbot::GlowColor",        DrawTools::ColorTools::Cyan<char8_t> };
 
     AutoInt iAimKey{ "Aimbot::AimKey",          VK_DELETE };
     AutoInt iRandomMiss{ "Aimbot::RandomMiss",  21 };
@@ -61,45 +79,54 @@ struct _AimDataInfo
 
     AutoString sAimParticle{ "Aimbot::AimParticle", "soldierbuff_blue_buffed" };
 
-    IGlowObject* pGlowEnt = nullptr;
+    IUniqueGlowObject pGlowEnt = nullptr;
 
     bool bShouldAim = true;
 
-    _AimDataInfo()
+    _AimDataInfo() noexcept
     {
-        cAimGlow.Set(DrawTools::ColorTools::Cyan<char8_t>);
+        (*sAimParticle).reserve(SizeOfAimParticle());
     }
 
-    inline void ToggleState(bool state)
+    inline constexpr void ToggleState(bool state) noexcept
     {
         this->bShouldAim = state;
     }
 
-    inline bool CanAim()
+    inline constexpr bool CanAim() noexcept
     {
         return this->bShouldAim;
     }
 
-    inline void SetKey(int i)
+    inline void SetKey(int i) noexcept
     {
         switch (i)
         {
         case 0:
+        {
             iAimKey = static_cast<int>('Q');
             break;
+        }
         case 1:
+        {
             iAimKey = VK_END;
             break;
+        }
         case 2:
+        {
             iAimKey = VK_F9;
             break;
-        case 3:
+        }
+//        case 3:
+        default:
+        {
             iAimKey = VK_DELETE;
             break;
         }
+        }
     }
 
-    inline int KeyToPos()
+    inline int KeyToPos() noexcept
     {
         switch (iAimKey)
         {
@@ -110,32 +137,32 @@ struct _AimDataInfo
         case VK_F9:
             return 2;
         case VK_DELETE:
+		default:
             return 3;
         }
-        return 0;
     }
 
     inline void AllocateGlowOnce()
     {
         if (!pGlowEnt)
-            pGlowEnt = new IGlowObject;
+            pGlowEnt = std::make_unique<IGlowObject>();
     }
 
-    inline void DestroyGlowOnce()
+    inline void DestroyGlowOnce() noexcept
     {
-        if (pGlowEnt)
-        {
-            delete pGlowEnt;
-            pGlowEnt = nullptr;
-        }
+        pGlowEnt = nullptr;
+    }
+
+    constexpr size_t SizeOfAimParticle() const
+    {
+        return 64;
     }
 } aimbot_data;
 
-static std::map<ITFPlayer*, Timer> m_MapTimer;
+static std::unordered_map<ITFPlayer*, TimerID> m_MapTimer;
 
-static bool FindBestTarget();
 
-static bool IsProjectileBased(ClassID clsID)
+static bool IsProjectileBased(ClassID clsID) noexcept
 {
     switch (clsID)
     {
@@ -163,7 +190,7 @@ static bool IsProjectileBased(ClassID clsID)
     return false;
 }
 
-static bool IsSniperRifle(ClassID clsID)
+static bool IsSniperRifle(ClassID clsID) noexcept
 {
     switch (clsID)
     {
@@ -175,16 +202,18 @@ static bool IsSniperRifle(ClassID clsID)
     return false;
 }
 
-inline void _InvalidateAimLock()
+inline void _InvalidateAimLock() noexcept
 {
     m_bFoundTarget = false;
     pLastEnt = nullptr;
     aimbot_data.pGlowEnt->SetEntity(nullptr);
 }
 
+
+static bool FindBestTarget(const QAngle& angle);
 static bool IsValidPlayer(ITFPlayer*);
-static bool GetBestPlayerPos(ITFPlayer*, Vector*);
-static inline void SmoothAngle(QAngle&, float);
+static bool GetBestPlayerPos(ITFPlayer*, const QAngle&, Vector*);
+static inline void SmoothAngle(const QAngle&, QAngle&, float);
 
 
 struct KillParticleInfo
@@ -201,39 +230,57 @@ class _EntListener : public IClientEntityListener
     {
         auto i = m_MapTimer.find(static_cast<ITFPlayer*>(pEnt));
         if (i != m_MapTimer.end())
-            Timer::DeleteFuture(&i->second, true);
+        {
+            Timer::DeleteFuture(i->second, true);
+        }
     }
 } static _ent_listener;
 
 
-static void Timer_KillParticle(void* data)
+
+HookRes IAimbotHack::OnCreateMove(CUserCmd* cmd)
 {
-    if (KillParticleInfo* pInfo = reinterpret_cast<KillParticleInfo*>(data))
-    {
-        pInfo->pFactory->StopEmission(pInfo->pParticle);
-        m_MapTimer.erase(pInfo->pOwner);
-        delete pInfo;
-    }
-}
-
-
-
-HookRes AimbotMenu::OnCreateMove(bool& ret)
-{
-    if (pLocalPlayer->GetLifeState() != LIFE_STATE::ALIVE)
-        return HookRes::Continue;
+    AutoBool("BackTrack::Reset") = true;
 
     if (!aimbot_data.bIsEnabled)
         return HookRes::Continue;
 
-    static std::atomic<bool> _invalidated = false;
-    if (!(Globals::m_pUserCmd->buttons & IN_ATTACK) && !aimbot_data.bAutoAim)
+    M0Profiler watch_aimbot("IAimbotHack::CreateMove", M0PROFILER_GROUP::CHEAR_PROFILE);
+    static bool good_local = false;
+    static Timer timer_refresh_stat;
+    if (timer_refresh_stat.trigger_if_elapsed(100ms))
+        good_local = engineclient->IsInGame();
+
+    ITFPlayer* pMe = ::ILocalPtr();
+    if (!pMe || !good_local)
+        return HookRes::BreakImmediate;
+    else if (pMe->GetLifeState() != LIFE_STATE::ALIVE)
+        return HookRes::Continue;
+
+    class IAimState
     {
-        if (!_invalidated)
+        bool invalid{ false };
+    public:
+
+        constexpr operator bool() noexcept
+        {
+            return invalid;
+        }
+        const void invalidate() noexcept
         {
             _InvalidateAimLock();
-            _invalidated = true;
+            invalid = true;
         }
+        constexpr void set_state(bool state) noexcept
+        {
+            invalid = state;
+        }
+    } static _aim_state;
+
+    if (!(cmd->buttons & IN_ATTACK) && !aimbot_data.bAutoAim)
+    {
+        if (!_aim_state)
+            _aim_state.invalidate();
         return HookRes::Continue;
     }
 
@@ -243,7 +290,7 @@ HookRes AimbotMenu::OnCreateMove(bool& ret)
         bool bKeyPress = GetAsyncKeyState(aimbot_data.iAimKey);
 
         if (aimbot_data.bKeyLock)         aimbot_data.ToggleState(bKeyPress);
-        else if (bKeyPress && timer_update_key.has_elapsed(500))
+        else if (bKeyPress && timer_update_key.has_elapsed(500ms))
         {
             aimbot_data.ToggleState(!aimbot_data.CanAim());
             timer_update_key.update();
@@ -257,12 +304,12 @@ HookRes AimbotMenu::OnCreateMove(bool& ret)
     }
 
     // Update sniper rifle
-    IBaseObject* pWep = pLocalWeapon;
+    IBaseObject* pWep = ::GetIBaseObject(pMe->GetActiveWeapon());
     ClassID clsID = pWep ? static_cast<ClassID>(pWep->GetClientClass()->m_ClassID) : ClassID_CTFPlayer;
     static Timer timer_snap_track;
     {
         if (aimbot_data.bZoomedOnly && IsSniperRifle(clsID))
-            if (pLocalPlayer->InCond(ETFCond::TF_COND_ZOOMED))
+            if (pMe->InCond(ETFCond::TF_COND_ZOOMED))
                 timer_snap_track.update();
     }
 
@@ -272,120 +319,127 @@ HookRes AimbotMenu::OnCreateMove(bool& ret)
         return HookRes::Continue;
     }
 
-    if (!FindBestTarget())
+    if (!FindBestTarget(cmd->viewangles))
     {
         _InvalidateAimLock();
         return HookRes::Continue;
     }
     
     Vector vecBestPos;
-    if (!GetBestPlayerPos(pLastEnt, &vecBestPos))
+    if (!GetBestPlayerPos(pLastEnt, cmd->viewangles, &vecBestPos))
     {
         _InvalidateAimLock();
         return HookRes::Continue;
     }
 
-    _invalidated = false;
-    ret = true;
+    _aim_state.set_state(false);
 
-    QAngle angRes;
-    angRes = GetAimAngle(vecBestPos);
+    QAngle angRes = GetAimAngle(vecBestPos);
 
-    if (aimbot_data.flSmoothFactor && timer_snap_track.has_elapsed(300))
-        SmoothAngle(angRes, aimbot_data.flSmoothFactor);
-    else ret = false;
+    bool override = false;
+    if (aimbot_data.flSmoothFactor && timer_snap_track.has_elapsed(300ms))
+        SmoothAngle(cmd->viewangles, angRes, aimbot_data.flSmoothFactor);
+    else {
+        CreateMove->SetReturnInfo(false);
+        override = true;
+    }
 
-    Globals::m_pUserCmd->viewangles = angRes;
+    cmd->viewangles = angRes;
 
     {
         static Timer update_line;
-        if (MIKUDebug::m_bDebugging && update_line.trigger_if_elapsed(1800))
-            debugoverlay->AddLineOverlay(pLocalPlayer->LocalEyePosition(), vecBestPos, 255, 255, 0, false, 2.0f);
+        if (MIKUDebug::m_bDebugging && update_line.trigger_if_elapsed(1800ms))
+            debugoverlay->AddLineOverlay(pMe->LocalEyePosition(), vecBestPos, 255, 255, 0, false, 2.0f);
     }
 
     if (aimbot_data.bUseGlow)
     {
         aimbot_data.pGlowEnt->SetEntity(pLastEnt);
-        aimbot_data.pGlowEnt->SetColor(DrawTools::ColorTools::FromArray(aimbot_data.cAimGlow.get()));
+        aimbot_data.pGlowEnt->SetColor(DrawTools::ColorTools::FromArray(*aimbot_data.cAimGlow));
     }
-    else if (aimbot_data.bDrawParticles)
+    else if (aimbot_data.bDrawParticles && pLastEnt)
     {
         // Display Particles
         static Timer timer_update_particles;
-        if (timer_update_particles.trigger_if_elapsed(130))
+        if (timer_update_particles.trigger_if_elapsed(130ms))
         {
-            auto i = m_MapTimer.find(*pLastEnt);
+            auto pos = m_MapTimer.find(pLastEnt);
 
-            if (i != m_MapTimer.end())
-                Timer::RollBack(&i->second);
+            if (pos != m_MapTimer.end())
+                Timer::RewindBack(pos->second);
             else {
                 auto factory = CTFParticleFactory::ParticleProp(pLastEnt);
 
                 KillParticleInfo* pInfo = new KillParticleInfo{
                             factory->Create((*aimbot_data.sAimParticle).c_str(), PATTACH_ABSORIGIN_FOLLOW),
                             factory,
-                            *pLastEnt
+                            pLastEnt
                 };
 
-                Timer t = Timer::CreateFuture(0.15, TIMER_EXECUTE_ON_MAP_END, Timer_KillParticle, pInfo);
-                m_MapTimer.insert(std::make_pair(*pLastEnt, t));
+                TimerID particle_timer = Timer::CreateFuture(150ms, TimerFlags::ExecuteOnMapEnd, 
+                    [](void* data)
+                    {
+                        KillParticleInfo* pInfo = reinterpret_cast<KillParticleInfo*>(data);
+                        pInfo->pFactory->StopEmission(pInfo->pParticle);
+                        m_MapTimer.erase(pInfo->pOwner);
+                        delete pInfo;
+                    }, pInfo);
+
+                m_MapTimer.insert(std::make_pair(pLastEnt, particle_timer));
             }
         }
     }
 
-    return HookRes::Continue;
+    return override ? HookRes::ChangeReturnValue : HookRes::Continue;
 }
 
-AimbotMenu::AimbotMenu()
+void IAimbotHack::OnLoadDLL()
 {
-    using namespace IGlobalEvent;
-    using std::bind;
+    using namespace IGlobalVHookPolicy;
 
-    LoadDLL::Hook::Register(
-        []() -> HookRes
-        { 
-            if (!(BAD_LOCAL()))
-                aimbot_data.AllocateGlowOnce();
+    if (engineclient->IsInGame())
+        aimbot_data.AllocateGlowOnce();
 
-            return HookRes::Continue;
-        });
-    UnloadDLL::Hook::Register([]() -> HookRes { aimbot_data.DestroyGlowOnce(); return HookRes::Continue; });
+    if (!BadLocal())
+    {
+        aimbot_data.AllocateGlowOnce();
+    }
 
-    LevelInit::Hook::Register([]() -> HookRes { aimbot_data.AllocateGlowOnce(); return HookRes::Continue; });
-    LevelShutdown::Hook::Register([]() -> HookRes { aimbot_data.DestroyGlowOnce(); return HookRes::Continue; });
+    CreateMove = CreateMove::Hook::QueryHook(CreateMove::Name);
+    CreateMove->AddPostHook(HookCall::VeryEarly, std::bind(&IAimbotHack::OnCreateMove, this, std::placeholders::_2));
+            
+    auto level_init = LevelInit::Hook::QueryHook(LevelInit::Name);
+    level_init->AddPostHook(HookCall::Any, [](const char*) { aimbot_data.AllocateGlowOnce(); return HookRes::Continue; });
 
-    CreateMove::Hook::Register(bind(&AimbotMenu::OnCreateMove, this, std::placeholders::_1));
+    auto level_shutdown = LevelShutdown::Hook::QueryHook(LevelShutdown::Name);
+    level_shutdown->AddPostHook(HookCall::Any, []() { aimbot_data.DestroyGlowOnce(); return HookRes::Continue; });
 }
-
+void IAimbotHack::OnUnloadDLL()
+{
+    aimbot_data.DestroyGlowOnce();
+}
 
 static bool IsValidPlayer(ITFPlayer* pPlayer)
 {
-    if (!pPlayer || pPlayer->IsDormant())
-        return false;
-
     if (pPlayer->GetLifeState() != LIFE_STATE::ALIVE)
         return false;
 
-    ITFPlayer* pMe = pLocalPlayer;
+    IBaseObject* pActiveWep = ::ILocalWpn();
 
-    if (pPlayer == pMe || pPlayer->GetTeam() == pMe->GetTeam())
-        return false;
-
-    IBaseObject* pActiveWep = pLocalWeapon;
-
-    static Vector vecPos; vecPos = pPlayer->GetAbsOrigin();
+    const Vector& vecPos = pPlayer->GetAbsOrigin();
 
     // if we have active melee
     {
         if (pActiveWep->GetWeaponSlot() == 2)
-            if (vecPos.DistTo(pLocalPlayer->GetAbsOrigin()) > pActiveWep->Melee_GetSwingRange())
+            if (vecPos.DistTo(::ILocalPtr()->GetAbsOrigin()) > pActiveWep->Melee_GetSwingRange())
                 return false;
     }
 
     //filter conds
     {
-        static const std::set<ETFCond> _BadConds = {
+        constexpr ETFCond BadConds[]{
             TF_COND_STEALTHED_USER_BUFF,
+            TF_COND_BULLET_IMMUNE,
             TF_COND_INVULNERABLE,
             TF_COND_DEFENSEBUFF,
             TF_COND_DEFENSEBUFF_HIGH,
@@ -394,7 +448,7 @@ static bool IsValidPlayer(ITFPlayer* pPlayer)
             TF_COND_DISGUISED,
         };
 
-        for (auto cond : _BadConds)
+        for (ETFCond cond : BadConds)
         {
             if (pPlayer->InCond(cond))
                 return false;
@@ -405,7 +459,7 @@ static bool IsValidPlayer(ITFPlayer* pPlayer)
 }
 
 
-bool FindBestTarget()
+bool FindBestTarget(const QAngle& angle)
 {
     if (aimbot_data.bAimLock && m_bFoundTarget)
         if (pHndl.IsValid() && IsValidPlayer(pLastEnt))
@@ -413,13 +467,19 @@ bool FindBestTarget()
         else m_bFoundTarget = false;
 
     float flCur = 0.0, flBest = 99999.9f;
-    ITFPlayer* pBest = nullptr, * pCur;
-    ITFPlayer* pMe = pLocalPlayer;
-    Vector pEyeVec = pMe->LocalEyePosition();
+    ITFPlayer* pBest = nullptr;
+    ITFPlayer* pMe = ::ILocalPtr();
+    const Vector& pEyeVec = pMe->LocalEyePosition();
 
     for (int i = 1; i <= gpGlobals->maxClients; i++)
     {
-        pCur = reinterpret_cast<ITFPlayer*>(GetClientEntityW(i));
+        ITFPlayer* pCur = ::GetITFPlayer(i);
+
+        if (::BadEntity(pCur))
+            continue;
+
+        if (pCur->GetTeam() == pMe->GetTeam())
+            continue;
 
         if (IsValidPlayer(pCur))
         {
@@ -433,22 +493,23 @@ bool FindBestTarget()
                 flCur = -pCur->GetAbsOrigin().DistTo(pMe->GetAbsOrigin());
                 break;
 
-            case TargetPriority_t::CLOSEST_FOV:
-                flCur = GetLocalFOV(pCur->EyePosition());
-                if (flCur > aimbot_data.flAimFOV)
-                    continue;
-                break;
-
             case TargetPriority_t::LOWEST_HP:
-                flCur = float(*pCur->GetEntProp<int>("m_iHealth"));
+                flCur = static_cast<float>(*pCur->GetEntProp<int, PropType::Recv>("m_iHealth"));
                 break;
 
             case TargetPriority_t::HIGHEST_HP:
-                flCur = -float(*pCur->GetEntProp<int>("m_iHealth"));
+                flCur = -static_cast<float>(*pCur->GetEntProp<int, PropType::Recv>("m_iHealth"));
                 break;
 
             case TargetPriority_t::HIGHEST_SCORE:
-                flCur = -float(ctfresource.GetEntProp<int>(pCur, "m_iScore"));
+                flCur = -static_cast<float>(ctfresource.GetEntProp<int>(pCur, "m_iScore"));
+                break;
+
+//            case TargetPriority_t::CLOSEST_FOV:
+            default:
+                flCur = GetLocalFOV(angle, pCur->EyePosition());
+                if (flCur > aimbot_data.flAimFOV)
+                    continue;
                 break;
             }
 
@@ -471,7 +532,7 @@ bool FindBestTarget()
 }
 
 
-static bool GetClosestHitbox(IClientShared* pEnt, Vector*& vec, IBoneCache* cache)
+static bool GetClosestHitbox(IClientShared* pEnt, const QAngle& angle, Vector*& vec, std::unique_ptr<IBoneCache> cache)
 {
     const model_t* mdl = pEnt->GetModel();
     if (!mdl)
@@ -481,24 +542,24 @@ static bool GetClosestHitbox(IClientShared* pEnt, Vector*& vec, IBoneCache* cach
     if (!pStudioHDR)
         return false;
 
-    float nearest = 99999999.f, cur;
+    float nearest = 99999999.f;
 
     mstudiohitboxset_t* pStudioBoxSet = pStudioHDR->pHitboxSet(pEnt->HitboxSet());
 
     Vector hitbox_pos, vecFinal = vec3_origin;
-    ITFPlayer* pMe = pLocalPlayer; 
+    ITFPlayer* pMe = ::ILocalPtr();
     Vector eye_pos = pMe->LocalEyePosition();
 
     for (int i = 0; i < pStudioBoxSet->numhitboxes; i++)
     {
-        if (!pEnt->GetHitbox(i, cache))
+        if (!pEnt->GetHitbox(i, cache.get()))
             continue;
 
         hitbox_pos = cache->center;
         if (!Trace::VectorIsVisible(eye_pos, hitbox_pos, pMe))
             continue;
 
-        cur = GetLocalFOV(hitbox_pos);
+        float cur = GetLocalFOV(angle, hitbox_pos);
         if (cur < nearest && cur <= aimbot_data.flAimFOV)
         {
             vecFinal = hitbox_pos;
@@ -510,21 +571,20 @@ static bool GetClosestHitbox(IClientShared* pEnt, Vector*& vec, IBoneCache* cach
     return vecFinal != vec3_origin;
 }
 
-bool GetBestPlayerPos(ITFPlayer* pEnt, Vector* vecFinal)
+bool GetBestPlayerPos(ITFPlayer* pEnt, const QAngle& angle, Vector* vecFinal)
 {
-    IBaseObject* pActiveWeapon = pLocalWeapon;
-    ITFPlayer* pMe = pLocalPlayer;
+    ITFPlayer* pMe = ::ILocalPtr();
+    IBaseObject* pActiveWeapon = ::GetIBaseObject(pMe->GetActiveWeapon());
 
     std::unique_ptr<IBoneCache> cache = std::make_unique<IBoneCache>();
 
-    Vector vecRes;
     switch (aimbot_data.eHitboxPos)
     {
     case HitBoxPriority_t::HB_HEAD:
     {
         if (pEnt->GetHitbox(hitbox_t::head, cache.get()))
         {
-            vecRes = cache->center;
+            Vector vecRes = cache->center;
 
             if (Trace::VectorIsVisible(pMe->LocalEyePosition(), vecRes, pMe))
             {
@@ -547,8 +607,8 @@ bool GetBestPlayerPos(ITFPlayer* pEnt, Vector* vecFinal)
         case ClassID_CTFSniperRifleDecap:
         {
             int hitbox;
-            float flDmg = *pActiveWeapon->GetEntProp<float>("m_flChargedDamage");
-            if (flDmg >= *(pEnt->GetEntProp<int>("m_iHealth")))
+            float flDmg = *pActiveWeapon->GetEntProp<float, PropType::Recv>("m_flChargedDamage");
+            if (flDmg >= *(pEnt->GetEntProp<int, PropType::Recv>("m_iHealth")))
                 hitbox = hitbox_t::spine_3;
             else
                 hitbox = hitbox_t::head;
@@ -558,7 +618,7 @@ bool GetBestPlayerPos(ITFPlayer* pEnt, Vector* vecFinal)
             {
                 if (pEnt->GetHitbox(hitbox, cache.get()))
                 {
-                    vecRes = cache->center;
+                    const Vector& vecRes = cache->center;
                     if (Trace::VectorIsVisible(pMe->LocalEyePosition(), vecRes, pMe))
                     {
                         *vecFinal = vecRes;
@@ -572,7 +632,7 @@ bool GetBestPlayerPos(ITFPlayer* pEnt, Vector* vecFinal)
         {
             if (pEnt->GetHitbox(hitbox_t::hip_L, cache.get()))
             {
-                vecRes = cache->center;
+                const Vector&  vecRes = cache->center;
                 if (Trace::VectorIsVisible(pMe->LocalEyePosition(), vecRes, pMe))
                 {
                     *vecFinal = vecRes;
@@ -581,7 +641,7 @@ bool GetBestPlayerPos(ITFPlayer* pEnt, Vector* vecFinal)
             }
             if (pEnt->GetHitbox(hitbox_t::hip_R, cache.get()))
             {
-                vecRes = cache->center;
+                const Vector& vecRes = cache->center;
                 if (Trace::VectorIsVisible(pMe->LocalEyePosition(), vecRes, pMe))
                 {
                     *vecFinal = vecRes;
@@ -594,44 +654,44 @@ bool GetBestPlayerPos(ITFPlayer* pEnt, Vector* vecFinal)
     [[fallthrough]];
     case HitBoxPriority_t::HB_CLOSEST:
     {
-        return GetClosestHitbox(pEnt, vecFinal, cache.get());
+        return GetClosestHitbox(pEnt, angle, vecFinal, std::move(cache));
     }
-    break;
+    default:
+        break;
     }
 }
 
-void SmoothAngle(QAngle& angRes, float factor)
+void SmoothAngle(const QAngle& input, QAngle& output, float factor)
 {
-    QAngle angCur = Globals::m_pUserCmd->viewangles;
-    QAngle angDelta = (angCur - angRes) / factor;
+    QAngle delta = (input - output) / factor;
 
-    angRes.x = ApproachAngle(angRes.x, angCur.x, angDelta.x);
-    angRes.y = ApproachAngle(angRes.y, angCur.y, angDelta.y);
+    output.x = ApproachAngle(output.x, input.x, delta.x);
+    output.y = ApproachAngle(output.y, input.y, delta.y);
 
-    ClampAngle(angRes);
+    ClampAngle(output);
 }
 
 
-void AimbotMenu::OnRender()
+void IAimbotHack::OnRender()
 {
     if (ImGui::BeginTabItem("Aimbot"))
     {
-        ImGui::Checkbox("Enable", aimbot_data.bIsEnabled.get());
+        ImGui::Checkbox("Enable", &aimbot_data.bIsEnabled);
 
-        ImGui::Checkbox("Auto Aim", aimbot_data.bIsEnabled.get());
-        ImGui::SameLine(); DrawTools::DrawHelp("Only activate if MOUSE1 is pressed");
+        ImGui::Checkbox("Auto Aim", &aimbot_data.bAutoAim);
+        ImGui::SameLine(); ImGui::DrawHelp("Only activate if MOUSE1 is pressed");
 
         if (aimbot_data.bIsEnabled)
         {
             {
-                ImGui::Combo("Priority Types", aimbot_data.ePriority.get(), "Highest Score\0Closest FOV\0Lowest HP\0Highest HP\0Furthest Away\0\0");
-                ImGui::SameLine(); DrawTools::DrawHelp("Choose your player priority");
+                ImGui::Combo("Priority Types", &aimbot_data.ePriority, "Highest Score\0Closest FOV\0Lowest HP\0Highest HP\0Furthest Away\0\0");
+                ImGui::SameLine(); ImGui::DrawHelp("Choose your player priority");
                 ImGui::Separator();
             }
 
             {
-                ImGui::Combo("Aim Priority", aimbot_data.eHitboxPos.get(), "Head\0Closest\0Custom\0\0");
-                ImGui::SameLine(); DrawTools::DrawHelp("Choose your hitbox priority");
+                ImGui::Combo("Aim Priority", &aimbot_data.eHitboxPos, "Head\0Closest\0Custom\0\0");
+                ImGui::SameLine(); ImGui::DrawHelp("Choose your hitbox priority");
                 ImGui::Separator();
             }
 
@@ -640,28 +700,28 @@ void AimbotMenu::OnRender()
                 if (ImGui::Combo("Switch Key", &m_iCur, "Q\0END\0F9\0DELETE\0\0"))
                     aimbot_data.SetKey(m_iCur);
 
-                ImGui::SameLine(); DrawTools::DrawHelp("Toggle Aimbot State");
+                ImGui::SameLine(); ImGui::DrawHelp("Toggle Aimbot State");
                 ImGui::Separator();
             }
 
-            ImGui::Checkbox("Zoomed", aimbot_data.bZoomedOnly.get());
-            ImGui::SameLine(); DrawTools::DrawHelp("Sniper: Only activate when you are scoping");
+            ImGui::Checkbox("Zoomed", &aimbot_data.bZoomedOnly);
+            ImGui::SameLine(); ImGui::DrawHelp("Sniper: Only activate when you are scoping");
             ImGui::Dummy({ 5, 5 });
 
-            ImGui::Checkbox("Aim-Lock", aimbot_data.bAimLock.get());
-            ImGui::SameLine(); DrawTools::DrawHelp("Keep targeting same player (until he is dead / aim reset)");
+            ImGui::Checkbox("Aim-Lock", &aimbot_data.bAimLock);
+            ImGui::SameLine(); ImGui::DrawHelp("Keep targeting same player (until he is dead / aim reset)");
             ImGui::Dummy({ 5, 5 });
 
-            ImGui::InputInt("Random Miss", aimbot_data.iRandomMiss.get());
-            ImGui::SameLine(); DrawTools::DrawHelp("Chance of randomly missing target");
+            ImGui::InputInt("Random Miss", &aimbot_data.iRandomMiss);
+            ImGui::SameLine(); ImGui::DrawHelp("Chance of randomly missing target");
             ImGui::Dummy({ 5, 5 });
 
-            ImGui::InputFloat("FOV", aimbot_data.flAimFOV.get(), 1.0f, 5.0f, "%.0f");
-            ImGui::SameLine(); DrawTools::DrawHelp("Field of view to target");
+            ImGui::InputFloat("FOV", &aimbot_data.flAimFOV, 1.0f, 5.0f, "%.0f");
+            ImGui::SameLine(); ImGui::DrawHelp("Field of view to target");
             ImGui::Dummy({ 5, 5 });
 
-            ImGui::Checkbox("Key-Lock", aimbot_data.bKeyLock.get());
-            ImGui::SameLine(); DrawTools::DrawHelp("Keep pressing Switch Key for aim to activate");
+            ImGui::Checkbox("Key-Lock", &aimbot_data.bKeyLock);
+            ImGui::SameLine(); ImGui::DrawHelp("Keep pressing Switch Key for aim to activate");
             ImGui::Dummy({ 5, 5 });
 
             if (ImGui::BeginChild("Effects", { 0, 110.f }))
@@ -673,7 +733,7 @@ void AimbotMenu::OnRender()
                     if (aimbot_data.pGlowEnt)
                         aimbot_data.pGlowEnt->SetEntity(nullptr);
                 }
-                ImGui::SameLine(); DrawTools::DrawHelp("No Particle");
+                ImGui::SameLine(); ImGui::DrawHelp("No Particle");
 
                 if (ImGui::RadioButton("Glow", aimbot_data.bUseGlow))
                 {
@@ -681,17 +741,11 @@ void AimbotMenu::OnRender()
                     aimbot_data.bDrawParticles = false;
                 }
 
-                ImGui::SameLine(); DrawTools::DrawHelp("Dispatch Glow");
+                ImGui::SameLine(); ImGui::DrawHelp("Dispatch Glow");
 
                 {
-                    static float color[]{   static_cast<float>(aimbot_data.cAimGlow[0]) / 255,
-                                            static_cast<float>(aimbot_data.cAimGlow[1]) / 255,
-                                            static_cast<float>(aimbot_data.cAimGlow[2]) / 255,
-                                            static_cast<float>(aimbot_data.cAimGlow[3]) / 255 };
-                    if (ImGui::ColorEdit4("Glow Color", color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Uint8))
-                        for (char8_t i = 0; i < SizeOfArray(color); i++)
-                            aimbot_data.cAimGlow[i] = static_cast<char8_t>(color[i] * 255);
-                    ImGui::SameLine(); DrawTools::DrawHelp("Custom Color");
+                    ImGui::ColorEdit4_2("Glow Color", *aimbot_data.cAimGlow, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Uint8);
+                    ImGui::SameLine(); ImGui::DrawHelp("Custom Color");
                     ImGui::Dummy({ 5, 5 });
                 }
 
@@ -702,22 +756,18 @@ void AimbotMenu::OnRender()
                     if (aimbot_data.pGlowEnt)
                         aimbot_data.pGlowEnt->SetEntity(nullptr);
                 }
-                ImGui::SameLine(); DrawTools::DrawHelp("Particles to dispatch");
 
-                static char particle[64]{ ')' };
-                if (*particle == ')')
-                    strncpy(particle, (*aimbot_data.sAimParticle).c_str(), SizeOfArray(particle));
+                ImGui::SameLine(); ImGui::DrawHelp("Particles to dispatch");
 
-                if (ImGui::InputText("##PARTICLE NAME", particle, 64))
-                    *aimbot_data.sAimParticle = particle;
+                ImGui::InputText("##PARTICLE NAME", (*aimbot_data.sAimParticle).data(), aimbot_data.SizeOfAimParticle());
 
-                ImGui::SameLine(); DrawTools::DrawHelp("Input particle name");
+                ImGui::SameLine(); ImGui::DrawHelp("Input particle name");
                 ImGui::Dummy({ 5, 5 });
             }
             ImGui::EndChild();
 
-            ImGui::DragFloat("Smooth", aimbot_data.flSmoothFactor.get(), 1.0, 0.0, 75.0, "%.0f");
-            ImGui::SameLine(); DrawTools::DrawHelp("Aim Smooth rate [0.0, 75.0]");
+            ImGui::DragFloat("Smooth", &aimbot_data.flSmoothFactor, 1.0, 0.0, 75.0, "%.0f");
+            ImGui::SameLine(); ImGui::DrawHelp("Aim Smooth rate [0.0, 75.0]");
         }
 
         ImGui::EndTabItem();
@@ -725,7 +775,7 @@ void AimbotMenu::OnRender()
 }
 
 
-void AimbotMenu::JsonCallback(Json::Value& json, bool read)
+void IAimbotHack::JsonCallback(Json::Value& json, bool read)
 {
     Json::Value& aimbot = json["Aimbot"];
     Json::Value& effect = aimbot["Effects"];
@@ -750,8 +800,8 @@ void AimbotMenu::JsonCallback(Json::Value& json, bool read)
         PROCESS_JSON_READ(effect, "Type", Int, tmp);
         switch (tmp)
         {
-        case 0: 
-        { 
+        case 0:
+        {
             aimbot_data.bUseGlow = false;
             aimbot_data.bDrawParticles = false;
             if (aimbot_data.pGlowEnt)
@@ -764,7 +814,8 @@ void AimbotMenu::JsonCallback(Json::Value& json, bool read)
             aimbot_data.bDrawParticles = false;
             break;
         }
-        case 2:
+//        case 2:
+        default:
         {
             aimbot_data.bUseGlow = false;
             aimbot_data.bDrawParticles = true;
@@ -776,7 +827,7 @@ void AimbotMenu::JsonCallback(Json::Value& json, bool read)
 
         PROCESS_JSON_READ(effect, "Particle Name", String, *aimbot_data.sAimParticle);
 
-        int _clr[4];
+        int _clr[4]{ };
         PROCESS_JSON_READ_COLOR(effect, "Glow Color", Int, _clr);
         for (char8_t i = 0; i < SizeOfArray(_clr); i++)
             aimbot_data.cAimGlow[i] = static_cast<char8_t>(_clr[i]);
@@ -803,14 +854,33 @@ void AimbotMenu::JsonCallback(Json::Value& json, bool read)
         PROCESS_JSON_WRITE(effect, "Type", tmp);
         PROCESS_JSON_WRITE(effect, "Particle Name", *aimbot_data.sAimParticle);
 
-        PROCESS_JSON_WRITE_COLOR(effect, "Glow Color", aimbot_data.cAimGlow.data());
+        PROCESS_JSON_WRITE_COLOR(effect, "Glow Color", &aimbot_data.cAimGlow);
     }
 }
 
-static AimbotMenu ___Aimbot;
 
 #include "../Interfaces/HatCommand.h"
 HAT_COMMAND(invalidate_aimlock, "Invalidates Aim-Lock")
 {
     _InvalidateAimLock();
+}
+
+HAT_COMMAND(realloc_glow, "Reallocate Glow")
+{
+    if (!aimbot_data.pGlowEnt)
+    {
+        aimbot_data.AllocateGlowOnce();
+        REPLY_TO_TARGET(NULL, "Allocating glow");
+    }
+}
+
+HAT_COMMAND(eye_pos_test, "")
+{
+    auto pMe = ILocalPtr();
+    ITFParticleData* data = new ITFParticleData(pMe, "ghost_smoke", ParticleAttachment_t::PATTACH_ABSORIGIN_FOLLOW, NULL, pMe->EyePosTest());
+
+    Timer::CreateFuture(3s, TimerFlags::ExecuteOnMapEnd, [](void* info) {
+        ITFParticleData* particle = (ITFParticleData*)info;
+        delete particle;
+    }, data);
 }

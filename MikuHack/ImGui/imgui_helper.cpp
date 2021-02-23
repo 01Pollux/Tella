@@ -289,7 +289,7 @@ void ImGui_Impl_Init(void* hwnd, IDirect3DDevice9* device)
 	colors[ImGuiCol_PopupBg]			= ImVec4(TO_IMVEC4(5, 5, 5, 255));
 	colors[ImGuiCol_Border]				= ImVec4(TO_IMVEC4(255, 255, 255, 144));
 	colors[ImGuiCol_BorderShadow]		= ImVec4(TO_IMVEC4(0, 0, 0, 26));
-	colors[ImGuiCol_FrameBg]			= ImVec4(TO_IMVEC4(0, 0, 0, 240));
+	colors[ImGuiCol_FrameBg]			= ImVec4(TO_IMVEC4(5, 14, 14, 240));
 	colors[ImGuiCol_FrameBgHovered]		= ImVec4(TO_IMVEC4(66, 150, 250, 102));
 	colors[ImGuiCol_FrameBgActive]		= ImVec4(TO_IMVEC4(66, 150, 250, 171));
 	colors[ImGuiCol_TitleBg]			= ImVec4(TO_IMVEC4(10, 10, 10, 255));
@@ -608,4 +608,24 @@ void ImGui_ImplDX9_RenderDrawData(ImDrawData* draw_data)
 	// Restore the DX9 state
 	d3d9_state_block->Apply();
 	d3d9_state_block->Release();
+}
+
+
+
+namespace ImGui
+{
+	void DrawHelp(const char* text)
+	{
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(text);
+			ImGui::PopTextWrapPos();
+
+			ImGui::EndTooltip();
+		}
+	}
 }

@@ -1,7 +1,5 @@
 #include "BoneCache.h"
 #include "../Interfaces/CBaseEntity.h"
-#include "../Detour/detours.h"
-
 
 
 bool IBoneCache::GetHitbox(IClientShared* pEnt, int index, IBoneCache* pSetup)

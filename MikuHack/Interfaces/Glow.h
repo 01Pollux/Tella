@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <tier1/utlvector.h>
 #include <stdint.h>
 #include "CBaseEntity.h"
@@ -32,7 +33,7 @@ public:
 		return index;
 	}
 
-	void Unregister(int index)
+	void Unregister(int index) noexcept(false)
 	{
 		objects[index].next_free_slot = first_free_slot;
 		objects[index].entity = NULL;
@@ -54,6 +55,7 @@ public:
 		static const int END_OF_FREE_LIST = -1;
 		static const int ENTRY_IN_USE = -2;
 	};
+
 	static_assert(sizeof(ObjectDefinition) == 0x20, "sizeof(IGlowManager::ObjectDefinition) mismatch");
 
 	CUtlVector<ObjectDefinition> objects;
@@ -64,13 +66,13 @@ extern IGlowManager* GlowManager;
 class IGlowObject
 {
 public:
-	IGlowObject(IClientShared* pEnt = NULL, const Color& color = { 255, 255, 255, 255 })
+	explicit IGlowObject(IClientShared* pEnt = nullptr, const Color& color = { 255, 255, 255, 255 }) noexcept(false)
 	{
 		hndl = GlowManager->Register(pEnt ? pEnt->GetRefEHandle():INVALID_EHANDLE_INDEX, 
 							{ float(color.r()) / 255, float(color.g()) / 255, float(color.b()) / 255 }, float(color.a()) / 255);
 	}
 
-	~IGlowObject()
+	~IGlowObject() noexcept(false)
 	{
 		GlowManager->Unregister(hndl);
 	}
@@ -89,5 +91,12 @@ public:
 	}
 
 	int hndl;
+
+public:
+	IGlowObject(const IGlowObject&)				= delete;
+	IGlowObject& operator=(const IGlowObject&)	= delete;
+	IGlowObject(IGlowObject&&)					= delete;
+	IGlowObject& operator=(IGlowObject&&)		= delete;
 };
 
+using IUniqueGlowObject = std::unique_ptr<IGlowObject>;
