@@ -91,7 +91,7 @@ void PrecacheDataModel()
 		for (auto&& [name, path] : data)
 		{
 			if (modelprecache->AddString(false, path.c_str()) == INVALID_STRING_INDEX)
-				MIKUDebug::LogCritical(Format("[Model] Failed to Precache model: \"", name, "\":\"", path, "\""));
+				MIKUDebug::LogCritical(fmt::format("[Model] Failed to Precache model: \"{}\":\"{}\"", name, path));
 		}
 	}
 }

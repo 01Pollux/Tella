@@ -165,6 +165,19 @@
     <ClInclude Include="Profiler\defines.h" />
     <ClInclude Include="Profiler\mprofiler.h" />
     <ClInclude Include="GlobalHook\defines.h" />
+    <ClInclude Include="Helpers\String.h" />
+    <ClInclude Include="fmt\chrono.h" />
+    <ClInclude Include="fmt\color.h" />
+    <ClInclude Include="fmt\compile.h" />
+    <ClInclude Include="fmt\core.h" />
+    <ClInclude Include="fmt\format.h" />
+    <ClInclude Include="fmt\format-inl.h" />
+    <ClInclude Include="fmt\locale.h" />
+    <ClInclude Include="fmt\os.h" />
+    <ClInclude Include="fmt\ostream.h" />
+    <ClInclude Include="fmt\posix.h" />
+    <ClInclude Include="fmt\printf.h" />
+    <ClInclude Include="fmt\ranges.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -333,6 +346,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Profiler\mprofiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fmt\format.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fmt\os.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

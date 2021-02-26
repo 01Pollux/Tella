@@ -48,27 +48,7 @@ public:
 		else if (!PID_HudScope && !strcmp(panel->GetName(panelID), "HudScope"))
 			PID_HudScope = panelID;
 
-		if (panelID == PID_FocusOverlay)
-		{
-			static bool should_focus = false;
-
-			if (Mmain.m_bIsActive && !should_focus)
-			{
-				should_focus = true;
-
-				surface->UnlockCursor();
-				surface->SetCursorAlwaysVisible(true);
-			}
-			else if (!Mmain.m_bIsActive && should_focus)
-			{
-				should_focus = false;
-
-//				surface->LockCursor();
-				surface->SetCursorAlwaysVisible(false);
-			}
-			return HookRes::Continue;
-		}
-		return panelID == PID_HudScope ? HookRes::Continue : HookRes::BreakImmediate;
+		return (panelID == PID_HudScope || panelID == PID_FocusOverlay) ? HookRes::Continue : HookRes::BreakImmediate;
 	}
 
 	void OnLoadDLL() override

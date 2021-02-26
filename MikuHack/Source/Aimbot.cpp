@@ -15,19 +15,26 @@
 #include "../Profiler/mprofiler.h"
 
 
-class IAimbotHack : public MenuPanel, public IMainRoutine
+class IAimbotHack : public MenuPanel,
+                    public IMainRoutine,
+                    public IClientEntityListener
 {
-    IGlobalVHook<bool, float, CUserCmd*>* CreateMove;
+public:	// MenuPanel
+    void OnRender() final;
+    void JsonCallback(Json::Value& json, bool read) final;
 
-public:
-    void OnLoadDLL() override;
-    void OnUnloadDLL() override;
+public: // IMainRoutine
+    void OnLoadDLL() final;
+    void OnUnloadDLL() final;
+
+public: // IClientEntityListener
+    void OnEntityDeleted(IClientShared* pEnt) final;
+
+public: // IAimbotHack
     HookRes OnCreateMove(CUserCmd* cmd);
 
-public:	// MenuPanel
-
-    void OnRender() override;
-    void JsonCallback(Json::Value& json, bool read) override;
+private:
+    IGlobalVHook<bool, float, CUserCmd*>* CreateMove;
 } static dummy_aimbot;
 
 
@@ -223,20 +230,12 @@ struct KillParticleInfo
     ITFPlayer* pOwner;
 };
 
-
-class _EntListener : public IClientEntityListener
+void IAimbotHack::OnEntityDeleted(IClientShared* pEnt)
 {
-    void OnEntityDeleted(IClientShared* pEnt) override
-    {
-        auto i = m_MapTimer.find(static_cast<ITFPlayer*>(pEnt));
-        if (i != m_MapTimer.end())
-        {
-            Timer::DeleteFuture(i->second, true);
-        }
-    }
-} static _ent_listener;
-
-
+    auto i = m_MapTimer.find(static_cast<ITFPlayer*>(pEnt));
+    if (i != m_MapTimer.end())
+        Timer::DeleteFuture(i->second, true);
+}
 
 HookRes IAimbotHack::OnCreateMove(CUserCmd* cmd)
 {
@@ -245,7 +244,7 @@ HookRes IAimbotHack::OnCreateMove(CUserCmd* cmd)
     if (!aimbot_data.bIsEnabled)
         return HookRes::Continue;
 
-    M0Profiler watch_aimbot("IAimbotHack::CreateMove", M0PROFILER_GROUP::CHEAR_PROFILE);
+    M0Profiler watch_aimbot("IAimbotHack::CreateMove", M0PROFILER_GROUP::CHEAT_PROFILE);
     static bool good_local = false;
     static Timer timer_refresh_stat;
     if (timer_refresh_stat.trigger_if_elapsed(100ms))
@@ -409,13 +408,29 @@ void IAimbotHack::OnLoadDLL()
     CreateMove->AddPostHook(HookCall::VeryEarly, std::bind(&IAimbotHack::OnCreateMove, this, std::placeholders::_2));
             
     auto level_init = LevelInit::Hook::QueryHook(LevelInit::Name);
-    level_init->AddPostHook(HookCall::Any, [](const char*) { aimbot_data.AllocateGlowOnce(); return HookRes::Continue; });
+    level_init->AddPostHook(HookCall::Any, 
+        [this](const char*)
+        {
+            AddEntityListener();
+            aimbot_data.AllocateGlowOnce(); 
+            return HookRes::Continue; 
+        }
+    );
 
     auto level_shutdown = LevelShutdown::Hook::QueryHook(LevelShutdown::Name);
-    level_shutdown->AddPostHook(HookCall::Any, []() { aimbot_data.DestroyGlowOnce(); return HookRes::Continue; });
+    level_shutdown->AddPostHook(HookCall::Any, 
+        [this]() 
+        {
+            RemoveEntityListener();
+            aimbot_data.DestroyGlowOnce();
+            return HookRes::Continue;
+        }
+    );
 }
+
 void IAimbotHack::OnUnloadDLL()
 {
+    RemoveEntityListener();
     aimbot_data.DestroyGlowOnce();
 }
 

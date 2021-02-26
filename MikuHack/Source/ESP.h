@@ -4,13 +4,14 @@
 #include "../GlobalHook/vhook.h"
 #include "../GlobalHook/load_routine.h"
 
+using uint = unsigned int;
+
 struct ESPData;
 class IClientShared;
 
-class ESPMenu: public MenuPanel, public IMainRoutine
+class IESPHack: public MenuPanel, public IMainRoutine
 {
 public:
-
 	struct ESPStruct
 	{
 		bool				m_bActive;
@@ -19,7 +20,7 @@ public:
 		int					m_iFontColor[4];
 		float				m_flMaxDist;
 
-		enum ESPMode
+		enum class ESPMode: char8_t
 		{
 			BOX =		0b01,
 			BOX3D =		0b10,
@@ -30,7 +31,8 @@ public:
 		bool				m_bDrawDistance;
 	};
 
-	struct PESPStruct {
+	struct PESPStruct
+	{
 		ESPStruct base;
 
 		bool m_bDrawClass;
@@ -43,7 +45,8 @@ public:
 	}; 
 	PESPStruct player_esp[2]; 	//0: RED, 1: BLU
 
-	struct BESPStruct {
+	struct BESPStruct
+	{
 		ESPStruct base;
 
 		bool m_bDrawOwner;		//TODO!
@@ -53,11 +56,11 @@ public:
 
 		bool m_bDrawHealth;
 		bool m_bDrawTeam;
-
 	};
 	BESPStruct building_esp[2]; 	//0: RED, 1: BLU
 
-	struct OESPStruct {
+	struct OESPStruct
+	{
 		ESPStruct base;
 
 		bool m_bDrawPacks;
@@ -68,7 +71,7 @@ public:
 
 public: //MenuPanel
 
-	enum ESPType_t: uint
+	enum ESPType_t: char8_t
 	{
 		Player,
 		Building,
@@ -86,7 +89,7 @@ public:
 	{
 		using namespace IGlobalVHookPolicy;
 		paint_traverse = PaintTraverse::Hook::QueryHook(PaintTraverse::Name);
-		paint_traverse->AddPostHook(HookCall::Late, std::bind(&ESPMenu::OnPaintTraverse, this, std::placeholders::_1));
+		paint_traverse->AddPostHook(HookCall::Late, std::bind(&IESPHack::OnPaintTraverse, this, std::placeholders::_1));
 	}
 
 	HookRes OnPaintTraverse(uint);
@@ -108,4 +111,8 @@ private:
 	}
 };
 
-extern ESPMenu EMenu;
+bool operator&(const IESPHack::ESPStruct::ESPMode& a, const IESPHack::ESPStruct::ESPMode& b)
+{
+	using true_type = std::underlying_type_t<IESPHack::ESPStruct::ESPMode>;
+	return static_cast<true_type>(a) & static_cast<true_type>(b);
+}

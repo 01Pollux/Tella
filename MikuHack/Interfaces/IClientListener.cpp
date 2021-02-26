@@ -29,7 +29,7 @@ void IClientEntityListener::AddEntityListener()
 void IClientEntityListener::RemoveEntityListener()
 {
 	auto listener = FindEntityListener();
-	listener->FindAndRemove(this);
+	listener->FindAndFastRemove(this);
 }
 
 

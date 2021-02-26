@@ -18,6 +18,9 @@ public:
 public:
 	void AddEntityListener();
 	void RemoveEntityListener();
+
+protected:
+	~IClientEntityListener() = default;
 };
 
 

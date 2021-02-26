@@ -5,6 +5,7 @@
 #include "Library.h"
 #include "Timer.h"
 #include "NetVars.h"
+#include "String.h"
 #include "Offsets.h"
 
 #include "../Interfaces/CBaseEntity.h"

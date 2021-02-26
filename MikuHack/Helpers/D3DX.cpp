@@ -108,8 +108,15 @@ LRESULT STDMETHODCALLTYPE hooked_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	{
 		Mmain.m_bIsActive = !Mmain.m_bIsActive;
 		if (Mmain.m_bIsActive)
+		{
+			surface->UnlockCursor();
+			surface->SetCursorAlwaysVisible(true);
+		}
+		else
+		{
 			surface->LockCursor();
-		else surface->UnlockCursor();
+			surface->SetCursorAlwaysVisible(false);
+		}
 
 		if (!check_closed)
 			check_closed = true;

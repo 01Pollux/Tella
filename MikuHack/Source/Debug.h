@@ -34,45 +34,24 @@ namespace MIKUDebug
 	void Init();
 	void Shutdown();
 
-	void Log(LogType type, std::string_view txt);
+	void Log(LogType type, std::string txt);
 
-	inline void LogToFile(std::string_view txt) {
+	inline void LogToFile(std::string txt) {
 		Log(LogType::Generic, txt);
 	}
 
-	inline void LogDebug(std::string_view txt) {
+	inline void LogDebug(std::string txt) {
 		Log(LogType::Debug, txt);
 	}
 
-	inline void LogCritical(std::string_view txt) {
+	inline void LogCritical(std::string txt) {
 		Log(LogType::Critical, txt);
 	}
 
-	inline void LogCustom(std::string_view txt) {
+	inline void LogCustom(std::string txt) {
 		Log(LogType::Custom, txt);
 	}
 };
-
-
-inline void _RFormat(std::ostringstream& str)
-{
-}
-
-template<typename T, typename ...A>
-void _RFormat(std::ostringstream& str, T& var, const A& ...args)
-{
-	str << var;
-	_RFormat(str, args...);
-}
-
-
-template<typename ...A>
-std::string Format(const A& ...args)
-{
-	std::ostringstream stream;
-	_RFormat(stream, args...);
-	return stream.str();
-}
 
 //#define MDEBUG MIKUDebug
 namespace MDEBUG = MIKUDebug;

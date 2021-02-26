@@ -45,14 +45,14 @@ void MIKUDebug::Shutdown()
 }
 
 
-void MIKUDebug::Log(LogType type, string_view fmt)
+void MIKUDebug::Log(LogType type, string fmt)
 {
 	auto _logfn = 
 		[&]() {
 		auto& stream = fileStreams[static_cast<std::underlying_type_t<LogType>>(type)];
 
 		time_t time = chrono::system_clock::to_time_t(chrono::system_clock::now());
-		stream << "[ " << put_time(gmtime(&time), "%c") << " ]:  " << fmt << '\n';
+		stream << "[ " << put_time(gmtime(&time), "%c") << " ]:  " << std::move(fmt) << '\n';
 	};
 	std::async(std::move(_logfn));
 }

@@ -271,7 +271,6 @@ void ImGui_Impl_Init(void* hwnd, IDirect3DDevice9* device)
 	io.KeyMap[ImGuiKey_Y] = 'Y';
 	io.KeyMap[ImGuiKey_Z] = 'Z';
 
-	io.RenderDrawListsFn = ImGui_ImplDX9_RenderDrawLists;
 	io.ImeWindowHandle = g_hWnd;
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -321,7 +320,6 @@ void ImGui_Impl_Init(void* hwnd, IDirect3DDevice9* device)
 	colors[ImGuiCol_TabUnfocused]		= ImVec4(TO_IMVEC4(14, 89, 159, 183));
 	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(TO_IMVEC4(0, 35, 67, 232));
 	colors[ImGuiCol_TextSelectedBg]		= ImVec4(TO_IMVEC4(105, 237, 240, 130));
-	colors[ImGuiCol_ModalWindowDarkening]= ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
 
 	style.WindowPadding = ImVec2(6, 4);
 	style.WindowRounding = 6.0f;

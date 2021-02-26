@@ -189,48 +189,7 @@ void OpenDebugControl(bool* open)
 
 void OpenProfileManager(bool* open)
 {
-	ImGui::Begin("Profiler Manager", open, ImGuiWindowFlags_NoResize);
-
-	ImGui::SetWindowSize(ImVec2{ 870, 640 });
-
-	static bool should_record[SizeOfArray(M0PROFILE_NAMES)]{ };
-
-	for (size_t i = 0; i < SizeOfArray(M0PROFILE_NAMES); i++)
-	{
-		if (ImGui::TreeNode(M0PROFILE_NAMES[i]))
-		{
-			const M0PROFILER_GROUP group =static_cast<M0PROFILER_GROUP>(i);
-
-			if (ImGui::Checkbox("Enable", &should_record[i]))
-			{
-				if (should_record[i])	M0Profiler::Start(group);
-				else					M0Profiler::Stop(group);
-			}
-			
-			ImGui::SameLine();
-			static  bool output_all = false;
-			ImGui::Checkbox("Output All", &output_all);
-
-			ImGui::SameLine();
-			if (ImGui::Button("Export"))
-			{
-				M0Profiler::Stop(group);
-				should_record[i] = false;
-
-				time_t this_time; time(&this_time);
-				tm* time_info = localtime(&this_time);
-
-				std::string path(Format(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], std::put_time(time_info, "__%h_%d_%H_%M_%S"), ".txt"));
-				std::ofstream output(path, std::ios::app | std::ios::out);
-
-				M0Profiler::OutputToFile(group, output, output_all ? M0PROFILER_FLAGS::RESULTS_ONLY : M0PROFILER_FLAGS::EMPTY);
-
-				M0Profiler::Reset(group);
-			}
-		}
-	}
-
-	ImGui::End();
+	M0ProfileHelper::RenderToImGui(open);
 }
 
 //

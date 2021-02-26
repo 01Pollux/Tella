@@ -6,6 +6,8 @@
 
 #include "json.h"
 #include "../Source/Debug.h"
+#include "String.h"
+
 
 #define DLL_STR ".dll"
 
@@ -108,7 +110,7 @@ uintptr_t ILibraryManager::FindPattern(const char* sym)
 
 		if (res.value.empty())
 		{
-			MIKUDebug::LogCritical(Format("[Library: ", name, "] Empty Signature for: \"", sym ? sym : "<NULL>", "\"."));
+			MIKUDebug::LogCritical(fmt::format("[Library: {}] Empty Signature for: \"{}\".", name, sym ? sym : "<NULL>"));
 			return NULL;
 		}
 
@@ -123,7 +125,7 @@ uintptr_t ILibraryManager::FindPattern(const char* sym)
 		m_KeySymbols->insert(std::make_pair(sym, ptr));
 
 		if (!ptr)
-			MIKUDebug::LogCritical(Format("[Library: ", name, "] Address of Signature: \"", sym, "\": \"", res.value.c_str(), "\" is NULL."));
+			MIKUDebug::LogCritical(fmt::format("[Library: {}] Address of Signature: \"{}\": \"{}\" is NULL.", name, sym, res.value));
 
 		return ptr;
 	}

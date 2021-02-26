@@ -174,6 +174,18 @@
   <ItemGroup>
     <ClInclude Include="Detour\detours.h" />
     <ClInclude Include="Detour\detver.h" />
+    <ClInclude Include="fmt\chrono.h" />
+    <ClInclude Include="fmt\color.h" />
+    <ClInclude Include="fmt\compile.h" />
+    <ClInclude Include="fmt\core.h" />
+    <ClInclude Include="fmt\format-inl.h" />
+    <ClInclude Include="fmt\format.h" />
+    <ClInclude Include="fmt\locale.h" />
+    <ClInclude Include="fmt\os.h" />
+    <ClInclude Include="fmt\ostream.h" />
+    <ClInclude Include="fmt\posix.h" />
+    <ClInclude Include="fmt\printf.h" />
+    <ClInclude Include="fmt\ranges.h" />
     <ClInclude Include="GlobalHook\defines.h" />
     <ClInclude Include="GlobalHook\detour.h" />
     <ClInclude Include="GlobalHook\load_routine.h" />
@@ -192,6 +204,7 @@
     <ClInclude Include="Helpers\Offsets.h" />
     <ClInclude Include="Helpers\D3DX.h" />
     <ClInclude Include="Helpers\SigTools.h" />
+    <ClInclude Include="Helpers\String.h" />
     <ClInclude Include="Helpers\Timer.h" />
     <ClInclude Include="Helpers\VTable.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -241,6 +254,8 @@
     <ClCompile Include="Detour\image.cpp" />
     <ClCompile Include="Detour\modules.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="fmt\format.cc" />
+    <ClCompile Include="fmt\os.cc" />
     <ClCompile Include="GlobalHook\vhook.cpp" />
     <ClCompile Include="GlobalHook\vhook_impl.cpp" />
     <ClCompile Include="Helpers\BoneCache.cpp" />
@@ -259,6 +274,7 @@
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_helper.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Interfaces\CAttributes.cpp" />
     <ClCompile Include="Interfaces\CBaseEntity.cpp" />
@@ -274,6 +290,7 @@
     <ClCompile Include="Interfaces\SDK\KeyValues.cpp" />
     <ClCompile Include="Interfaces\SDK\tier1.cpp" />
     <ClCompile Include="Interfaces\SDK\UtlString.cpp" />
+    <ClCompile Include="Profiler\render.cpp" />
     <ClCompile Include="Profiler\mprofiler.cpp" />
     <ClCompile Include="Source\Aimbot.cpp" />
     <ClCompile Include="Source\Debug.cpp" />

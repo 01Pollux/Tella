@@ -1,5 +1,3 @@
-#pragma warning (disable : 26812)
-
 //#define _01_MANUALMAPPED_DLL
 #define _01_ALLOC_CONSOLE
 #define _01_USE_VECTORED_HANDLER
@@ -11,6 +9,7 @@
 #include "GlobalHook/load_routine.h"
 
 #include "Helpers/NetVars.h"
+#include "Helpers/String.h"
 #include "Helpers/Config.h"
 
 #include <convar.h>
@@ -35,16 +34,20 @@ static LPVOID hMod;
 
 static void ReleaseAllProfilers()
 {
+    using namespace std;
     time_t this_time; time(&this_time);
-    tm* time_info = localtime(&this_time);
-    auto time = std::put_time(time_info, "__%h_%d_%H_%M_%S");
+    tm time_info = fmt::localtime(this_time);
+    IFormatter fmt("{}{}__%h_%d_%H_%M_%S.txt");
 
-    for (size_t i = 0; i < static_cast<size_t>(M0PROFILER_GROUP::COUNT); ++i)
+    for (M0PROFILER_GROUP_T i = 0; i < static_cast<M0PROFILER_GROUP_T>(M0PROFILER_GROUP::COUNT); ++i)
     {
-        std::string path(Format(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], time, ".txt"));
-        std::ofstream output(path, std::ios::app | std::ios::out);
-
-        M0Profiler::OutputToFile(static_cast<M0PROFILER_GROUP>(i), output);
+        if (stringstream str;
+            M0Profiler::OutputToSteam(static_cast<M0PROFILER_GROUP>(i), str, M0PROFILER_FLAGS::CLEAR_STATE))
+        {
+            str.seekp(0);
+            ofstream output(fmt(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], time_info), ios::app | ios::out);
+            output << str.rdbuf();
+        }
     }
 }
 

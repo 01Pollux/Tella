@@ -7,52 +7,10 @@
 #include <fstream>
 
 
-constexpr size_t M0PROFILER_MAX_NCALLS = 34086U;
+constexpr size_t M0PROFILER_MAX_NCALLS = 2'097'152U;
 
 namespace M0ProfileHelper
 {
-	struct M0PROFILER_RECORD
-	{
-		using MIN_MAX_PAIR = std::pair<M0PROFILER_MICRO_SECONDS, M0PROFILER_MICRO_SECONDS>;
-		using MIN_MAX_MAP = std::unordered_map<M0PROFILER_TAG_NAME, MIN_MAX_PAIR>;
-
-		struct SINGLE_INFO
-		{
-			M0PROFILER_TAG_NAME			unique_name;
-			M0PROFILER_MICRO_SECONDS	now;
-		};
-
-		std::vector<SINGLE_INFO> data;
-
-		static constexpr MIN_MAX_PAIR default_min_max = { M0PROFILER_MICRO_SECONDS(INT_MAX) , { } };
-		mutable MIN_MAX_MAP min_max;
-
-		M0PROFILER_NCALLS		times{ };
-
-
-		void CalcMinMax() noexcept
-		{
-			for (auto& [name, time] : data)
-			{
-				auto& [min, max] = min_max[name];
-
-				if (time < min)
-					min = time;
-
-				if (time > max)
-					max = time;
-			}
-		}
-
-		static double Perc(const M0PROFILER_MICRO_SECONDS& cur, const M0PROFILER_MICRO_SECONDS& avg) noexcept
-		{
-			using double_time = std::chrono::duration<double>;
-
-			auto freq = std::chrono::duration_cast<double_time>(cur).count() / std::chrono::duration_cast<double_time>(avg).count();
-			return (freq) * 100.0;
-		}
-	};
-
 	class M0PROFILE_STATUS
 	{
 		using true_type = std::underlying_type_t<M0PROFILER_GROUP>;
@@ -91,20 +49,12 @@ namespace M0ProfileHelper
 		return M0PROFILE_NAMES[static_cast<std::underlying_type_t<M0PROFILER_GROUP>>(group)];
 	}
 
-	bool IsActive(M0PROFILER_GROUP group) noexcept
-	{
-		return status[group];
-	}
-
-	
-
-	class MProfileManager
+	class M0ProfileManager
 	{
 	public:
 		void OnSectionStart(M0PROFILER_INSTANCE instance) noexcept;
 		void OnSectionEnd(const M0PROFILER_MICRO_SECONDS time, M0PROFILER_INSTANCE instance);
 	} g_MProfileManager;
-
 };
 
 using namespace M0ProfileHelper;
@@ -119,116 +69,136 @@ M0Profiler::M0Profiler(M0PROFILER_TAG_NAME name, M0PROFILER_GROUP group) : name(
 M0Profiler::~M0Profiler()
 {
 	if (IsActive(group))
-		g_MProfileManager.OnSectionEnd(std::chrono::duration_cast<M0PROFILER_MICRO_SECONDS>(timer.Time()), this);
+		g_MProfileManager.OnSectionEnd(timer.Time(), this);
 }
 
-
-void M0Profiler::Start(M0PROFILER_GROUP group)
+bool M0Profiler::IsActive(M0PROFILER_GROUP group) noexcept
 {
-	status[group] = true;
+	return status[group];
 }
 
-void M0Profiler::Start(M0PROFILER_GROUP groups[], size_t num)
+void M0Profiler::Toggle(M0PROFILER_GROUP group, bool state) noexcept
+{
+	status[group] = state;
+}
+
+void M0Profiler::Start(M0PROFILER_GROUP groups[], size_t num) noexcept
 {
 	for (size_t i = 0; i < num; i++)
 		status[groups[i]] = true;
 }
 
-void M0Profiler::Stop(M0PROFILER_GROUP group)
-{
-	status[group] = false;
-}
-
-void M0Profiler::Stop(M0PROFILER_GROUP groups[], size_t num)
+void M0Profiler::Stop(M0PROFILER_GROUP groups[], size_t num) noexcept
 {
 	for (size_t i = 0; i < num; i++)
 		status[groups[i]] = false;
 }
 
 
-void M0Profiler::OutputToFile(M0PROFILER_GROUP group, std::ofstream& stream, M0PROFILER_FLAGS flags)
+bool M0Profiler::OutputToSteam(M0PROFILER_GROUP group, std::stringstream& stream, M0PROFILER_FLAGS flags)
 {
 	auto& profile = profilers[group];
+	if (profile.empty())
+		return false;
 
 	stream << std::setw(10);
 
 	stream << "Summary for \"" << GetName(group) << "\":\n";
 
-	bool dont_record_childrens = flags & M0PROFILER_FLAGS::RESULTS_ONLY;
+	bool dont_record_childrens = flags & M0PROFILER_FLAGS::HIDE_CHILDRENS;
 
-	for (auto& [section, info] : profile)
+	for (const auto& [name, record] : profile)
 	{
-		stream << "\n----------------------------------------------------------------------------------------------\n\n";
+		stream << "\n----------------------------------------------------------------------------------------------\n";
 
-		info->CalcMinMax();
+		M0PROFILER_MICRO_SECONDS min{ INT_MAX }, max{ }, total{ };
 
-		const auto& [min, max] = info->min_max[section];
-		const M0PROFILER_NANO_SECONDS avg = (max + min) / 2;
-
-		M0PROFILER_NANO_SECONDS total{};
-
-		std::cout << "Section: " << section << '\n';
-		stream << section
-			<< "\tReference Count: "
-			<< info->times
-			<< "\tAvg: " << avg.count()
-			<< "ns\tMin: " << min.count()
-			<< "ns\tMax: " << max.count() << "ns\n\n";
-
-		for (auto& child = info->data;
-			auto & [name, time]: child)
+		for (const auto& times = record;
+			 const auto& time : times)
 		{
 			total += time;
 
 			if (!dont_record_childrens)
 			{
-				stream <<
-					"\t> \"" << name << "\": " <<
-					"\t( Elapsed: " << time.count() << "ns  /  ~" << std::chrono::duration_cast<M0PROFILER_MICRO_SECONDS>(time).count() << " microsec )\n";
+				stream << "\t<( Elapsed: "
+					<< std::chrono::duration_cast<M0PROFILER_NANO_SECONDS>(time).count()
+					<< " ns  |  ~" << time.count() << " microsec )>\n";
 			}
+
+			if (time < min)
+				min = time;
+			if (time > max)
+				max = time;
 		}
 
-		auto mt = (total / info->data.size());
+		size_t num_calls = record.size();
+		const M0PROFILER_MICRO_SECONDS avg = (max + min) / 2;
+		auto mt = (total / num_calls);
 
-		stream << "\nTotal Time Spent: " << total.count() << "ns  /  ~" << std::chrono::duration_cast<M0PROFILER_MICRO_SECONDS>(mt).count() << "microsec \n"
-			<< "Average: " << mt.count() << "ns  /  ~" << std::chrono::duration_cast<M0PROFILER_MICRO_SECONDS>(mt).count() << "microsec\n\n";
+		stream << "\nFunction Name: \t"
+			<< name
+
+			<< "\nReference Count: \t"
+			<< num_calls
+
+			<< "\nAverage Time: \t"
+			<< std::chrono::duration_cast<M0PROFILER_NANO_SECONDS>(avg).count()
+			<< " ns  |  ~" << avg.count() << " microsec"
+
+			<< "\nMinimum Time: \t"
+			<< std::chrono::duration_cast<M0PROFILER_NANO_SECONDS>(min).count()
+			<< " ns  |  ~" << min.count() << " microsec"
+
+			<< "\nMaximum Time: \t"
+			<< std::chrono::duration_cast<M0PROFILER_NANO_SECONDS>(max).count()
+			<< " ns  |  ~" << max.count() << " microsec"
+
+			<< "\nTotal Time: \t"
+			<< std::chrono::duration_cast<M0PROFILER_NANO_SECONDS>(total).count()
+			<< " ns  |  ~" << total.count() << " microsec"
+
+			<< "\nTotal Average Time: \t"
+			<< std::chrono::duration_cast<M0PROFILER_NANO_SECONDS>(mt).count()
+			<< " ns  |  ~" << mt.count() << " microsec\n";
 	}
 
 	stream << "\n----------------------------------------------------------------------------------------------" << std::endl;
+
+	if (flags & M0PROFILER_FLAGS::CLEAR_STATE)
+		Reset(group);
+
+	return true;
 }
 
-inline M0PROFILER_MAP& M0Profiler::GetOutputMap(M0PROFILER_GROUP group)
+M0PROFILER_MAP& M0Profiler::GetDataMap(M0PROFILER_GROUP group) noexcept
 {
 	return profilers[group];
 }
 
-void M0Profiler::Reset(M0PROFILER_GROUP group)
+void M0Profiler::Reset(M0PROFILER_GROUP group) noexcept
 {
 	profilers[group].clear();
 }
 
-inline void MProfileManager::OnSectionStart(M0PROFILER_INSTANCE instance) noexcept
+inline void M0ProfileManager::OnSectionStart(M0PROFILER_INSTANCE instance) noexcept
 {
 	instance->timer.Start();
 }
 
-void MProfileManager::OnSectionEnd(const M0PROFILER_MICRO_SECONDS time, M0PROFILER_INSTANCE instance)
+void M0ProfileManager::OnSectionEnd(const M0PROFILER_MICRO_SECONDS time, M0PROFILER_INSTANCE instance)
 {
-	const char* name = instance->name;
-	auto& profile = profilers[instance->group];
-	auto iter = profile.find(name);
+	M0PROFILER_TAG_NAME name = instance->GetSectionName();
+	M0PROFILER_MAP& profiler = profilers[instance->GetGroup()];
+	M0PROFILER_MAP::iterator iter = profiler.find(name);
 
-	if (iter == profile.end())
+	if (iter == profiler.end())
 	{
-		iter = profile.insert(std::make_pair(name, std::make_unique<M0PROFILER_RECORD>())).first;
-		iter->second->min_max[name] = M0PROFILER_RECORD::default_min_max;
+		M0PROFILER_RECORD record;
+		iter = profiler.emplace(name, M0PROFILER_RECORD{}).first;
 	}
 
 	auto& record = iter->second;
 
-	if (record->data.size() < M0PROFILER_MAX_NCALLS)
-	{
-		record->data.push_back({ name, time });
-		++record->times;
-	}
+	if (record.size() < M0PROFILER_MAX_NCALLS)
+		record.emplace_back(time);
 }

@@ -8,7 +8,10 @@
 #include "../Interfaces/IVEngineClient.h"
 
 #include "../Debug.h"
+#include "../Helpers/String.h"
 #include "../Helpers/Timer.h"
+
+#include <set>
 
 void ParseKeyValues(KeyValues*);
 
@@ -63,8 +66,7 @@ HookRes SMAC_AntiCVars::OnSendNetMsg(INetMessage& msg)
 	case clc_RespondCvarValue:
 	{
 		CLC_RespondCvarValue& cvar_respond = reinterpret_cast<CLC_RespondCvarValue&>(msg);
-		const char* name = cvar_respond.m_szCvarName;
-		auto i = m_CVarsList.find(name);
+		auto i = m_CVarsList.find(cvar_respond.m_szCvarName);
 
 		if (i != m_CVarsList.end())
 			cvar_respond.m_szCvarValue = i->second.c_str();
@@ -76,6 +78,7 @@ HookRes SMAC_AntiCVars::OnSendNetMsg(INetMessage& msg)
 			ParseKeyValues(static_cast<CLC_CmdKeyValues&>(msg).m_pKeyValues);
 		break;
 	}
+	
 	default: break;
 	}
 
@@ -97,81 +100,88 @@ HAT_COMMAND(fake_cvar, "Set ConVar Value")
 	pCVar->SetValue(value);
 }
 
+static void CollectUniqueKVSection(KeyValues* kv, std::set<KeyValues*>& output)
+{
+	FOR_EACH_SUBKEY(kv, subkey)
+		FOR_EACH_VALUE(subkey, block)
+			output.insert(block);
+
+	FOR_EACH_VALUE(kv, block)
+		output.insert(block);
+}
+
 void ParseKeyValues(KeyValues* kv)
 {
-	MIKUDebug::LogDebug(Format("\n\nBEGIN KV: \"", kv->GetName(), "\""));
+	std::set<KeyValues*> kvs;
+	CollectUniqueKVSection(kv, kvs);
 
-	std::vector<KeyValues*> kvs{ };
-	{
-		FOR_EACH_SUBKEY(kv, subkey)
-			FOR_EACH_VALUE(subkey, block)
-				if (std::find(kvs.begin(), kvs.end(), block) == kvs.end())
-					kvs.push_back(block);
-		FOR_EACH_VALUE(kv, block)
-			if (std::find(kvs.begin(), kvs.end(), block) == kvs.end())
-				kvs.push_back(block);
-	}
+	MIKUDebug::LogDebug(fmt::format("\n\nBEGIN KV: \"{}\"", kv->GetName()));
 
-	char dt = KeyValues::types_t::TYPE_NONE;
+	using KVType = KeyValues::types_t;
+
+	char dt = KVType::TYPE_NONE;
 	const char* name = "";
 
-	for (KeyValues* kv : kvs)
+	IBufferFormatter buf;
+	
+	buf.reserve(kvs.size() * 8);
+	for (const KeyValues* kv : kvs)
 	{
 		dt = kv->m_iDataType;
 		name = kv->GetName();
+		buf.cat("\tKey: \"{}\" - ", name);
 
 		switch (dt)
 		{
 		
-		case KeyValues::types_t::TYPE_STRING:
+		case KVType::TYPE_STRING:
 		{
 			if (kv->m_sValue && *(kv->m_sValue))
-			{
-				MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - STRING: ", kv->m_sValue));
-			}
+				buf.cat("STRING: {}", kv->m_sValue);
 			else
-			{
-				MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - STRING: <EMPTY>"));
-			}
+				buf.cat("STRING: <EMPTY>");
 			break;
 		}
 
-		case KeyValues::types_t::TYPE_INT:
+		case KVType::TYPE_INT:
 		{
-			MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - INT: ", kv->m_iValue));
+			buf.cat("INT: {}", kv->m_iValue);
 			break;
 		}
 
-		case KeyValues::types_t::TYPE_UINT64:
+		case KVType::TYPE_UINT64:
 		{
-			MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - DOUBLE: ", *reinterpret_cast<double*>(kv->m_sValue)));
+			buf.cat("DOUBLE: {}", *reinterpret_cast<double*>(kv->m_sValue));
 			break;
 		}
 
-		case KeyValues::types_t::TYPE_FLOAT:
+		case KVType::TYPE_FLOAT:
 		{
-			MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - FLOAT: ", kv->m_flValue));
+			buf.cat("FLOAT: {}", kv->m_flValue);
 			break;
 		}
-		case KeyValues::types_t::TYPE_COLOR:
+		case KVType::TYPE_COLOR:
 		{
-			MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - COLOR: { ", kv->m_Color[0], " ", kv->m_Color[1], " ", kv->m_Color[2], " ", kv->m_Color[3], " }"));
+			buf.cat("COLOR: < {} - {} - {} - {} >", kv->m_Color[0], kv->m_Color[1], kv->m_Color[2], kv->m_Color[3]);
 			break;
 		}
-		case KeyValues::types_t::TYPE_PTR:
+		case KVType::TYPE_PTR:
 		{
-			MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - PTR: ", kv->m_pValue));
+			buf.cat("PTR: ", kv->m_pValue);
 			break;
 		}
 		default:
 		{
-			MIKUDebug::LogDebug(Format("\tKey: \"", name, "\" - UNKNOWN"));
+			buf.cat("UNKNOWN");
 			break;
 		}
 		}
+
+		buf.cat("\n");
 	}
 
-	MIKUDebug::LogDebug("END KV");
+	buf.cat("\nEND KV");
+	MIKUDebug::LogDebug(std::move(*buf));
 }
 
 HAT_COMMAND(revive_marker, "")

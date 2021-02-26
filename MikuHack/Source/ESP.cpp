@@ -1,8 +1,8 @@
 #pragma once
 
+#include "ESP.h"
 #include "../Helpers/Commons.h"
 #include "../Helpers/DrawTools.h"
-#include "ESP.h"
 
 #include <algorithm>
 #include <mutex>
@@ -11,11 +11,11 @@
 #include "../Helpers/Timer.h"
 #include "../Interfaces/VGUIS.h"
 
-ESPMenu EMenu;
+IESPHack EMenu;
 
 struct ESPData
 {
-	ESPMenu::ESPType_t type = ESPMenu::ESPType_t::Objects;
+	IESPHack::ESPType_t type = IESPHack::ESPType_t::Objects;
 	short color_offset = 0;
 
 	float dist;
@@ -28,10 +28,9 @@ struct ESPData
 
 	Color color;
 
-	inline void AddEntityString(std::string_view str) { strings.push_back(std::string(str)); }
-	inline void AddEntityString(std::string_view str, std::vector<std::string>::iterator iter) { strings.insert(iter, std::string(str)); }
+	void AddEntityString(std::string&& str) { strings.push_back(std::move(str)); }
+	void AddEntityString(std::string&& str, std::vector<std::string>::iterator iter) { strings.insert(iter, std::move(str)); }
 };
-
 static std::vector<ESPData> espdata;
 
 #define ADD_STRING(ESP, TYPE, ...) \
@@ -59,7 +58,7 @@ static std::vector<ESPData> espdata;
 void ProcessEntity(const MyClientCacheList& pEnt, const Vector&);
 
 
-void ESPMenu::OnRender()
+void IESPHack::OnRender()
 {
 	constexpr const char* ESPTeam[] = { "RED", "BLU" };
 
@@ -100,7 +99,7 @@ void ESPMenu::OnRender()
 						if (ImGui::BeginCombo("##MODES", display_str[i].c_str()))
 						{
 							constexpr const char* modes[] = { "Box", "Box 3D" };
-							static bool enabled[SizeOfArray(modes)]{ };
+							static bool enabled[2][SizeOfArray(modes)]{ };
 							static int actual = 0;
 
 							static std::vector<const char*> vec;
@@ -108,8 +107,8 @@ void ESPMenu::OnRender()
 
 							for (uint x = 0; x < SizeOfArray(modes); x++)
 							{
-								ImGui::Selectable(modes[x], &enabled[x], ImGuiSelectableFlags_DontClosePopups);
-								if (enabled[x])
+								ImGui::Selectable(modes[x], &enabled[i][x], ImGuiSelectableFlags_DontClosePopups);
+								if (enabled[i][x])
 								{
 									vec.push_back(modes[x]);
 									actual |= (1 << x);
@@ -120,16 +119,24 @@ void ESPMenu::OnRender()
 							}
 
 							if (vec.size())
+							{
 								for (size_t x = 0; x < vec.size(); x++)
 								{
-									if (!x) display_str[i] = vec[x];
-									else	display_str[i] += " | " + std::string(vec[x]);
+									if (!x)
+										display_str[i] = vec[x];
+									else
+										display_str[i] += " | " + std::string(vec[x]);
 								}
-							else			display_str[i] = "None";
+							}
+							else
+							{
+								display_str[i] = "None";
+							}
 
 							player_esp[i].base.m_bitsDrawMode = static_cast<ESPStruct::ESPMode>(actual);
 							ImGui::EndCombo();
 						}
+
 						ImGui::SameLine();
 						ImGui::DrawHelp("Select display type");
 						ImGui::Separator();
@@ -202,7 +209,7 @@ void ESPMenu::OnRender()
 						if (ImGui::BeginCombo("##MODES", display_str[i].c_str()))
 						{
 							static const char* modes[] = { "Box", "Box 3D"};
-							static bool enabled[SizeOfArray(modes)]{ };
+							static bool enabled[2][SizeOfArray(modes)]{ };
 							static int actual = 0;
 
 							static std::vector<const char*> vec;
@@ -210,8 +217,8 @@ void ESPMenu::OnRender()
 
 							for (uint x = 0; x < IM_ARRAYSIZE(modes); x++)
 							{
-								ImGui::Selectable(modes[x], &enabled[x], ImGuiSelectableFlags_DontClosePopups);
-								if (enabled[x])
+								ImGui::Selectable(modes[x], &enabled[i][x], ImGuiSelectableFlags_DontClosePopups);
+								if (enabled[i][x])
 								{
 									vec.push_back(modes[x]);
 									actual |= (1 << i);
@@ -222,12 +229,19 @@ void ESPMenu::OnRender()
 							}
 
 							if (vec.size())
+							{
 								for (size_t x = 0; x < vec.size(); x++)
 								{
-									if (!x) display_str[i] = vec[x];
-									else	display_str[i] += " | " + std::string(vec[x]);
+									if (!x)
+										display_str[i] = vec[x];
+									else
+										display_str[i] += " | " + std::string(vec[x]);
 								}
-							else			display_str[i] = "None";
+							}
+							else
+							{
+								display_str[i] = "None";
+							}
 
 							building_esp[i].base.m_bitsDrawMode = static_cast<ESPStruct::ESPMode>(actual);
 							ImGui::EndCombo();
@@ -363,7 +377,7 @@ void ESPMenu::OnRender()
 }
 
 
-HookRes ESPMenu::OnPaintTraverse(uint pId)
+HookRes IESPHack::OnPaintTraverse(uint pId)
 {
 	if (pId != PID_FocusOverlay)
 		return HookRes::Continue;
@@ -385,14 +399,14 @@ HookRes ESPMenu::OnPaintTraverse(uint pId)
 
 	CollectEntities();
 
-	M0Profiler watch_esp("ESPMenu::OnPaintTraverse::DrawEntities", M0PROFILER_GROUP::CHEAR_PROFILE);
+	M0Profiler watch_esp("ESPMenu::OnPaintTraverse::DrawEntities", M0PROFILER_GROUP::CHEAT_PROFILE);
 	for (auto& data : espdata)
 		DrawEntities(data);
 
 	return HookRes::Continue;
 }
 
-void ESPMenu::DrawEntities(ESPData& data)
+void IESPHack::DrawEntities(ESPData& data)
 {
 	IClientShared* pEnt = data.pEnt;
 	Vector origin;
@@ -473,7 +487,7 @@ Draw_Text:
 	}
 }
 
-bool ESPMenu::DrawBox(ESPData& data)
+bool IESPHack::DrawBox(ESPData& data)
 {
 	IClientShared* pEnt = data.pEnt;
 	Color& color = data.color;
@@ -483,7 +497,6 @@ bool ESPMenu::DrawBox(ESPData& data)
 	const Vector& mins = pCol->OBBMins() + origin;
 	const Vector& maxs = pCol->OBBMaxs() + origin;
 
-	
 	static Vector points[8];
 
 	int max_x = -1, max_y = -1, min_x = 65536, min_y = 65536;
@@ -575,9 +588,9 @@ bool ESPMenu::DrawBox(ESPData& data)
 	return true;
 }
 
-void ESPMenu::CollectEntities()
+void IESPHack::CollectEntities()
 {
-	M0Profiler watch_esp("ESPMenu::OnPaintTraverse::CollectEntities", M0PROFILER_GROUP::CHEAR_PROFILE);
+	M0Profiler watch_esp("ESPMenu::OnPaintTraverse::CollectEntities", M0PROFILER_GROUP::CHEAT_PROFILE);
 
 	espdata.clear();
 	const Vector& myOrg = ::ILocalPtr()->GetAbsOrigin();
@@ -589,7 +602,7 @@ void ESPMenu::CollectEntities()
 	}
 
 	std::sort(espdata.begin(), espdata.end(),
-		[](ESPData& a, ESPData& b) -> bool
+		[](ESPData& a, ESPData& b)
 		{
 			return a.dist > b.dist;
 		}
@@ -597,7 +610,7 @@ void ESPMenu::CollectEntities()
 }
 
 
-void ESPMenu::JsonCallback(Json::Value& json, bool read)
+void IESPHack::JsonCallback(Json::Value& json, bool read)
 {
 	Json::Value& ESPCfg = json["ESP"];
 	constexpr const char* ESPTeam[] = { "RED", "BLU" };
@@ -622,7 +635,7 @@ void ESPMenu::JsonCallback(Json::Value& json, bool read)
 				}
 				{
 					PROCESS_JSON_READ(curPM, "bits Draw", Int, temp);
-					player_esp[i].base.m_bitsDrawMode = static_cast<ESPMenu::ESPStruct::ESPMode>(temp);
+					player_esp[i].base.m_bitsDrawMode = static_cast<IESPHack::ESPStruct::ESPMode>(temp);
 				}
 				{
 					PROCESS_JSON_READ(curPM, "Draw Name", Bool, player_esp[i].base.m_bDrawName);
@@ -647,7 +660,7 @@ void ESPMenu::JsonCallback(Json::Value& json, bool read)
 				}
 				{
 					PROCESS_JSON_READ(curBM, "bits Draw", Int, temp);
-					building_esp[i].base.m_bitsDrawMode = static_cast<ESPMenu::ESPStruct::ESPMode>(temp);
+					building_esp[i].base.m_bitsDrawMode = static_cast<IESPHack::ESPStruct::ESPMode>(temp);
 				}
 				{
 					PROCESS_JSON_READ(curBM, "Draw Name", Bool, building_esp[i].base.m_bDrawName);
@@ -671,7 +684,7 @@ void ESPMenu::JsonCallback(Json::Value& json, bool read)
 			}
 			{
 				PROCESS_JSON_READ(OM, "bits Draw", Int, temp);
-				objects_esp.base.m_bitsDrawMode = static_cast<ESPMenu::ESPStruct::ESPMode>(temp);
+				objects_esp.base.m_bitsDrawMode = static_cast<IESPHack::ESPStruct::ESPMode>(temp);
 			}
 			{
 				PROCESS_JSON_READ(OM, "Draw Name", Bool, objects_esp.base.m_bDrawName);
@@ -955,7 +968,7 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 		ADD_STRING(PlayerESP.base, Distance, "Distance: " + std::to_string(dist) + " HU");
 		ADD_STRING(PlayerESP, Team, m_szTeams[team]);
 
-		data.type = ESPMenu::ESPType_t::Player;
+		data.type = IESPHack::ESPType_t::Player;
 		data.color_offset = team;
 
 		ProcessPlayer(data, reinterpret_cast<ITFPlayer*>(pEnt));
@@ -987,7 +1000,7 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 			ADD_STRING(BuildingESP, Team, m_szTeams[team]);
 			ADD_STRING(BuildingESP.base, Name, "Dispenser");
 
-			data.type = ESPMenu::ESPType_t::Building;
+			data.type = IESPHack::ESPType_t::Building;
 			data.color_offset = team;
 
 			ProcessBuilding(data, reinterpret_cast<IBaseObject*>(pEnt), id);
@@ -1014,7 +1027,7 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 			ADD_STRING(BuildingESP, Team, m_szTeams[team]);
 			ADD_STRING(BuildingESP.base, Name, "Teleporter");	//TODO : m_iObjectMode!
 
-			data.type = ESPMenu::ESPType_t::Building;
+			data.type = IESPHack::ESPType_t::Building;
 			data.color_offset = team;
 
 			ProcessBuilding(data, reinterpret_cast<IBaseObject*>(pEnt), id);
@@ -1041,7 +1054,7 @@ void ProcessEntity(const MyClientCacheList& cache, const Vector& myOrg)
 			ADD_STRING(BuildingESP, Team, m_szTeams[team]);
 			ADD_STRING(BuildingESP.base, Name, "Sentrygun");
 
-			data.type = ESPMenu::ESPType_t::Building;
+			data.type = IESPHack::ESPType_t::Building;
 			data.color_offset = team;
 
 			ProcessBuilding(data, reinterpret_cast<IBaseObject*>(pEnt), id);

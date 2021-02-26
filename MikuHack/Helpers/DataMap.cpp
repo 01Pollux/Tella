@@ -4,8 +4,8 @@
 #include "DataMap.h"
 #include "NetVars.h"
 
-#include "../Source/Debug.h"
 #include "Offsets.h"
+#include "String.h"
 
 #include "../Helpers/Commons.h"
 #include "../Interfaces/IBaseClientDLL.h"
@@ -67,7 +67,7 @@ bool LookupDataMap(IClientShared* pEnt, const char* name, datamap_info_t* info, 
 		if (!_FindInDataMap(map, name, info))
 		{
 			info->valid = false;
-			MIKUDebug::LogCritical(Format("DATAMAP: Failed to find: ", actual));
+			MIKUDebug::LogCritical(fmt::format("DATAMAP: Failed to find: {}", actual));
 		}
 		else info->valid = true;
 		m_DataMapHash.insert(std::make_pair(actual, *info));
