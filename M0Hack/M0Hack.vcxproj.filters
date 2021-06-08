@@ -1,0 +1,647 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Cheats">
+      <UniqueIdentifier>{fcc02b85-547f-4233-8866-dfac7edf6dfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GlobalHook">
+      <UniqueIdentifier>{38d646ff-6a58-4dbd-86fc-8ba9df826ef7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper">
+      <UniqueIdentifier>{a32234c9-dd31-4df5-91ad-3abe05cfec78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{5cd039be-f488-47fc-8838-ca8f6612d74b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{08734016-49b1-4283-a2dd-b515815b719d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{cf2399a1-995e-40c8-8652-3c64b9311733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{1cb192ac-5a8e-465d-bed5-ab26d4f263eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\MathLib">
+      <UniqueIdentifier>{5771dbac-ae54-4f32-879f-6bbe392764f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GlobalHook\Detour">
+      <UniqueIdentifier>{2ca80b96-5a38-4352-b80c-d35546d98eb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheats\Aimbot">
+      <UniqueIdentifier>{eda6216e-26a8-48cb-bcc0-e6ccfa7119a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Entity">
+      <UniqueIdentifier>{c904c08f-dc27-45f7-8d7d-f806c0fde07f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheats\ESP">
+      <UniqueIdentifier>{81bc9402-8f86-4dfa-8c99-9c9324943987}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheats\Extras">
+      <UniqueIdentifier>{87e09626-2fd5-4c8c-b96f-1dbc38255087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Huds">
+      <UniqueIdentifier>{4e8dd209-3af1-446c-bc09-b1c8c1f2df2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheats\Extras\Visuals">
+      <UniqueIdentifier>{c25249f7-7bb8-4d26-9099-308301b81502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheats\Inventory">
+      <UniqueIdentifier>{9bc34891-388b-4ecc-8ea7-1e7db935f89e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Hooks">
+      <UniqueIdentifier>{fa7d22a0-5885-404e-b173-c2fe867f6270}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Proto">
+      <UniqueIdentifier>{a1eb561b-f160-4400-bfcb-d83c3addfa96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Steam">
+      <UniqueIdentifier>{9f5b6533-d380-47a2-bcd7-8fd4bfeec4fc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SDK\MathLib\Matrix3x4.hpp">
+      <Filter>SDK\MathLib</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\MathLib\Vector2D.hpp">
+      <Filter>SDK\MathLib</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\MathLib\Vector3D.hpp">
+      <Filter>SDK\MathLib</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\MathLib\VMatrix.hpp">
+      <Filter>SDK\MathLib</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\cdll_int.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Const.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ConVar.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ConVar_Internal.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Cvar.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GlobalVars.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\UtlVector.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\VGUI.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\AppSystem.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\mprofiler.hpp">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\mdefines.hpp">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Lib_Sig.hpp">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Lib_Win.hpp">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Lib.hpp">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_helper.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx9.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_win32.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Debug.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\DrawTools.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\EnumClass.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Json.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Offsets.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Timer.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\defines.hpp">
+      <Filter>GlobalHook</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\detour.hpp">
+      <Filter>GlobalHook</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\listener.hpp">
+      <Filter>GlobalHook</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\vhook.hpp">
+      <Filter>GlobalHook</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\vtable.hpp">
+      <Filter>GlobalHook</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\Detour\detours.hpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHook\Detour\detver.hpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Main.hpp">
+      <Filter>Cheats</Filter>
+    </ClInclude>
+    <ClInclude Include="winmain.hpp" />
+    <ClInclude Include="SDK\Entity\BasePlayer.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\ClientEntity.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\BaseEntity.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\EntityList.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\ClientEntity_Internal.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\BoneCache.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\Studio.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ModelInfo.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Glow.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\HandleEntity.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\DebugOverlay.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Trace.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameTrace.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameEnumerator.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\BaseObject.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Aimbot\aimbot.hpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Aimbot\aimbot_export.hpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Aimbot\aimbot_particles.hpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\UserCmd.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Extras\Effects.hpp">
+      <Filter>Cheats\Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Random.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\ResourceEntity.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\AutoList.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\NetVars_Helper.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\GameProp.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\DataMap_Helper.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Config.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\ESP\esp.hpp">
+      <Filter>Cheats\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\ESP\esp_reserved.hpp">
+      <Filter>Cheats\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\EconEntity.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Entity\BaseWeapon.hpp">
+      <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Color.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Huds\TFHuds.h">
+      <Filter>SDK\Huds</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Huds\HudElement.h">
+      <Filter>SDK\Huds</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Patch.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Aimbot\aimbot_var.hpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Inventory\Inventory_Skins.hpp">
+      <Filter>Cheats\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheats\Inventory\Inventory_Models.hpp">
+      <Filter>Cheats\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\NetStringTable.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\NetMessage.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\NetChannel.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameEvent.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\BitBuffers.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\CheckSum.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper\Format.hpp">
+      <Filter>Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\LevelChange.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\PaintTraverse.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\SendNetMsg.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\CreateMove.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\FrameStageNotify.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\D3Dx9.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\KeyValues.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\GCSys.hpp">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\GCMsg.hpp">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Hooks\GameCoordinator.hpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Steam\Commons.hpp">
+      <Filter>SDK\Steam</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Steam\Enums.hpp">
+      <Filter>SDK\Steam</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\gcsystem.hpp">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\base_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\econ_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\gcsdk_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\gcsystemmsgs.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\steammessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\tf_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\tf_proto_def_messages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SDK\ConVar.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\mprofiler.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\mrender.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Lib_Sig.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Lib.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_helper.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\Debug.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\DrawTools.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\Json.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\NetVars.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\Timer.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\DataMap.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\listener.cpp">
+      <Filter>GlobalHook</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\vtable.cpp">
+      <Filter>GlobalHook</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\disasm.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\disolarm.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\disolarm64.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\disolia64.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\disolx64.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\disolx86.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\image.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\modules.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\creatwth.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHook\Detour\detours.cpp">
+      <Filter>GlobalHook\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\MenuPanel.cpp">
+      <Filter>Cheats</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="SDK\Entity\BoneCache.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\BaseEntity.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Glow.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\DebugOverlay.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Trace.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\BasePlayer.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\EntityManager.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\BaseObject.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\MathLib\Vector3D.cpp">
+      <Filter>SDK\MathLib</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Aimbot\aimbot_render.cpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Aimbot\aimbot.cpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Aimbot\aimbot_filter.cpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Aimbot\aimbot_particles.cpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Aimbot\aimbot_process.cpp">
+      <Filter>Cheats\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\ResourceEntity.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\Config.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\ESP\esp_filter.cpp">
+      <Filter>Cheats\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\ESP\esp_process.cpp">
+      <Filter>Cheats\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\ESP\esp_render.cpp">
+      <Filter>Cheats\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\ESP\esp.cpp">
+      <Filter>Cheats\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\EconEntity.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Entity\BaseWeapon.cpp">
+      <Filter>SDK\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\Effects.cpp">
+      <Filter>Cheats\Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Huds\TFHuds.cpp">
+      <Filter>SDK\Huds</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\Visuals\HideScope.cpp">
+      <Filter>Cheats\Extras\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\Visuals\DisplayDead.cpp">
+      <Filter>Cheats\Extras\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\Visuals\Visuals_Render.cpp">
+      <Filter>Cheats\Extras\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Inventory\Inventory_Skins.cpp">
+      <Filter>Cheats\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Inventory\Inventory_Models.cpp">
+      <Filter>Cheats\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Inventory\Inventory_Render.cpp">
+      <Filter>Cheats\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\BitBuffers.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\CheckSum.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_D3Dx9.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_FrameStageNotify.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_LevelChange.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_PaintTraverse.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_ConCommandBase.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_CreateMove.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_SendNetMsg.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\ConCmds1.cpp">
+      <Filter>Cheats\Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\KeyValues.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\NetMessage.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper\Format.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\Auto-Detonate.cpp">
+      <Filter>Cheats\Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="Cheats\Extras\Auto-Backstab.cpp">
+      <Filter>Cheats\Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\GCSys.cpp">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Hooks\hook_GameCoordinator.cpp">
+      <Filter>SDK\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\econ_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\gcsdk_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\gcsystemmsgs.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\steammessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\tf_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\tf_proto_def_messages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\base_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libprotobuf.lib" />
+  </ItemGroup>
+</Project>
