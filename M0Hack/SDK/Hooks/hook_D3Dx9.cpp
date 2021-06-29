@@ -121,7 +121,7 @@ LRESULT WINAPI WindowProcedureHook::WinProcCallback(HWND hWnd, UINT uMsg, WPARAM
 
 void WindowProcedureHook::InitDevice()
 {
-	M0Pointer pDevice = M0Libraries::D3DX9->FindPattern("pDirect3DDevice");
+	void* pDevice = M0Library{ M0D3DX9_DLL }.FindPattern("pDirect3DDevice");
 
 	v_D3DEndScene = VHOOK_REG_S(EndScene, pDevice, Offsets::D3D::VTIdx_EndScene);
 	VHOOK_LINK_S(v_D3DEndScene, EndScene);

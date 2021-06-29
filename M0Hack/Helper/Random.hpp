@@ -2,60 +2,63 @@
 
 #include <random>
 
-namespace Random
+namespace tella
 {
-	using RandomDevice = std::random_device;
-
-	template<typename RandomSeed = RandomDevice>
-	[[nodiscard]] inline bool Bool(RandomSeed& seed)
+	namespace random
 	{
-		std::bernoulli_distribution r(0.5);
-		return r(seed);
-	}
+		using default_device = std::random_device;
 
-	[[nodiscard]] inline bool Bool()
-	{
-		RandomDevice eng;
-		return Bool(eng);
-	}
+		template<typename _Eng = default_device>
+		[[nodiscard]] inline bool Bool(_Eng& seed)
+		{
+			std::bernoulli_distribution r(0.5);
+			return r(seed);
+		}
 
-	template<typename RandomSeed = RandomDevice>
-	[[nodiscard]] inline int Int(int min, int max, RandomSeed& seed)
-	{
-		std::uniform_int_distribution<int> r(min, max);
-		return r(seed);
-	}
+		[[nodiscard]] inline bool Bool()
+		{
+			default_device eng;
+			return Bool(eng);
+		}
 
-	[[nodiscard]] inline int Int(int min, int max)
-	{
-		RandomDevice eng;
-		return Int(min, max, eng);
-	}
+		template<typename _Eng = default_device>
+		[[nodiscard]] inline int Int(int min, int max, _Eng& seed)
+		{
+			std::uniform_int_distribution<int> r(min, max);
+			return r(seed);
+		}
 
-	template<typename RandomSeed = RandomDevice>
-	[[nodiscard]] inline float Float(float min, float max, RandomSeed& seed)
-	{
-		std::uniform_real_distribution<float> r(min, max);
-		return r(seed);
-	}
+		[[nodiscard]] inline int Int(int min, int max)
+		{
+			default_device eng;
+			return Int(min, max, eng);
+		}
 
-	[[nodiscard]] inline float Float(float min, float max)
-	{
-		RandomDevice eng;
-		return Float(min, max, eng);
-	}
+		template<typename _Eng = default_device>
+		[[nodiscard]] inline float Float(float min, float max, _Eng& seed)
+		{
+			std::uniform_real_distribution<float> r(min, max);
+			return r(seed);
+		}
 
-	template<typename RandomSeed = RandomDevice>
-	[[nodiscard]] inline double Double(double min, double max, RandomSeed& seed)
-	{
-		std::uniform_real_distribution<double> r(min, max);
-		return r(seed);
+		[[nodiscard]] inline float Float(float min, float max)
+		{
+			default_device eng;
+			return Float(min, max, eng);
+		}
 
-	}
+		template<typename _Eng = default_device>
+		[[nodiscard]] inline double Double(double min, double max, _Eng& seed)
+		{
+			std::uniform_real_distribution<double> r(min, max);
+			return r(seed);
 
-	[[nodiscard]] inline double Double(double min, double max)
-	{
-		RandomDevice eng;
-		return Double(min, max, eng);
+		}
+
+		[[nodiscard]] inline double Double(double min, double max)
+		{
+			default_device eng;
+			return Double(min, max, eng);
+		}
 	}
 }

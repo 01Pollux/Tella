@@ -5,7 +5,7 @@ class AutoBackstab
 {
 public:
 	AutoBackstab();
-	HookRes OnCreateMove(UserCmd*);
+	MHookRes OnCreateMove(UserCmd*);
 
 private:
 	M0Config::Bool Enable{ "AutoStab.Enable", true, "Automatically stab player's"};
@@ -37,23 +37,21 @@ AutoBackstab::AutoBackstab()
 	);
 }
 
-HookRes AutoBackstab::OnCreateMove(UserCmd* cmd)
+MHookRes AutoBackstab::OnCreateMove(UserCmd* cmd)
 {
-	using HookRes::Continue;
-
 	if (!Enable)
-		return Continue;
+		return { };
 
 	const ILocalPlayer pMe;
 	if (pMe->Class != TFClass::Spy || pMe->FeignDeathReady)
-		return Continue;
+		return { };
 
 	IBaseWeapon pWpn(pMe->ActiveWeapon);
 	if (!pWpn || pWpn->GetWeaponSlot() != 2)
-		return Continue;
+		return { };
 
 	if (pWpn->ReadyToBackstab)
 		cmd->Buttons |= IN_ATTACK;
 
-	return Continue;
+	return { };
 }

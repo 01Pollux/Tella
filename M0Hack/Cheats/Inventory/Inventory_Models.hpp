@@ -43,7 +43,7 @@ namespace Inventory
 		}
 
 	private:
-		IFuncThunk<M0Pointer*, uint32_t> GetPlayerClassData{ };
+		IFuncThunk<void**, uint32_t> GetPlayerClassData{ };
 	};
 
 	static constexpr std::string_view ActualTFModels[] =

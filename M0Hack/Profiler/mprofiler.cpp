@@ -101,7 +101,7 @@ bool M0Profiler::OutputToStream(M0PROFILER_GROUP group, std::stringstream& strea
 
 	stream << "Summary for \"" << GetName(group) << "\":\n";
 
-	const bool dont_record_childrens = HasBitSet(flags, M0PROFILER_FLAGS::HIDE_CHILDRENS);
+	const bool dont_record_childrens = flags.test(M0PROFILER_FLAGS_::Hide_Childrens);
 
 	for (const auto& [name, record] : profile)
 	{
@@ -161,10 +161,10 @@ bool M0Profiler::OutputToStream(M0PROFILER_GROUP group, std::stringstream& strea
 
 	stream << "\n----------------------------------------------------------------------------------------------" << std::endl;
 
-	if (HasBitSet(flags, M0PROFILER_FLAGS::CLEAR_STATE))
+	if (flags.test(M0PROFILER_FLAGS_::Clear_State))
 		Reset(group);
 
-	if (HasBitSet(flags, M0PROFILER_FLAGS::STREAM_SEEK_BEG))
+	if (flags.test(M0PROFILER_FLAGS_::Stream_Seek_Beg))
 		stream.seekp(0);
 
 	return true;
@@ -173,7 +173,7 @@ bool M0Profiler::OutputToStream(M0PROFILER_GROUP group, std::stringstream& strea
 void M0Profiler::OutputToStream(M0PROFILER_GROUP group, const char* output_name, M0PROFILER_FLAGS flags)
 {
 	std::stringstream str;
-	if (OutputToStream(group, str, flags | M0PROFILER_FLAGS::STREAM_SEEK_BEG))
+	if (OutputToStream(group, str, flags.set(M0PROFILER_FLAGS_::Stream_Seek_Beg)))
 	{
 		std::ofstream stream(output_name, std::ios::app | std::ios::out);
 		stream << str.rdbuf();

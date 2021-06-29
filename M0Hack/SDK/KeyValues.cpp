@@ -13,8 +13,8 @@ public:
 			EVENT_KEY_LOAD_DLL_EARLY,
 			[](M0EventData*)
 			{
-				KeyValues::GetSymbolForStringFn = static_cast<decltype(KeyValues::GetSymbolForStringFn)>(M0Libraries::Engine->FindPattern("KeyValues::GetSymbolForString"));
-				KeyValues::GetStringForSymbolFn = static_cast<decltype(KeyValues::GetStringForSymbolFn)>(M0Libraries::Engine->FindPattern("KeyValues::GetStringForSymbol"));
+				KeyValues::GetSymbolForStringFn = static_cast<decltype(KeyValues::GetSymbolForStringFn)>(M0Library{ M0ENGINE_DLL }.FindPattern("KeyValues::GetSymbolForString"));
+				KeyValues::GetStringForSymbolFn = static_cast<decltype(KeyValues::GetStringForSymbolFn)>(M0Library{ M0ENGINE_DLL }.FindPattern("KeyValues::GetStringForSymbol"));
 			},
 			EVENT_NULL_NAME
 		);
@@ -83,7 +83,7 @@ void KeyValues::Init()
 
 bool KeyValues::LoadFromFile(const char* fileName, const char* pathID, bool refreshCache)
 {
-	static IMemberFuncThunk<bool, const char*, const char*, bool> LoadFromFile(M0Libraries::Engine->FindPattern("KeyValues::LoadFromBuffer"));
+	static IMemberFuncThunk<bool, const char*, const char*, bool> LoadFromFile(M0Library{ M0ENGINE_DLL }.FindPattern("KeyValues::LoadFromBuffer"));
 	return LoadFromFile(this, fileName, pathID, refreshCache);
 }
 

@@ -12,13 +12,13 @@ static Inventory::ModelManager model_manager;
 
 void Inventory::PlayerDataModel::init()
 {
-	GetPlayerClassData = M0Libraries::Client->FindPattern("GetPlayerClassData");
+	GetPlayerClassData.set(M0Library{ M0CLIENT_DLL }.FindPattern("GetPlayerClassData"));
 }
 
 void Inventory::PlayerDataModel::set(TFClass playercls, std::string_view newmdl) noexcept
 {
-	M0Pointer* data = GetPlayerClassData(static_cast<uint32_t>(playercls));
-	M0Pointer* mdl = &data[Offsets::ClientDLL::PlayerData_t::OffsetToModel];
+	void** data = GetPlayerClassData(static_cast<uint32_t>(playercls));
+	void** mdl = &data[Offsets::ClientDLL::PlayerData_t::OffsetToModel];
 
 	if (!newmdl.data())
 		newmdl = ActualTFModels[static_cast<size_t>(playercls)];
@@ -85,10 +85,10 @@ Inventory::ModelManager::ModelManager()
 			M0HookManager::Policy::LevelInit levelinit(true);
 			levelinit->AddPostHook(
 				HookCall::Any,
-				[this](const char*)
+				[this](const char*) -> MHookRes
 				{
 					PrecacheModels();
-					return HookRes::Continue;
+					return { };
 				}
 			);
 		},

@@ -7,7 +7,7 @@ class AutoDetonate
 {
 public:
 	AutoDetonate();
-	HookRes OnCreateMove(UserCmd*);
+	MHookRes OnCreateMove(UserCmd*);
 
 private:
 	_NODISCARD std::vector<IBaseWeapon> CollectMyStickies();
@@ -95,16 +95,14 @@ std::vector<ITFPlayer> AutoDetonate::CollectEnemies()
 }
 
 
-HookRes AutoDetonate::OnCreateMove(UserCmd* cmd)
+MHookRes AutoDetonate::OnCreateMove(UserCmd* cmd)
 {
-	using HookRes::Continue;
-
 	if (!Enable)
-		return Continue;
+		return { };
 
 	const ILocalPlayer pMe;
 	if (pMe->Class != TFClass::Demoman)
-		return Continue;
+		return { };
 
 	{
 		static AutoCTimer<0.5f> check_leftclick;
@@ -112,7 +110,7 @@ HookRes AutoDetonate::OnCreateMove(UserCmd* cmd)
 			check_leftclick.update();
 
 		if (check_leftclick.has_elapsed())
-			return Continue;
+			return { };
 	}
 
 	static AutoCTimer<2.5f> check_hasscottish;
@@ -125,11 +123,11 @@ HookRes AutoDetonate::OnCreateMove(UserCmd* cmd)
 
 	auto stickies = CollectMyStickies();
 	if (stickies.empty())
-		return Continue;
+		return { };
 	
 	auto players = CollectMyStickies();
 	if (stickies.empty())
-		return Continue;
+		return { };
 
 	const Vector my_eyepos = pMe->EyePosition();
 	const Vector mins = pMe->CollisionProp->OBBMins(), maxs = pMe->CollisionProp->OBBMaxs();
@@ -148,7 +146,7 @@ HookRes AutoDetonate::OnCreateMove(UserCmd* cmd)
 			{
 				Trace::TraceLine(stickie_pos, position, MASK_SOLID, &tr, &localfilter);
 				if (tr.Fraction >= 1.0)
-					return Continue;
+					return { };
 			}
 		}
 
@@ -177,5 +175,5 @@ HookRes AutoDetonate::OnCreateMove(UserCmd* cmd)
 		}
 	}
 
-	return change_hr ? HookRes::ChangeReturnValue : Continue;
+	return change_hr ? MHookRes(bitmask::to_mask(HookRes::ChangeReturnValue)) : MHookRes{ };
 }

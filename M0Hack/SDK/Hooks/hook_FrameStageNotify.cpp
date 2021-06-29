@@ -1,9 +1,9 @@
 #include "FrameStageNotify.hpp"
-#include "GlobalHook/listener.hpp"
+#include "GlobalHooks/event_listener.hpp"
 
+TH_DECL_HANDLER_MFP(FrameStageNotify, M0PROFILER_GROUP::HOOK_FRAME_STAGE_NOTIFY, void, ClientFrameStage);
 
-DECL_VHOOK_HANDLER(FrameStageNotify, M0PROFILER_GROUP::HOOK_FRAME_STAGE_NOTIFY, void, ClientFrameStage);
-EXPOSE_VHOOK(FrameStageNotify, "FrameStageNotify", Interfaces::ClientDLL, Offsets::ClientDLL::VTIdx_FrameStageNotify);
+//EXPOSE_VHOOK(FrameStageNotify, "FrameStageNotify", Interfaces::ClientDLL, Offsets::ClientDLL::VTIdx_FrameStageNotify);
 
 
 class FrameStageNotify_Mgr
@@ -11,25 +11,17 @@ class FrameStageNotify_Mgr
 public:
 	FrameStageNotify_Mgr()
 	{
-		M0EventManager::AddListener(
-			EVENT_KEY_LOAD_DLL_EARLY,
-			[this](M0EventData*)
+		using namespace tella;
+		event_listener::insert(
+			event_listener::names::LoadDLL_Early,
+			[this](event_listener::data*)
 			{
-				FrameStageNotify.init();
+				FrameStageNotify.find(TH_REFERENCE_NAME(FrameStageNotify));
 			},
-			EVENT_NULL_NAME
-		);
-
-		M0EventManager::AddListener(
-			EVENT_KEY_UNLOAD_DLL_LATE,
-			[this](M0EventData*)
-			{
-				FrameStageNotify.shutdown();
-			},
-			EVENT_NULL_NAME
+			event_listener::names::Null
 		);
 	}
 
 private:
-	FrameStageNotify_Hook FrameStageNotify;
+	TH_REFERENCE(FrameStageNotify) FrameStageNotify;
 } static fsn_hook;

@@ -3,111 +3,133 @@
 #include "SDK/Interfaces.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <minidumpapiset.h>
+#include <mmsystem.h>
 
 #include "Profiler/mprofiler.hpp"
 
 #include "Helper/Config.hpp"
-#include "GlobalHook/listener.hpp"
-#include "GlobalHook/Detour/detours.hpp"
+#include "GlobalHooks/event_listener.hpp"
+#include "GlobalHooks/detour.hpp"
 
 #include "Helper/Debug.hpp"
+#include "VGUI.hpp"
 
-//#define M01_MANUAL_MAPPED_DLL
 
-namespace ThisDLL
+namespace tella
 {
-    static HMODULE hMod = nullptr;
-
-#ifdef M01_USING_STDOUT
-    static FILE* STDOut = nullptr;
-#endif
-
-#ifdef M01_USING_VECTORED_HANDLER
-    static PVOID ExceptionHandler = nullptr;
-#endif
-
-    static __declspec(noreturn) void Close()
+    namespace this_dll
     {
-#ifdef M01_MANUAL_MAPPED_DLL
-        _asm {
-            push NULL
+        static HMODULE hMod = nullptr;
 
-            push MEM_RELEASE
-            push NULL
-            push hMod
+        static FILE* STDOut = nullptr;
 
-            push ExitThread
-            jmp VirtualFree
-    };
-#else
-        FreeLibraryAndExitThread(ThisDLL::hMod, NULL);
-#endif
-    }
+        static PVOID ExceptionHandler = nullptr;
 
-#ifdef M01_USING_VECTORED_HANDLER
-    LONG NTAPI OnRaiseException(_In_ PEXCEPTION_POINTERS ExceptionInfo);
-#endif
-
-    static void ReleaseAllProfilers()
-    {
-        std::string time = FormatTime("__{0:%g}_{0:%h}_{0:%d}_{0:%H}_{0:%OM}_{0:%OS}"sv);
-        IFormatterSV fmt("{}/{}{}.txt"sv);
-
-        for (M0PROFILER_GROUP_T i = 0; i < static_cast<M0PROFILER_GROUP_T>(M0PROFILER_GROUP::COUNT); ++i)
+        static __declspec(noreturn) void Close(bool manualfree)
         {
-            M0Profiler::OutputToStream(
-                static_cast<M0PROFILER_GROUP>(i),
-                fmt(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], time).c_str(),
-                M0PROFILER_FLAGS::DEFAULT_OUTPUT
-            );
+            if (manualfree)
+            {
+                _asm {
+                    push NULL
+
+                    push MEM_RELEASE
+                    push NULL
+                    push hMod
+
+                    push ExitThread
+                    jmp VirtualFree
+                };
+            }
+            else FreeLibraryAndExitThread(hMod, NULL);
+        }
+
+        LONG NTAPI OnRaiseException(_In_ PEXCEPTION_POINTERS ExceptionInfo);
+
+        static void ReleaseAllProfilers()
+        {
+            std::string time = FormatTime("__{0:%g}_{0:%h}_{0:%d}_{0:%H}_{0:%OM}_{0:%OS}"sv);
+            IFormatterSV fmt("{}/{}{}.log"sv);
+            constexpr M0PROFILER_FLAGS flags = bitmask::to_mask(M0PROFILER_FLAGS_::Stream_Seek_Beg, M0PROFILER_FLAGS_::Clear_State);
+
+            for (M0PROFILER_GROUP_T i = 0; i < static_cast<M0PROFILER_GROUP_T>(M0PROFILER_GROUP::COUNT); ++i)
+            {
+                M0Profiler::OutputToStream(
+                    static_cast<M0PROFILER_GROUP>(i),
+                    fmt(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], time).c_str(),
+                    flags
+                );
+            }
         }
     }
-    
-    DETOUR_CREATE_STATIC(void, OnWriteSteamMiniDump, UINT32, PVOID, LPCSTR) { }
 }
+
+TH_DECL_DETOUR_SFP(void, OnWriteSteamMiniDump, UINT32, PVOID, LPCSTR) { }
 
 
 static DWORD WINAPI InitDLL(PVOID)
 {
-#ifdef M01_USING_STDOUT
-    AllocConsole();
-    freopen_s(&ThisDLL::STDOut, "CONOUT$", "w", stdout);
-    if (!ThisDLL::STDOut)
-    {
-        Beep(400, 1000);
-        ThisDLL::Close();
-        return FALSE;
-    }
-#endif
+    using namespace tella;
 
-#ifdef M01_USING_VECTORED_HANDLER
-    ThisDLL::ExceptionHandler = AddVectoredExceptionHandler(1, ThisDLL::OnRaiseException);
-#endif
+    Json::Value mainConfig;
+    {
+        std::ifstream file(TCONFIG_PATH);
+        file >> mainConfig;
+    }
+
+    bool is_manual_mapped = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Manual Mapping"sv).asBool();
+
+    {
+        if (Json::Value open_console = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Console"sv);
+            open_console.asBool())
+        {
+            if (!AllocConsole())
+            {
+                this_dll::Close(is_manual_mapped);
+                return FALSE;
+            }
+            freopen_s(&this_dll::STDOut, "CONOUT$", "w", stderr);
+        }
+    }
+
+
+    if (Json::Value exception_handler = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Exception Handler"sv);
+        exception_handler.asBool())
+        this_dll::ExceptionHandler = AddVectoredExceptionHandler(1, this_dll::OnRaiseException);
 
     Interfaces::InitAllInterfaces();
 
     {
-        PVOID addr = M0Libraries::Engine->FindPattern("FakeSteamMiniDump");
-        DETOUR_LINK_TO_STATIC(ThisDLL::OnWriteSteamMiniDump, addr);
+        if (Json::Value writesteammd = TCONFIG var_storage::read_var(mainConfig, "DLL Info.No SteamMiniDump"sv);
+            writesteammd.asBool())
+        {
+            TH_DETOUR_LINK_TO_SFP(OnWriteSteamMiniDump, M0Library{ M0ENGINE_DLL }.FindPattern("FakeSteamMiniDump"));
+        }
     }
 
-    if (auto pEvent = M0EventManager::Find(EVENT_KEY_LOAD_DLL_EARLY))
+
+    {
+        if (Json::Value load_vars = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Load.Auto Init Vars"sv);
+            load_vars.asBool())
+            TCONFIG var_storage::read_var();
+    }
+
+    if (auto pEvent = event_listener::find(event_listener::names::LoadDLL_Early))
     {
         pEvent();
-        M0EventManager::Destroy(pEvent);
+        event_listener::destroy(pEvent);
     }
 
-    if (auto pEvent = M0EventManager::Find(EVENT_KEY_LOAD_DLL))
+    if (auto pEvent = event_listener::find(event_listener::names::LoadDLL))
     {
         pEvent();
-        M0EventManager::Destroy(pEvent);
+        event_listener::destroy(pEvent);
     }
 
-    // Todo M0GConfig for tempo globals like auto save
-    {
-        //M0Config::M0VarStorage::read_var();
-    }
+    if (Json::Value play_sound = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Load.Play Sound"sv);
+        !play_sound.isNull())
+        PlaySoundA(play_sound.asCString(), NULL, SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
 
     return TRUE;
 }
@@ -115,46 +137,68 @@ static DWORD WINAPI InitDLL(PVOID)
 
 static DWORD WINAPI UnloadDLL(PVOID)
 {
-    ThisDLL::Close();
+    bool is_manual_mapped = TCONFIG var_storage::read_var("DLL Info.Manual Mapping"sv).asBool();
+    tella::this_dll::Close(is_manual_mapped);
     return TRUE;
 }
 
 
 void ThisDLL::Unload()
 {
-    if (auto pEvent = M0EventManager::Find(EVENT_KEY_UNLOAD_DLL))
+    using namespace tella;
+
+    if (auto pEvent = event_listener::find(event_listener::names::UnLoadDLL))
         pEvent();
 
-    if (auto pEvent = M0EventManager::Find(EVENT_KEY_UNLOAD_DLL_LATE))
+    if (auto pEvent = event_listener::find(event_listener::names::UnLoadDLL_Late))
         pEvent();
 
-    ThisDLL::ReleaseAllProfilers();
+    if (this_dll::STDOut)
+    {
+        fclose(this_dll::STDOut);
+        FreeConsole();
+    }
 
-#ifdef M01_USING_STDOUT
-    fclose(ThisDLL::STDOut);
-    FreeConsole();
-#endif
+    Json::Value mainConfig;
+    {
+        std::ifstream file(TCONFIG_PATH);
+        file >> mainConfig;
+    }
 
-#ifdef M01_USING_VECTORED_HANDLER
-    if (ThisDLL::ExceptionHandler)
-        RemoveVectoredExceptionHandler(ThisDLL::ExceptionHandler);
-#endif
+    if (Json::Value save_profilers = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Save Profilers"sv);
+        save_profilers.asBool())
+        this_dll::ReleaseAllProfilers();
 
-    DETOUR_UNLINK_FROM_STATIC(ThisDLL::OnWriteSteamMiniDump);
+    {
+        if (hook::OnWriteSteamMiniDump_org)
+            TH_DETOUR_UNLINK_FROM_SFP(OnWriteSteamMiniDump);
+    }
     
+    {
+        if (Json::Value load_vars = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Unload.Auto Save Vars"sv);
+            load_vars.asBool())
+            TCONFIG var_storage::write_var();
+     
+        if (Json::Value play_sound = TCONFIG var_storage::read_var(mainConfig, "DLL Info.Unload.Play Sound"sv);
+            !play_sound.isNull())
+            PlaySoundA(play_sound.asCString(), NULL, SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
+    }
+
+    if (this_dll::ExceptionHandler)
+        RemoveVectoredExceptionHandler(this_dll::ExceptionHandler);
+
     HANDLE hThread = CreateThread(NULL, NULL, UnloadDLL, NULL, NULL, NULL);
     if (hThread)
         CloseHandle(hThread);
 }
 
 
-#ifdef M01_USING_VECTORED_HANDLER
-LONG NTAPI ThisDLL::OnRaiseException(_In_ PEXCEPTION_POINTERS ExceptionInfo)
+LONG NTAPI tella::this_dll::OnRaiseException(_In_ PEXCEPTION_POINTERS ExceptionInfo)
 {
     class _AutoDetachSteamMinidump
     {
     public:
-        ~_AutoDetachSteamMinidump() { DETOUR_UNLINK_FROM_STATIC(ThisDLL::OnWriteSteamMiniDump); }
+        ~_AutoDetachSteamMinidump() { TH_DETOUR_UNLINK_FROM_SFP(OnWriteSteamMiniDump); }
     } dummy_minidump;
 
     AutoLib DBGHelp("DBGHelp.dll");
@@ -197,9 +241,9 @@ LONG NTAPI ThisDLL::OnRaiseException(_In_ PEXCEPTION_POINTERS ExceptionInfo)
 
     AutoFile hFile("./Miku/Log/FATAL_{0:%g}_{0:%h}_{0:%d}_{0:%H}_{0:%OM}_{0:%OS}.dmp"sv);
 
-    MiniDumpWriteDumpFn WriteMiniDump = reinterpret_cast<MiniDumpWriteDumpFn>(GetProcAddress(*DBGHelp, "MiniDumpWriteDump"));
+    MiniDumpWriteDumpFn WriteMiniDump = std::bit_cast<MiniDumpWriteDumpFn>(GetProcAddress(*DBGHelp, "MiniDumpWriteDump"));
 
-    ThisDLL::ReleaseAllProfilers();
+    tella::this_dll::ReleaseAllProfilers();
 
     MINIDUMP_EXCEPTION_INFORMATION MiniDumpInfo{
            .ThreadId = GetCurrentThreadId(),
@@ -221,7 +265,6 @@ LONG NTAPI ThisDLL::OnRaiseException(_In_ PEXCEPTION_POINTERS ExceptionInfo)
     }
     else return EXCEPTION_CONTINUE_SEARCH;
 }
-#endif
 
 
 BOOL APIENTRY DllMain(HMODULE hModule,
@@ -231,7 +274,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(hModule);
-        ThisDLL::hMod = hModule;
+        tella::this_dll::hMod = hModule;
         HANDLE hThread = CreateThread(NULL, NULL, InitDLL, NULL, NULL, NULL);
         if (hThread)
             CloseHandle(hThread);
@@ -241,3 +284,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 #include "ConVar.hpp"
 M01_CONCOMMAND(shutdown_dll, ThisDLL::Unload, "Shutdown DLL");
+
+
+void HackWinAPI_StopSound()
+{
+    PlaySoundA(NULL, NULL, NULL);
+}
+M01_CONCOMMAND(stop_sound, HackWinAPI_StopSound);

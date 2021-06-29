@@ -229,11 +229,26 @@ public:
 void IGameRecvProp::LoadOffset(IGamePropHelper* PropMgr)
 {
 	CachedRecvInfo info;
+
 	if (!PropMgr->FindRecvProp(ClassName, PropName, &info))
 		M0Logger::Err("Failed to Find RecvProp {}::{}"sv, ClassName, PropName);
 	else
 	{
 		Offset = info.Offset;
 		Prop = info.Prop;
+	}
+}
+
+void IGameDataMapProp::LoadOffset(const IBaseEntityInternal* pEnt)
+{
+	CachedDataMapInfo info;
+	IGamePropHelper propmgr;
+
+	if (!propmgr.FindDataMap(pEnt->GetDataMapDesc(), PropName, &info))
+		M0Logger::Err("Failed to Find RecvProp {}::{}"sv, pEnt->GetClientClass()->NetworkName, PropName);
+	else
+	{
+		Offset = info.Offset;
+		Prop = info.TypeDesc;
 	}
 }

@@ -1,12 +1,6 @@
 #pragma once
 
-#include "GlobalHook/vhook.hpp"
+#include "GlobalHooks/tellahook.hpp"
 #include "SDK/cdll_int.hpp"
 
-namespace M0HookManager
-{
-	namespace Policy
-	{
-		MAKE_VHOOK_POLICY(FrameStageNotify, "FrameStageNotify", void, ClientFrameStage);
-	}
-}
+TH_DECL_REFERENCE_MFP(FrameStageNotify, "FrameStageNotify", void, ClientFrameStage);

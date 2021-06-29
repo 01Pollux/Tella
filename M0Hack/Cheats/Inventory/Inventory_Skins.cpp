@@ -68,16 +68,16 @@ void Inventory::SkinManager::ProcessWeaponHack(ITFPlayer pMe)
 	}
 }
 
-HookRes Inventory::SkinManager::FrameStageNotify(ClientFrameStage stage)
+MHookRes Inventory::SkinManager::FrameStageNotify(ClientFrameStage stage)
 {
-	ILocalPlayer pMe;
-	if (!Enable || !pMe)
-		return HookRes::Continue;
+	if (!Enable || ITFPlayerInternal::BadLocal())
+		return { };
 
+	ILocalPlayer pMe;
 	if (stage == ClientFrameStage::PostDataUpdatePre)
 		ProcessWeaponHack(pMe);
 
-	return HookRes::Continue;
+	return { };
 }
 
 void Inventory::SkinManager::FireGameEvent(IGameEvent* Event)
@@ -193,7 +193,7 @@ void Inventory::ItemsInfo::save()
 	cfg << writer.write(data);
 }
 
-void Inventory::ItemsInfo::insert(TFClass cls, int index, WeaponsInfo&& info, WeaponsInfo::InsertFlag insert_flag)
+void Inventory::ItemsInfo::insert(TFClass cls, int index, WeaponsInfo&& info, bitmask::mask<WeaponsInfo::InsertFlag> insert_flag)
 {
 	using InsertFlag = WeaponsInfo::InsertFlag;
 	ItemMap& curmap = ClassesMap[static_cast<size_t>(cls) - 1];
@@ -205,17 +205,17 @@ void Inventory::ItemsInfo::insert(TFClass cls, int index, WeaponsInfo&& info, We
 	{
 		WeaponsInfo& cur_info = iter->second;
 
-		if (HasBitSet(insert_flag, InsertFlag::OverrideIndex))
+		if (insert_flag.test(InsertFlag::OverrideIndex))
 			cur_info.NewIndex = info.NewIndex;
 
-		if (HasBitSet(insert_flag, InsertFlag::OverrideState))
+		if (insert_flag.test(InsertFlag::OverrideState))
 			cur_info.IsDisabled = info.IsDisabled;
 		
-		if (HasBitSet(insert_flag, InsertFlag::OverrideName))
+		if (insert_flag.test(InsertFlag::OverrideName))
 			cur_info.IsDisabled = info.IsDisabled;
 
-		if (bool override_map = HasBitSet(insert_flag, InsertFlag::OverrideMap);
-			HasBitSet(insert_flag, InsertFlag::AddMap))
+		if (bool override_map = insert_flag.test(InsertFlag::OverrideMap);
+			insert_flag.test(InsertFlag::AddMap))
 		{
 			for (auto& attributes = iter->second.Attributes; 
 				 auto& entry : info.Attributes)

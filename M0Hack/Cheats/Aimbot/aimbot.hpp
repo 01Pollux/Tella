@@ -25,10 +25,8 @@ public:
 
 	void OnRender();
 
-	HookRes OnCreateMovePre(UserCmd*);
-	HookRes OnCreateMovePost(UserCmd*);
-
-	//void OnConfigChanged(M0EVENT*);
+	MHookRes OnCreateMovePre(UserCmd*);
+	MHookRes OnCreateMovePost(UserCmd*);
 
 	void ToggleAutoAim() noexcept
 	{
@@ -43,7 +41,7 @@ private:
 	void GetBestPlayer(const UserCmd*);
 	_NODISCARD bool IsValidPlayer(const ITFPlayer);
 	void GetBestEntity(const UserCmd*);
-	_NODISCARD bool IsValidEntity(const IBaseEntity);
+	_NODISCARD bool IsValidEntity(const IBaseEntity, const TFTeam);
 
 	_NODISCARD bool CheckInputs(const UserCmd*);
 

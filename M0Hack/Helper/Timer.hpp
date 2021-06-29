@@ -8,14 +8,16 @@
 
 using namespace std::chrono_literals;
 
-enum class TimerFlags: char8_t
+enum class TimerFlags
 {
-	Empty,
 	AutoRepeat,
-	ExecuteOnMapEnd
-};
+	ExecuteOnMapEnd,
 
-ECLASS_BITWISE_OPERATORS(TimerFlags);
+	_Highest_Enum
+};
+using MTimerFlags = tella::bitmask<TimerFlags>;
+
+
 
 using TimerRawData = void*;
 using TimerCallbackFn = std::function<void(TimerRawData)>;
@@ -100,22 +102,22 @@ private:
 	float last_time{ };
 };
 
-namespace ITimerSys
+namespace tella
 {
-	const TimerID CreateFuture(std::chrono::milliseconds time, TimerFlags flags, const TimerCallbackFn& callback, TimerRawData data);
-
-	void RequestFrame(TimerCallbackFn callback, void* data);
-
-	void DeleteFuture(const TimerID& timer, bool execute = false);
-
-	void RewindBack(const TimerID& timer);
-
-	void ExecuteFrame();
-
-	void RunOnLevelShutdown();
-
-	namespace detail
+	namespace timer
 	{
+		const TimerID new_future(std::chrono::milliseconds time, MTimerFlags flags, const TimerCallbackFn& callback, TimerRawData data);
+
+		void request_frame(TimerCallbackFn callback, void* data);
+
+		void delete_future(const TimerID& timer, bool execute = false);
+
+		void rewind(const TimerID& timer);
+
+		void _execute_frame();
+
+		void _on_level_shutdown();
+
 		template<class>
 		struct is_std_chrono_duration
 		{
@@ -221,8 +223,9 @@ private:
 template<typename ITimerW, int Dur, class TimeUnit = std::chrono::milliseconds>
 class AutoTimerUnk
 {
-	static_assert(ITimerSys::detail::is_std_chrono_duration_v<TimeUnit>, "TimeUnit must be a std::chrono::duration");
 public:
+	static_assert(ITimerSys::detail::is_std_chrono_duration_v<TimeUnit>, "TimeUnit must be a std::chrono::duration");
+
 	_NODISCARD constexpr TimeUnit get_time() const noexcept
 	{
 		return std::chrono::seconds(Dur);
@@ -266,56 +269,58 @@ template<float Dur>
 using AutoCTimer = IAutoCTimer<ITimer, Dur>;
 
 
-M0CONFIG_BEGIN;
-
-class RTTimer final : public Custom<AutoRTTimer, false>
+namespace tella
 {
-	M0CONFIG_INHERIT_FROM(RTTimer, AutoRTTimer, Custom < AutoRTTimer, false>);
-
-public:
-	using M0Var_Internal<AutoRTTimer>::get;
-	using M0Var_Internal<AutoRTTimer>::operator=;
-
-	void set_time(float tu) noexcept
+	namespace config
 	{
-		get().set_time(tu);
-	}
+		class RTTimer final : public custom_var<AutoRTTimer, false>
+		{
+			TCONFIG_INHERIT_FROM(RTTimer, AutoRTTimer, custom_var<AutoRTTimer, false>);
 
-	_NODISCARD const float& get_time() const noexcept
-	{
-		return get().get_time();
-	}
+		public:
+			using var_internal<AutoRTTimer>::get;
+			using var_internal<AutoRTTimer>::operator=;
 
-	_NODISCARD const ITimer& get_timer() const noexcept
-	{
-		return get().get_timer();
-	}
+			void set_time(float tu) noexcept
+			{
+				get().set_time(tu);
+			}
 
-	void update() noexcept
-	{
-		get().update();
-	}
+			_NODISCARD const float& get_time() const noexcept
+			{
+				return get().get_time();
+			}
 
-	_NODISCARD bool has_elapsed() const noexcept
-	{
-		return get().has_elapsed();
-	}
+			_NODISCARD const ITimer& get_timer() const noexcept
+			{
+				return get().get_timer();
+			}
 
-	_NODISCARD bool trigger_if_elapsed() noexcept
-	{
-		return get().trigger_if_elapsed();
-	}
+			void update() noexcept
+			{
+				get().update();
+			}
 
-protected:
-	void _write(Json::Value& out) const final
-	{
-		out = get_time();
-	}
+			_NODISCARD bool has_elapsed() const noexcept
+			{
+				return get().has_elapsed();
+			}
 
-	void _read(const Json::Value& inc) final
-	{
-		set_time(inc.asFloat());
-	}
-};
+			_NODISCARD bool trigger_if_elapsed() noexcept
+			{
+				return get().trigger_if_elapsed();
+			}
 
-M0CONFIG_END;
+		protected:
+			void _write(Json::Value& out) const final
+			{
+				out = get_time();
+			}
+
+			void _read(const Json::Value& inc) final
+			{
+				set_time(inc.asFloat());
+			}
+		};
+	}
+}

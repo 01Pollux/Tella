@@ -338,24 +338,77 @@ enum class EntSolidType
 };
 
 
-enum class EntSolidFlags 
+enum class EntSolidFlags
 {
-	CustomRayTest = 0x0001,	// Ignore solid type + always call into the entity for ray tests
-	CustomBoxTest = 0x0002,	// Ignore solid type + always call into the entity for swept box tests
-	NotSolid = 0x0004,	// Are we currently not solid?
-	Trigger = 0x0008,	// This is something may be collideable but fires touch functions
+	Custom_Ray_Test,	// Ignore solid type + always call into the entity for ray tests
+	Custom_Box_Test,	// Ignore solid type + always call into the entity for swept box tests
+	Not_Solid,			// Are we currently not solid?
+	Trigger	,			// This is something may be collideable but fires touch functions
 	// even when it's not collideable (when the FSOLID_NOT_SOLID flag is set)
-	NotStandable = 0x0010,	// You can't stand on this
-	VolumeContents = 0x0020,	// Contains volumetric contents (like water)
-	ForceWorldAlign = 0x0040,	// Forces the collision rep to be world-aligned even if it's SOLID_BSP or SOLID_VPHYSICS
-	UseTriggerBounds = 0x0080,	// Uses a special trigger bounds separate from the normal OBB
-	RootParentsAlign = 0x0100,	// Collisions are defined in root parent's local coordinate space
-	TriggerTouchDebris = 0x0200,	// This trigger will touch debris objects
+	Not_Standable,		// You can't stand on this
+	Volume_Contents,	// Contains volumetric contents (like water)
+	Force_World_Align,	// Forces the collision rep to be world-aligned even if it's SOLID_BSP or SOLID_VPHYSICS
+	Use_Trigger_Bounds,	// Uses a special trigger bounds separate from the normal OBB
+	Root_Parents_Align,	// Collisions are defined in root parent's local coordinate space
+	Trigger_Touch_Debris,// This trigger will touch debris objects
 
-	MaxBits = 10
+	_Last_Enum
 };
 
-ECLASS_BITWISE_OPERATORS(EntSolidFlags);
+
+enum class EntFlags
+{
+	KillMe,				// This entity is marked for death -- This allows the game to actually delete ents at a safe time
+	Dormant,			// Entity is dormant, no updates to client
+	NoClip_Active,		// Lets us know when the noclip command is active.
+	Settingup_Bones,	// Set while a model is setting up its bones.
+
+	Keep_On_Recreate_Entities,							// This is a special entity that should not be deleted when we restart entities only
+	Has_Player_Child = Keep_On_Recreate_Entities,		// One of the child entities is a player.
+
+	Dirty_ShadowUpdate,		// Client only- need shadow manager to update the shadow...
+	Notify,		// Another entity is watching events on this entity (used by teleport)
+
+	// The default behavior in ShouldTransmit is to not send an entity if it doesn't
+	// have a model. Certain entities want to be sent anyway because all the drawing logic
+	// is in the client DLL. They can set this flag and the engine will transmit them even
+	// if they don't have a model.
+	Force_Check_Transmit,
+
+	Bot_Frozen,				// This is set on bots that are frozen.
+	Server_Only,			// Non-networked entity.
+	No_Auto_Edict_Attach,	// Don't attach the edict; we're doing it explicitly
+	
+	// Some dirty bits with respect to abs computations
+	Dirty_Abstransform,
+	Dirty_AbsVelocity,
+	Dirty_AbsAngVelocity,
+	Dirty_Surroding_Collision_Bounds,
+	Dirty_Spatial_Partition,
+
+	In_Skybox,					// This is set if the entity detects that it's in the skybox.
+								// This forces it to pass the "in PVS" for transmission.
+	Use_Parition_When_No_Solid,	// Entities with this flag set show up in the partition even when not solid
+	Touching_Fluid,				// Used to determine if an entity is floating
+
+	// FIXME: Not really sure where I should add this...
+	Is_Being_Lifted_By_Barnacle,
+	No_Rotorwash_Push,	// I shouldn't be pushed by the rotorwash
+	No_Think_Function,
+	No_Game_Physics_Simulation,
+
+	Check_Untouch,
+	Dont_Block_LOS,				// I shouldn't block NPC line-of-sight
+	Dont_Walk_On,				// NPC;s should not walk on this entity
+	No_Dissolve,				// These guys shouldn't dissolve
+	No_MegaPhyscannon_Ragdoll,	// Mega physcannon can't ragdoll these guys.
+	No_Water_Velocity_Change,	// Don't adjust this entity's velocity when transitioning into water
+	No_Physcannon_Interation,	// Physcannon can't pick these up or punt them
+	No_Damage_Forces,			// Doesn't accept forces from physics damage
+
+	_Highest_Enum,
+};
+
 
 
 //-----------------------------------------------------------------------------
@@ -363,36 +416,30 @@ ECLASS_BITWISE_OPERATORS(EntSolidFlags);
 //-----------------------------------------------------------------------------
 inline bool IsSolid(EntSolidType solidType, EntSolidFlags solidFlags)
 {
-	return (solidType != EntSolidType::None) && (!(solidFlags & EntSolidFlags::NotSolid));
+	return (solidType != EntSolidType::None) && (!(static_cast<uint32_t>(solidFlags) & static_cast<size_t>(EntSolidFlags::Not_Solid)));
 }
 
-
-// m_lifeState values
-#define	LIFE_ALIVE				0 // alive
-#define	LIFE_DYING				1 // playing death animation or still falling off of a ledge waiting to hit ground
-#define	LIFE_DEAD				2 // dead. lying still.
-#define LIFE_RESPAWNABLE		3
-#define LIFE_DISCARDBODY		4
 
 // entity effects
 enum EntEffects
 {
-	BoneMerge = 0x001,	// Performs bone merge on client side
-	BrightLight = 0x002,	// DLIGHT centered at entity origin
-	DimLight = 0x004,	// player flashlight
-	NoInterp = 0x008,	// don't interpolate the next frame
-	NoShadow = 0x010,	// Don't cast no shadow
-	NoDraw = 0x020,	// don't draw entity
-	NoReceiveShadow = 0x040,	// Don't receive no shadow
-	BoneMerge_FastCull = 0x080,	// For use with EF_BONEMERGE. If this is set, then it places this ent's origin at its
+	BoneMerge,	// Performs bone merge on client side
+	BrightLight,// DLIGHT centered at entity origin
+	DimLight,	// player flashlight
+	NoInterp,	// don't interpolate the next frame
+	NoShadow,	// Don't cast no shadow
+	NoDraw,		// don't draw entity
+	NoReceiveShadow,	// Don't receive no shadow
+	BoneMerge_FastCull,	// For use with EF_BONEMERGE. If this is set, then it places this ent's origin at its
 							
 	// parent and uses the parent's bbox + the max extents of the aiment.
 	// Otherwise, it sets up the parent's bones every frame to figure out where to place
 	// the aiment, which is inefficient because it'll setup the parent's bones even if
 	// the parent is not in the PVS.
-	ItemBlink = 0x100,	// blink an item so that the user notices it.
-	ParentAnimate = 0x200,	// always assume that the parent entity is animating
-	MaxBits = 10
+	ItemBlink,	// blink an item so that the user notices it.
+	ParentAnimate,	// always assume that the parent entity is animating
+
+	_Highest_Enum
 };
 
 #define EF_PARITY_BITS	3

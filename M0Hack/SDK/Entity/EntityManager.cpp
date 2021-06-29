@@ -80,7 +80,7 @@ public:
 
 inline ValveUtlVector<IClientEntityListener*>* IClientEntityListener::FindEntityListener()
 {
-	uintptr_t pEntListener = reinterpret_cast<uintptr_t>(M0Libraries::Client->FindPattern("pCEntityListPtr")) + Offsets::ClientDLL::ClientEntList::EntListenerVec;
+	uintptr_t pEntListener = reinterpret_cast<uintptr_t>(M0Library{ M0CLIENT_DLL }.FindPattern("pCEntityListPtr")) + Offsets::ClientDLL::ClientEntList::EntListenerVec;
 	return reinterpret_cast<ValveUtlVector<IClientEntityListener*>*>(pEntListener);
 }
 

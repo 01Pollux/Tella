@@ -1,47 +1,49 @@
 #include "CreateMove.hpp"
-#include "GlobalHook/listener.hpp"
+#include "GlobalHooks/event_listener.hpp"
+#include "GlobalHooks/th_vtable.hpp"
 #include "Helper/Timer.hpp"
+#include "Library/Lib.hpp"
+#include "Helper/Offsets.hpp"
 
+TH_DECL_HANDLER_MFP(CreateMove, M0PROFILER_GROUP::HOOK_CREATE_MOVE, bool, float, UserCmd*);
 
-DECL_VHOOK_HANDLER(CreateMove, M0PROFILER_GROUP::HOOK_CREATE_MOVE, bool, float, UserCmd*);
-EXPOSE_VHOOK(CreateMove, "CreateMove", M0Libraries::Client->FindPattern("ClientModePointer"), Offsets::ClientDLL::VTIdx_CreateMove);
-
-
-
-M0_INTERFACE;
-bool* pSendPacket = nullptr;
-M0_END;
+namespace Interfaces { bool* pSendPacket = nullptr; }
 
 class CreateMove_Mgr
 {
 public:
 	CreateMove_Mgr()
 	{
-		M0EventManager::AddListener(
-			EVENT_KEY_LOAD_DLL_EARLY,
-			[this](M0EventData*)
+		using namespace tella;
+		event_listener::insert(
+			event_listener::names::LoadDLL_Early,
+			[this](event_listener::data*)
 			{
-				CreateMove.init();
-				CreateMove->AddPreHook(HookCall::ReservedFirst, std::bind(&CreateMove_Mgr::OnCreateMove, this, std::placeholders::_2));
-				CreateMove->AddPostHook(HookCall::ReservedFirst, [](float, UserCmd* cmd) { return !cmd ? HookRes::BreakImmediate : HookRes::Continue; });
-			},
-			EVENT_NULL_NAME
-		);
+				hook::vtable cmvtable(M0Library{ M0CLIENT_DLL }.FindPattern("ClientModePointer"), Offsets::ClientDLL::VTIdx_CreateMove);
+				TH_ALLOC_HANDLER_ONCE(CreateMove, "CreateMove", *cmvtable);
 
-		M0EventManager::AddListener(
-			EVENT_KEY_UNLOAD_DLL_LATE,
-			[this](M0EventData*)
-			{
-				CreateMove.shutdown();
+				CreateMoveHook.find(TH_REFERENCE_NAME(CreateMoveHook));
+				CreateMoveHook->AddPreHook(
+					hook_order::reserved_first, 
+					std::bind(&CreateMove_Mgr::OnCreateMove, this, hook::arg::_3)
+				);
+
+				CreateMoveHook->AddPostHook(
+					hook_order::reserved_first, 
+					[](void*, float, const UserCmd* cmd)
+					{
+						return !cmd ? tella::to_bitmask(tella::hook_results_::break_loop, tella::hook_results_::skip_post) : tella::hook_results{ };
+					}
+				);
 			},
-			EVENT_NULL_NAME
+			event_listener::names::Null
 		);
 	}
 
-	HookRes OnCreateMove(const UserCmd* cmd)
+	tella::hook_results OnCreateMove(const UserCmd* cmd)
 	{
 		if (!cmd)
-			return HookRes::BreakImmediate;
+			return bitmask::to_mask(tella::hook_results_::break_loop, tella::hook_results_::skip_post);
 
 		_asm
 		{
@@ -52,11 +54,11 @@ public:
 			mov Interfaces::pSendPacket, eax
 		};
 
-		ITimerSys::ExecuteFrame();
+		tella::timer::_execute_frame();
 
-		return HookRes::Continue;
+		return { };
 	}
 
 private:
-	CreateMove_Hook CreateMove;
+	TH_REFERENCE(CreateMove) CreateMoveHook;
 } static createmove_hook;

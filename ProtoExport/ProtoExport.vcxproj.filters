@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{9e6d5741-b6d0-43f2-800e-2873a6a05599}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Proto">
+      <UniqueIdentifier>{176673eb-c2c2-466d-b2a8-1c518987e27c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{5601dfab-2cb3-4dde-a66b-ad7df934fd2e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SDK\Proto\econ_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\gcsdk_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\GCSys.cpp">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\gcsystemmsgs.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\steammessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\tf_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\tf_proto_def_messages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Proto\base_gcmessages.pb.cc">
+      <Filter>SDK\Proto</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Lib_Sig.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Lib.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Json.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SDK\Proto\econ_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\GCMsg.hpp">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\gcsdk_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\GCSys.hpp">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\gcsystem.hpp">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\gcsystemmsgs.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\steammessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\tf_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\tf_proto_def_messages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Proto\base_gcmessages.pb.h">
+      <Filter>SDK\Proto</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\ProtoExport.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Lib_Sig.hpp">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Lib_Win.hpp">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Lib.hpp">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

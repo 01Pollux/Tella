@@ -108,7 +108,7 @@ public:
 
 private:
 	void OnRender();
-	HookRes OnPaintTraverse(uint32_t);
+	MHookRes OnPaintTraverse(uint32_t);
 
 private:
 	ESPInfo::Player		PlayerESPInfo[ESPInfo::MAX_TEAMS]{ true, false };

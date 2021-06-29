@@ -7,8 +7,8 @@ class ITFHudManager
 public:
 	ITFHudManager();
 
-	IHudElement*	operator[](size_t index) noexcept { return huds[index]; }
-	size_t			size() const noexcept { return count; }
+	IHudElement*	operator[](size_t index) noexcept { return Huds[index]; }
+	size_t			size() const noexcept { return Count; }
 
 	IHudElement*		find(const char* name) noexcept;
 	const IHudElement*	find(const char* name) const noexcept;
@@ -19,12 +19,12 @@ public:
 	~ITFHudManager() = default;
 	bool operator<=>(const ITFHudManager&) const = delete;
 
-	auto begin() noexcept { return huds; }
-	const auto begin() const noexcept { return huds; }
-	auto end() noexcept { return huds + count; }
-	const auto end() const noexcept { return huds + count; }
+	auto begin() noexcept { return Huds; }
+	const auto begin() const noexcept { return Huds; }
+	auto end() noexcept { return Huds + Count; }
+	const auto end() const noexcept { return Huds + Count; }
 
 private:
-	size_t count;
-	IHudElement** huds;
+	size_t			Count;
+	IHudElement**	Huds;
 };

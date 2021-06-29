@@ -20,8 +20,13 @@ GAMEPROP_IMPL_RECV(IBaseEntityInternal, AngRotation);
 
 GAMEPROP_IMPL_RECV(IBaseEntityInternal, CollisionProp);
 GAMEPROP_IMPL_RECV(IBaseEntityInternal, CollisionGroup);
+GAMEPROP_IMPL_DTM(IBaseEntityInternal, EFlags);
 
 GAMEPROP_IMPL_RECV(IBaseEntityInternal, SimulationTime);
+GAMEPROP_IMPL_RECV(IBaseEntityInternal, AnimationTime);
+GAMEPROP_IMPL_RECV(IBaseEntityInternal, Cycle);
+GAMEPROP_IMPL_RECV(IBaseEntityInternal, Sequence);
+
 GAMEPROP_IMPL_RECV(IBaseEntityInternal, TeamNum);
 GAMEPROP_IMPL_RECV(IBaseEntityInternal, OwnerEntity);
 GAMEPROP_IMPL_RECV(IBaseEntityInternal, HitboxSet);
@@ -33,10 +38,10 @@ struct IClientPointers
 {
 	void Init()
 	{
-		pHighestEntity = reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(M0Libraries::Client->FindPattern("pCEntityListPtr")) +
-			Offsets::ClientDLL::ClientEntList::HighestEntityIndex);
+		M0Library clientdll{ M0CLIENT_DLL };
+		pHighestEntity = reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(clientdll.FindInterface("pCEntityListPtr")) + Offsets::ClientDLL::ClientEntList::HighestEntityIndex);
 		
-		pLocalPlayer = reinterpret_cast<IBaseEntityInternal**>(M0Libraries::Client->FindPattern("pLocalPlayer"));
+		pLocalPlayer = static_cast<IBaseEntityInternal**>(clientdll.FindInterface("pLocalPlayer"));
 	}
 
 	int* pHighestEntity{};
@@ -165,7 +170,7 @@ void IBaseEntityInternal::DrawHitboxes(const std::array<char8_t, 3>(&colors)[8],
 
 const IBoneCache* IBaseEntityInternal::GetBoneCache() const
 {
-	static IMemberFuncThunk<IBoneCache*, studiohdr_t*> getbonecache(M0Libraries::Client->FindPattern("CBaseEntity::GetBoneCache"));
+	static IMemberFuncThunk<IBoneCache*, studiohdr_t*> getbonecache(M0CLIENT_DLL, "CBaseEntity::GetBoneCache");
 	return getbonecache(this, nullptr);
 }
 
@@ -225,7 +230,7 @@ bool IBaseEntityInternal::GetBonePosition(PlayerHitboxIdx index, BoneResult* res
 
 void IBaseEntityInternal::SetModel(int index)
 {
-	static IMemberFuncThunk<void, int> setmodelidx(M0Libraries::Client->FindPattern("CBaseEntity::SetModelIndex"));
+	static IMemberFuncThunk<void, int> setmodelidx(M0CLIENT_DLL, "CBaseEntity::SetModelIndex");
 	setmodelidx(this, index);
 }
 

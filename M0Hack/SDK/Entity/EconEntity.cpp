@@ -46,7 +46,7 @@ void IAttributeList::RemoveAttribute(int index) noexcept
 
 IEconItemSchema* IEconItemSchema::Get()
 {
-	static IFuncThunk<IEconItemSchema*> GetItemSchema(M0Libraries::Client->FindPattern("GetItemSchema"));
+	static IFuncThunk<IEconItemSchema*> GetItemSchema(M0CLIENT_DLL, "GetItemSchema");
 	return GetItemSchema();
 }
 

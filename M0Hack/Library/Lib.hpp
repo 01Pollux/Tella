@@ -1,17 +1,22 @@
 #pragma once
 
-#include "../winmain.hpp"
-
 #include <map>
+#include "winmain.hpp"
+#include "SDK/ProtoExport.hpp"
 
-using M0Pointer = void*;
+#define M0ENGINE_DLL		"engine.dll"
+#define M0CLIENT_DLL		"client.dll"
+#define M0VALVESTD_DLL		"vstdlib.dll"
+#define M0D3DX9_DLL			"shaderapidx9.dll"
+#define M0MATSURFACE_DLL	"vguimatsurface.dll"
+
 
 class M0Library
 {
 public:
 	M0Library(const char* name) : Name(name)
 	{
-		GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, name, reinterpret_cast<HMODULE*>(&Address));
+		GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, name, reinterpret_cast<HMODULE*>(&Pointer));
 	}
 	
 	const char* GetName() const noexcept
@@ -19,35 +24,23 @@ public:
 		return Name;
 	}
 
-	M0Pointer GetAddress() const noexcept
+	void* GetAddress() const noexcept
 	{
-		return Address;
+		return Pointer;
 	}
 
-	M0Pointer FindPattern(const char* name);
+	void* FindPattern(const char* name);
 
 	// Find an exported interface by the game
-	M0Pointer FindInterface(const char* interface_name);
+	void* FindInterface(const char* interface_name);
 
 private:
 	const char* Name;
-	M0Pointer Address;
-
-	std::map<const char*, M0Pointer> CachedPointers;
+	void* Pointer;
 };
 
+
 class CallClass { };
-
-namespace M0Libraries
-{
-	extern M0Library* Client;
-	extern M0Library* Engine;
-	extern M0Library* ValveSTD;
-	extern M0Library* D3DX9;
-	extern M0Library* MatSurface;
-
-	void InitLibrary();
-}
 
 template<typename ReturnType, typename... Args>
 class IFuncThunk
@@ -55,20 +48,33 @@ class IFuncThunk
 	using FnPtr = ReturnType(*)(Args...);
 public:
 	IFuncThunk() = default;
-	IFuncThunk(M0Pointer ptr) noexcept
-	{
-		union
-		{
-			FnPtr fn;
-			M0Pointer ptr;
-		} u{ .ptr = ptr };
-
-		Func = u.fn;
-	};
+	IFuncThunk(void* ptr) noexcept { set(ptr); }
+	IFuncThunk(const char* lib_name, const char* sig_name) { M0Library lib(lib_name); set(lib.FindPattern(sig_name)); }
 
 	constexpr ReturnType operator()(Args... args)
 	{
 		return Func(args...);
+	}
+
+	void set(void* ptr) noexcept
+	{
+		union
+		{
+			FnPtr fn;
+			void* ptr;
+		} u{ .ptr = ptr };
+
+		Func = u.fn;
+	}
+
+	void* get() const noexcept
+	{
+		union
+		{
+			FnPtr fn;
+			void* ptr;
+		} u{ .fn = Func };
+		return u.ptr;
 	}
 
 private:
@@ -81,27 +87,33 @@ class IMemberFuncThunk
 	using FnPtr = ReturnType(CallClass::*)(Args...);
 public:
 	IMemberFuncThunk() = default;
-	IMemberFuncThunk(M0Pointer ptr) noexcept
-	{
-		union
-		{
-			FnPtr fn;
-			M0Pointer ptr;
-		} u{ .ptr = ptr };
+	IMemberFuncThunk(void* ptr) noexcept { set(ptr); }
+	IMemberFuncThunk(const char* lib_name, const char* sig_name) { M0Library lib(lib_name); set(lib.FindPattern(sig_name)); }
 
-		Func = u.fn;
-	};
-
-	template<class Class>
-	constexpr ReturnType operator()(Class* thisptr, Args... args)
+	constexpr ReturnType operator()(const void* thisptr, Args... args)
 	{
 		return ((CallClass*)thisptr->*Func)(args...);
 	}
 
-	template<class Class>
-	constexpr ReturnType operator()(const Class* thisptr, Args... args)
+	void set(void* ptr) noexcept
 	{
-		return ((CallClass*)thisptr->*Func)(args...);
+		union
+		{
+			FnPtr fn;
+			void* ptr;
+		} u{ .ptr = ptr };
+
+		Func = u.fn;
+	}
+
+	void* get() const noexcept
+	{
+		union
+		{
+			FnPtr fn;
+			void* ptr;
+		} u{ .fn = Func };
+		return u.ptr;
 	}
 
 private:
@@ -109,38 +121,28 @@ private:
 };
 
 
-template<typename ReturnType, typename... Args>
+template<typename _RTy, typename... _Args>
 class IMemberVFuncThunk
 {
-	using FnPtr = ReturnType(CallClass::*)(Args...);
 public:
 	IMemberVFuncThunk() = default;
 	IMemberVFuncThunk(int offset) noexcept : Offset(offset) { };
 
-	template<class Class>
-	constexpr ReturnType operator()(Class* thisptr, Args... args)
+	constexpr _RTy operator()(const void* thisptr, _Args... args)
 	{
-		M0Pointer* vtable = *(M0Pointer**)(thisptr);
-		union
-		{
-			FnPtr fn;
-			M0Pointer ptr;
-		} u{ .ptr = vtable[Offset] };
-
-		return ((CallClass*)thisptr->*u.fn)(args...);
+		void** vtable = *(void***)(thisptr);
+		IMemberFuncThunk<_RTy, _Args...> fn(vtable[Offset]);
+		return fn(thisptr, args...);
 	}
 
-	template<class Class>
-	constexpr ReturnType operator()(const Class* thisptr, Args... args)
+	void set(int offset) noexcept
 	{
-		const M0Pointer* vtable = *(const M0Pointer**)(thisptr);
-		union
-		{
-			FnPtr fn;
-			const M0Pointer ptr;
-		} u{ .ptr = vtable[Offset] };
+		Offset = offset;
+	}
 
-		return ((CallClass*)thisptr->*u.fn)(args...);
+	int get() const noexcept
+	{
+		return Offset;
 	}
 
 private:

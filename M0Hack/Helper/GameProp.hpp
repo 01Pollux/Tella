@@ -22,6 +22,7 @@ private:
 	bool FindInDataMap(const EntityDataMap* map, const char* name, CachedDataMapInfo* info);
 };
 
+
 class IGameRecvProp : public IAutoList<IGameRecvProp>
 {
 public:
@@ -47,11 +48,37 @@ private:
 	const char* PropName{ };
 };
 
-template<typename DataType, typename OffsetManager, OffsetManager* OffsetMgr, const size_t* DeltaOffset, ptrdiff_t ExtraOffset = 0>
+class IGameDataMapProp
+{
+public:
+	IGameDataMapProp(const char* prop_name) noexcept : PropName(prop_name) { };
+
+	void LoadOffset(const IBaseEntityInternal*);
+
+	_NODISCARD ptrdiff_t GetOffset() const noexcept
+	{
+		return Offset;
+	}
+
+	_NODISCARD const typedescription_t* GetProp() const noexcept
+	{
+		return Prop;
+	}
+
+private:
+	ptrdiff_t Offset{ -1 };
+	typedescription_t* Prop{ };
+
+	const char* PropName{ };
+};
+
+
+
+template<typename DataType, typename OffsetManager, OffsetManager* OffsetMgr, const size_t* DeltaOffset, bool IsDataMap, ptrdiff_t ExtraOffset = 0>
 class IGamePropManager
 {
 	template<typename OtherType>
-	using OtherPropManager = IGamePropManager<OtherType, OffsetManager, OffsetMgr, DeltaOffset, ExtraOffset>;
+	using OtherPropManager = IGamePropManager<OtherType, OffsetManager, OffsetMgr, DeltaOffset, IsDataMap, ExtraOffset>;
 
 public:
 	using reference = DataType&;
@@ -136,7 +163,7 @@ public:
 	_NODISCARD auto end() const noexcept				{ return this->GetVarConstRef().end(); }
 	_NODISCARD auto end() noexcept						{ return this->GetVarRef().end(); }
 
-	void set(const_reference o) noexcept	{ GetVarRef() = o; }
+	void set(const_reference o) noexcept			{ GetVarRef() = o; }
 
 	_NODISCARD reference get() noexcept				{ return GetVarRef(); }
 	_NODISCARD const_reference get() const noexcept	{ return GetVarConstRef(); }
@@ -164,9 +191,13 @@ private:
 
 	ptrdiff_t GetOffset() const noexcept
 	{
-		if constexpr (OffsetMgr)
-			return OffsetMgr->GetOffset() + ExtraOffset;
-		else return ExtraOffset;
+		if constexpr (!OffsetMgr)
+			return ExtraOffset;
+		else if constexpr (IsDataMap)
+			if (!prop())
+				OffsetMgr->LoadOffset(static_cast<const IBaseEntityInternal*>(GetThisPtr()));
+		
+		return OffsetMgr->GetOffset() + ExtraOffset;
 	}
 
 	pointer GetVarPtr() noexcept
@@ -191,20 +222,27 @@ private:
 };
 
 
+#define GAMEPROP_DECL_PROP(TYPE, MGR, CUSTOM_NAME, IS_DATAMAP, ...) \
+	static size_t _##CUSTOM_NAME##_mgr_offs; \
+	using _##CUSTOM_NAME##_mgr_t = IGamePropManager<TYPE, std::remove_pointer_t<decltype(MGR)>, MGR, &_##CUSTOM_NAME##_mgr_offs, IS_DATAMAP, __VA_ARGS__>; \
+	_##CUSTOM_NAME##_mgr_t CUSTOM_NAME
+
+#define GAMEPROP_IMPL_OFFSET(CLASS, NAME) size_t CLASS::_##NAME##_mgr_offs = offsetof(CLASS, NAME)
+
 
 #define GAMEPROP_DECL_RECV(TYPE, CLASSNAME, PROPNAME, CUSTOM_NAME, ...) \
 	static inline IGameRecvProp _##CUSTOM_NAME##_rcv{ CLASSNAME, PROPNAME }; \
-	static size_t _##CUSTOM_NAME##_mgr_offs; \
-	using _##CUSTOM_NAME##_mgr_t = IGamePropManager<TYPE, IGameRecvProp, &_##CUSTOM_NAME##_rcv, &_##CUSTOM_NAME##_mgr_offs, __VA_ARGS__>; \
-	_##CUSTOM_NAME##_mgr_t CUSTOM_NAME
+	GAMEPROP_DECL_PROP(TYPE, &_##CUSTOM_NAME##_rcv, CUSTOM_NAME, false, __VA_ARGS__)
 
-#define GAMEPROP_IMPL_RECV(CLASS, NAME) \
-	size_t CLASS::_##NAME##_mgr_offs = offsetof(CLASS, NAME)
+#define GAMEPROP_IMPL_RECV(CLASS, NAME) GAMEPROP_IMPL_OFFSET(CLASS, NAME)
+
+
+#define GAMEPROP_DECL_DTM(TYPE, PROPNAME, CUSTOM_NAME, ...) \
+	static inline IGameDataMapProp _##CUSTOM_NAME##_dtm{ PROPNAME }; \
+	GAMEPROP_DECL_PROP(TYPE, &_##CUSTOM_NAME##_dtm, CUSTOM_NAME, false, __VA_ARGS__)
+
+#define GAMEPROP_IMPL_DTM(CLASS, NAME) GAMEPROP_IMPL_OFFSET(CLASS, NAME)
+
 
 #define GAMEPROP_DECL_OFFSET(TYPE, CUSTOM_NAME, OFFSET) \
-	static size_t _##CUSTOM_NAME##_mgr_offs; \
-	using _##CUSTOM_NAME##_mgr_t = IGamePropManager<TYPE, void, nullptr, &_##CUSTOM_NAME##_mgr_offs, OFFSET>; \
-	_##CUSTOM_NAME##_mgr_t CUSTOM_NAME
-
-#define GAMEPROP_IMPL_OFFSET(CLASS, NAME) \
-	GAMEPROP_IMPL_RECV(CLASS, NAME)
+	GAMEPROP_DECL_PROP(TYPE, nullptr, CUSTOM_NAME, true, OFFSET)

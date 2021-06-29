@@ -29,9 +29,9 @@ class ConCommand : public ConCommandBase
 
 public:
 	ConCommand(const char* pName, ConCommandCallbackV callback,
-		const char* pHelpString = nullptr, ConVarFlag flags = ConVarFlag::None, ConCommandCompletionCallback completionFunc = nullptr);
+		const char* pHelpString = nullptr, MConVarFlag flags = MConVarFlag{}, ConCommandCompletionCallback completionFunc = nullptr);
 	ConCommand(const char* pName, ConCommandCallback callback,
-		const char* pHelpString = nullptr, ConVarFlag flags = ConVarFlag::None, ConCommandCompletionCallback completionFunc = nullptr);
+		const char* pHelpString = nullptr, MConVarFlag flags = MConVarFlag{}, ConCommandCompletionCallback completionFunc = nullptr);
 
 	virtual ~ConCommand() = default;
 
@@ -66,34 +66,34 @@ class ConVar : public ConCommandBase, public ConVar_Internal
 {
 public:
 	ConVar(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags = ConVarFlag::None)
+		const char* pName, const char* pDefaultValue, MConVarFlag flags = MConVarFlag{})
 	{
 		Create(pName, pDefaultValue, flags);
 	}
 
 	ConVar(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags,
+		const char* pName, const char* pDefaultValue, MConVarFlag flags,
 		const char* pHelpString)
 	{
 		Create(pName, pDefaultValue, flags, pHelpString);
 	}
 
 	ConVar(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags,
+		const char* pName, const char* pDefaultValue, MConVarFlag flags,
 		const char* pHelpString, bool bMin, float fMin, bool bMax, float fMax)
 	{
 		Create(pName, pDefaultValue, flags, pHelpString, bMin, fMin, bMax, fMax);
 	}
 
 	ConVar(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags,
+		const char* pName, const char* pDefaultValue, MConVarFlag flags,
 		const char* pHelpString, ConVarChangeCallback callback)
 	{
 		Create(pName, pDefaultValue, flags, pHelpString, false, 0.0, false, 0.0, false, 0.0, false, 0.0, callback);
 	}
 
 	ConVar(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags,
+		const char* pName, const char* pDefaultValue, MConVarFlag flags,
 		const char* pHelpString, bool bMin, float fMin, bool bMax, float fMax,
 		ConVarChangeCallback callback)
 	{
@@ -101,7 +101,7 @@ public:
 	}
 
 	ConVar(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags,
+		const char* pName, const char* pDefaultValue, MConVarFlag flags,
 		const char* pHelpString, bool bMin, float fMin, bool bMax, float fMax,
 		bool bCompMin, float fCompMin, bool bCompMax, float fCompMax,
 		ConVarChangeCallback callback)
@@ -112,12 +112,12 @@ public:
 
 	virtual ~ConVar() = default;
 
-	bool IsFlagSet(ConVarFlag flag) const noexcept final { return (flag & Parent->Flags) == flag; }
-	const char* GetHelpText() const noexcept final { return Parent->HelpString; }
-	bool IsRegistered() const noexcept final { return Parent->Is_Registered; }
-	const char* GetName() const noexcept final { return Parent->Name; }
-	void AddFlags(ConVarFlag flags) noexcept final { Parent->Flags |= flags; }
-	bool IsCommand() const noexcept final { return false; }
+	bool IsFlagSet(uint32_t flags)			const noexcept final { return (Parent->Flags & flags) == flags; }
+	const char* GetHelpText()						const noexcept final { return Parent->HelpString; }
+	bool IsRegistered()								const noexcept final { return Parent->Is_Registered; }
+	const char* GetName()							const noexcept final { return Parent->Name; }
+	void AddFlags(uint32_t flags)				  noexcept final { Parent->Flags |= flags; }
+	bool IsCommand()								const noexcept final { return false; }
 
 	void InstallChangeCallback(ConVarChangeCallback callback)
 	{
@@ -212,7 +212,7 @@ private:
 	virtual void ChangeStringValue(const char* tempVal, float flOldValue);
 
 	void Create(
-		const char* pName, const char* pDefaultValue, ConVarFlag flags = ConVarFlag::None,
+		const char* pName, const char* pDefaultValue, MConVarFlag flags = MConVarFlag{ },
 		const char* pHelpString = 0, bool bMin = false, float fMin = 0.0,
 		bool bMax = false, float fMax = 0.0,
 		bool bCompMin = false, float fCompMin = 0.0,
@@ -225,7 +225,7 @@ private:
 	{
 		ConCommandBase::Init();
 	}
-	ConVarFlag GetFlags() { return Parent->Flags; }
+	bitmask::mask<ConVarFlag> GetFlags() { return Parent->Flags; }
 public:
 
 	// This either points to "this" or it points to the original declaration of a ConVar.

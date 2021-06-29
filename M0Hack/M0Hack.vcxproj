@@ -25,17 +25,13 @@
     <ClInclude Include="Cheats\Aimbot\aimbot_var.hpp" />
     <ClInclude Include="Cheats\ESP\esp.hpp" />
     <ClInclude Include="Cheats\ESP\esp_reserved.hpp" />
+    <ClInclude Include="Cheats\Extras\Backtrack\Backtrack.hpp" />
     <ClInclude Include="Cheats\Extras\Effects.hpp" />
     <ClInclude Include="Cheats\Inventory\Inventory_Models.hpp" />
     <ClInclude Include="Cheats\Inventory\Inventory_Skins.hpp" />
     <ClInclude Include="Cheats\Main.hpp" />
-    <ClInclude Include="GlobalHook\defines.hpp" />
-    <ClInclude Include="GlobalHook\detour.hpp" />
-    <ClInclude Include="GlobalHook\Detour\detours.hpp" />
-    <ClInclude Include="GlobalHook\Detour\detver.hpp" />
-    <ClInclude Include="GlobalHook\listener.hpp" />
-    <ClInclude Include="GlobalHook\vhook.hpp" />
-    <ClInclude Include="GlobalHook\vtable.hpp" />
+    <ClInclude Include="GlobalHooks\core.hpp" />
+    <ClInclude Include="GlobalHooks\event_listener.hpp" />
     <ClInclude Include="Helper\AutoList.hpp" />
     <ClInclude Include="Helper\Color.hpp" />
     <ClInclude Include="Helper\Config.hpp" />
@@ -110,22 +106,18 @@
     <ClInclude Include="SDK\NetChannel.hpp" />
     <ClInclude Include="SDK\NetMessage.hpp" />
     <ClInclude Include="SDK\NetStringTable.hpp" />
-    <ClInclude Include="SDK\Proto\base_gcmessages.pb.h" />
-    <ClInclude Include="SDK\Proto\econ_gcmessages.pb.h" />
-    <ClInclude Include="SDK\Proto\GCMsg.hpp" />
-    <ClInclude Include="SDK\Proto\gcsdk_gcmessages.pb.h" />
-    <ClInclude Include="SDK\Proto\GCSys.hpp" />
-    <ClInclude Include="SDK\Proto\gcsystem.hpp" />
-    <ClInclude Include="SDK\Proto\gcsystemmsgs.pb.h" />
-    <ClInclude Include="SDK\Proto\steammessages.pb.h" />
-    <ClInclude Include="SDK\Proto\tf_gcmessages.pb.h" />
-    <ClInclude Include="SDK\Proto\tf_proto_def_messages.pb.h" />
     <ClInclude Include="SDK\Steam\Commons.hpp" />
     <ClInclude Include="SDK\Steam\Enums.hpp" />
     <ClInclude Include="SDK\Trace.hpp" />
     <ClInclude Include="SDK\UserCmd.hpp" />
     <ClInclude Include="SDK\UtlVector.hpp" />
     <ClInclude Include="SDK\VGUI.hpp" />
+    <ClInclude Include="TellaHooks\detour.hpp" />
+    <ClInclude Include="TellaHooks\Detour\detours.hpp" />
+    <ClInclude Include="TellaHooks\Detour\detver.hpp" />
+    <ClInclude Include="TellaHooks\policy.hpp" />
+    <ClInclude Include="TellaHooks\tellahook.hpp" />
+    <ClInclude Include="TellaHooks\th_vtable.hpp" />
     <ClInclude Include="winmain.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +132,8 @@
     <ClCompile Include="Cheats\ESP\esp_render.cpp" />
     <ClCompile Include="Cheats\Extras\Auto-Backstab.cpp" />
     <ClCompile Include="Cheats\Extras\Auto-Detonate.cpp" />
+    <ClCompile Include="Cheats\Extras\Backtrack\Backtrack.cpp" />
+    <ClCompile Include="Cheats\Extras\Backtrack\Backtrack_Datagram.cpp" />
     <ClCompile Include="Cheats\Extras\ConCmds1.cpp" />
     <ClCompile Include="Cheats\Extras\Effects.cpp" />
     <ClCompile Include="Cheats\Extras\Visuals\DisplayDead.cpp" />
@@ -150,18 +144,7 @@
     <ClCompile Include="Cheats\Inventory\Inventory_Skins.cpp" />
     <ClCompile Include="Cheats\MenuPanel.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="GlobalHook\Detour\creatwth.cpp" />
-    <ClCompile Include="GlobalHook\Detour\detours.cpp" />
-    <ClCompile Include="GlobalHook\Detour\disasm.cpp" />
-    <ClCompile Include="GlobalHook\Detour\disolarm.cpp" />
-    <ClCompile Include="GlobalHook\Detour\disolarm64.cpp" />
-    <ClCompile Include="GlobalHook\Detour\disolia64.cpp" />
-    <ClCompile Include="GlobalHook\Detour\disolx64.cpp" />
-    <ClCompile Include="GlobalHook\Detour\disolx86.cpp" />
-    <ClCompile Include="GlobalHook\Detour\image.cpp" />
-    <ClCompile Include="GlobalHook\Detour\modules.cpp" />
-    <ClCompile Include="GlobalHook\listener.cpp" />
-    <ClCompile Include="GlobalHook\vtable.cpp" />
+    <ClCompile Include="GlobalHooks\event_listener.cpp" />
     <ClCompile Include="Helper\Config.cpp" />
     <ClCompile Include="Helper\DataMap.cpp" />
     <ClCompile Include="Helper\Debug.cpp" />
@@ -206,18 +189,17 @@
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SDK\MathLib\Vector3D.cpp" />
     <ClCompile Include="SDK\NetMessage.cpp" />
-    <ClCompile Include="SDK\Proto\base_gcmessages.pb.cc" />
-    <ClCompile Include="SDK\Proto\econ_gcmessages.pb.cc" />
-    <ClCompile Include="SDK\Proto\gcsdk_gcmessages.pb.cc" />
-    <ClCompile Include="SDK\Proto\GCSys.cpp" />
-    <ClCompile Include="SDK\Proto\gcsystemmsgs.pb.cc" />
-    <ClCompile Include="SDK\Proto\steammessages.pb.cc" />
-    <ClCompile Include="SDK\Proto\tf_gcmessages.pb.cc" />
-    <ClCompile Include="SDK\Proto\tf_proto_def_messages.pb.cc" />
     <ClCompile Include="SDK\Trace.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="libprotobuf.lib" />
+    <ClCompile Include="TellaHooks\Detour\creatwth.cpp" />
+    <ClCompile Include="TellaHooks\Detour\detours.cpp" />
+    <ClCompile Include="TellaHooks\Detour\disasm.cpp" />
+    <ClCompile Include="TellaHooks\Detour\disolarm.cpp" />
+    <ClCompile Include="TellaHooks\Detour\disolarm64.cpp" />
+    <ClCompile Include="TellaHooks\Detour\disolia64.cpp" />
+    <ClCompile Include="TellaHooks\Detour\disolx64.cpp" />
+    <ClCompile Include="TellaHooks\Detour\disolx86.cpp" />
+    <ClCompile Include="TellaHooks\Detour\image.cpp" />
+    <ClCompile Include="TellaHooks\Detour\modules.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -311,9 +293,10 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Users\Yassine\source\repos\M0Hack\M0Hack\SDK;C:\Users\Yassine\source\repos\M0Hack\M0Hack\SDK\Entity;C:\Users\Yassine\source\repos\M0Hack\M0Hack;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SDK;$(ProjectDir)SDK\Entity;$(ProjectDir);$(SolutionDir)ProtoExport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -321,8 +304,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(TargetDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

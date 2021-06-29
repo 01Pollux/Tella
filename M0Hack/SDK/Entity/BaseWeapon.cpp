@@ -40,6 +40,6 @@ bool IBaseWeaponInternal::DoSwingTrace(GameTrace& trace) noexcept
 
 int IBaseWeaponInternal::GetSwingRange() const noexcept
 {
-	static IMemberFuncThunk<int> getswingrange(M0Libraries::Client->FindPattern("Melee_GetSwingRangeFn"));
+	static IMemberFuncThunk<int> getswingrange(M0CLIENT_DLL, "Melee_GetSwingRangeFn");
 	return getswingrange(this);
 }

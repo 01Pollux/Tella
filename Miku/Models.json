@@ -1,18 +1,33 @@
 {
   "Medic": {
-    "Aqua-sama": "models/custom/player/aqua/aqua.mdl"
+    "Current": "Aqua-sama",
+    "Models": {
+      "Aqua-sama": "models/custom/player/aqua/aqua.mdl"
+    }
   },
   "Scout": {
-    "Hatsune Miku": "models/custom/player/hatsune_miku/hatsune_miku_teamcolor.mdl"
+    "Current": "Hatsune Miku",
+    "Models": {
+      "Hatsune Miku": "models/custom/player/hatsune_miku/hatsune_miku_teamcolor.mdl"
+    }
   },
   "Sniper": {
-    "UNI": "models/custom/player/Uni/uni_tc1.mdl"
+    "Current": "UNI",
+    "Models": {
+      "UNI": "models/custom/player/Uni/uni_tc1.mdl"
+    }
   },
   "Soldier": {
-    "Soldine": "models/freak_fortress_2/soldine/soldier2.mdl"
+    "Current": "Soldine",
+    "Models": {
+      "Soldine": "models/freak_fortress_2/soldine/soldier2.mdl"
+    }
   },
   "Spy": {
-    "SCP Guard": "models/freak_fortress_2/scpguard/guardscp.mdl",
-    "Sagiri Izumi": "models/custom/player/sagiri_izumi/sagiri_izumi.mdl"
+    "Current": "SCP Guard",
+    "Models": {
+      "SCP Guard": "models/freak_fortress_2/scpguard/guardscp.mdl",
+      "Sagiri Izumi": "models/custom/player/sagiri_izumi/sagiri_izumi.mdl"
+    }
   }
 }

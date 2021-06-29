@@ -56,31 +56,31 @@ M0_END;
 
 void Interfaces::InitAllInterfaces()
 {
-	M0Libraries::InitLibrary();
-	
-	EngineClient		= reinterpret_cast<IVEngineClient*>(M0Libraries::Engine->FindInterface(EngineClientName));
-	ClientDLL			= reinterpret_cast<IBaseClientDLL*>(M0Libraries::Client->FindInterface(ClientDLLName));
+	M0Library engine_dll{ M0ENGINE_DLL }, client_dll{ M0CLIENT_DLL }, vstd_dll{ M0VALVESTD_DLL }, matsurface_dll{ M0MATSURFACE_DLL };
 
-	CVar				= reinterpret_cast<ICVar*>(M0Libraries::ValveSTD->FindInterface(CVarName));
+	EngineClient		= static_cast<IVEngineClient*>(engine_dll.FindInterface(EngineClientName));
+	ClientDLL			= static_cast<IBaseClientDLL*>(client_dll.FindInterface(ClientDLLName));
 
-	GlobalVars			= reinterpret_cast<IValveGlobalVars*>(M0Libraries::Engine->FindPattern("pGlobalVarBasePtr"));
+	CVar				= static_cast<ICVar*>(vstd_dll.FindInterface(CVarName));
 
-	VGUIPanel			= reinterpret_cast<VGUI::IPanel*>(M0Libraries::Client->FindPattern("g_pVGUIPanel"));
-	VGUISurface			= reinterpret_cast<VGUI::ISurface*>(M0Libraries::MatSurface->FindInterface(SurfaceName));
+	GlobalVars			= static_cast<IValveGlobalVars*>(engine_dll.FindPattern("pGlobalVarBasePtr"));
 
-	MdlInfo				= reinterpret_cast<IVModelInfo*>(M0Libraries::Engine->FindInterface(MdlInfoName));
+	VGUIPanel			= static_cast<VGUI::IPanel*>(client_dll.FindPattern("g_pVGUIPanel"));
+	VGUISurface			= static_cast<VGUI::ISurface*>(matsurface_dll.FindInterface(SurfaceName));
 
-	DebugOverlay		= reinterpret_cast<IVDebugOverlay*>(M0Libraries::Engine->FindInterface(DebugOverlayName));
+	MdlInfo				= static_cast<IVModelInfo*>(engine_dll.FindInterface(MdlInfoName));
 
-	ClientTrace			= reinterpret_cast<IEngineTrace*>(M0Libraries::Engine->FindInterface(ClientTraceName));
+	DebugOverlay		= static_cast<IVDebugOverlay*>(engine_dll.FindInterface(DebugOverlayName));
 
-	GlowManager			= reinterpret_cast<IGlowManager*>(M0Libraries::Client->FindPattern("GlowManager"));
+	ClientTrace			= static_cast<IEngineTrace*>(engine_dll.FindInterface(ClientTraceName));
 
-	EntityList			= reinterpret_cast<IClientEntityList*>(M0Libraries::Client->FindInterface(EntityListName));
+	GlowManager			= static_cast<IGlowManager*>(client_dll.FindPattern("GlowManager"));
 
-	NSTContainer		= reinterpret_cast<INetworkStringTableContainer*>(M0Libraries::Engine->FindInterface(NSTContainerName));
+	EntityList			= static_cast<IClientEntityList*>(client_dll.FindInterface(EntityListName));
 
-	GameEventMgr		= reinterpret_cast<IGameEventManager*>(M0Libraries::Engine->FindInterface(GameEventMgrName));
+	NSTContainer		= static_cast<INetworkStringTableContainer*>(engine_dll.FindInterface(NSTContainerName));
+
+	GameEventMgr		= static_cast<IGameEventManager*>(engine_dll.FindInterface(GameEventMgrName));
 }
 
 namespace VGUI
@@ -131,8 +131,8 @@ void Interfaces::ForceClientFullUpdate()
 	if (IBaseEntityInternal::BadLocal())
 		return;
 
-	static M0Pointer ClientState = M0Libraries::Engine->FindPattern("pBaseClientStatePtr");
-	static IMemberFuncThunk<void> ForceFullupdate(M0Libraries::Engine->FindPattern("ClientState::ForceFullUpdate"));
+	static void* ClientState = M0Library{ M0ENGINE_DLL }.FindPattern("pBaseClientStatePtr");
+	static IMemberFuncThunk<void> ForceFullupdate(M0ENGINE_DLL, "ClientState::ForceFullUpdate");
 
 	ForceFullupdate(ClientState);
 }

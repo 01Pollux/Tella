@@ -66,27 +66,26 @@ public:
 
 	void export_and_clear(M0PROFILER_GROUP group)
 	{
-		std::string time = FormatTime("____{0:%g}_{0:%h}_{0:%d}_{0:%H}_{0:%OM}_{0:%OS}"sv);
-		IFormatter fmt;
+		std::string time = FormatTime("___{0:%g}_{0:%h}_{0:%d}_{0:%H}_{0:%OM}_{0:%OS}"sv);
+		IFormatterT fmt("{}/{}{} ({}).txt"sv);
 
 		M0PROFILER_MAP& map = M0Profiler::GetDataMap(group);
+		constexpr M0PROFILER_FLAGS flags = bitmask::to_mask(M0PROFILER_FLAGS_::Stream_Seek_Beg, M0PROFILER_FLAGS_::Clear_State);
 
 		int num = 0;
 		for (auto& data : records)
 		{
 			map[data.Name] = std::move(data.Calls);
 
-			const std::string& str = fmt("{}/{}_{}{}.txt",
-				M0PROFILER_OUT_STREAM,
-				M0PROFILE_NAMES[static_cast<std::underlying_type_t<M0PROFILER_GROUP>>(group)],
-				num,
-				time
-			);
-
 			M0Profiler::OutputToStream(
 				group,
-				str.c_str(),
-				M0PROFILER_FLAGS::DEFAULT_OUTPUT
+				fmt(
+					M0PROFILER_OUT_STREAM,
+					M0PROFILE_NAMES[static_cast<std::underlying_type_t<M0PROFILER_GROUP>>(group)],
+					time,
+					num
+				),
+				flags
 			);
 
 			num++;
@@ -370,57 +369,53 @@ void M0Profiler::RenderToImGui(bool* p_open)
 }
 
 
-/*#include "../Interfaces/HatCommand.h"
+#include "ConVar.hpp"
 
-HAT_COMMAND(dump_mprof, "Dump M0Profiler's results manually")
+static void DumpProfiler(const CCommand& args)
 {
-	const char* type = args[1];
+	constexpr M0PROFILER_FLAGS flags = bitmask::to_mask(M0PROFILER_FLAGS_::Stream_Seek_Beg, M0PROFILER_FLAGS_::Clear_State);
+	std::string time = FormatTime("__{0:%g}_{0:%h}_{0:%d}_{0:%H}_{0:%OM}_{0:%OS}.txt"sv);
+	IFormatter fmt("{}/{}{}.log");
 
-	using namespace std;
-	char buf[64];
-	FormatTime(buf, sizeof(buf), "__%g_%h_%d_%H_%M_%S.txt");
-	IFormatter fmt("{STREAM}{NAME}{TIME}");
+	const int type = atoi(args[1]);
 
-	if (!*type)
+	switch (type)
 	{
-		Msg("Dumping all Profilers\n");
+	case -1:
+	{
+		ReplyToCCmd(color::names::violet, "Dumping all Profilers"sv);
 		for (M0PROFILER_GROUP_T i = 0; i < static_cast<M0PROFILER_GROUP_T>(M0PROFILER_GROUP::COUNT); ++i)
 		{
-			if (stringstream str;
-				M0Profiler::OutputToSteam(static_cast<M0PROFILER_GROUP>(i), str, M0PROFILER_FLAGS::DEFAULT_OUTPUT))
-			{
-				std::ofstream output(
-					fmt(
-						fmt::arg("STREAM", M0PROFILER_OUT_STREAM),
-						fmt::arg("NAME", M0PROFILE_NAMES[i]),
-						fmt::arg("TIME", buf)
-					),
-					std::ios::app | std::ios::out
-				);
-				output << str.rdbuf();
-			}
+			M0Profiler::OutputToStream(
+				static_cast<M0PROFILER_GROUP>(i),
+				fmt(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[i], time).c_str(),
+				flags
+			);
 		}
+		break;
 	}
-	else
+	case 0:
 	{
-		const int i = atoi(type);
-		if(i >= 0 && i < static_cast<M0PROFILER_GROUP_T>(M0PROFILER_GROUP::COUNT))
-		{
-			if (stringstream str;
-				M0Profiler::OutputToSteam(static_cast<M0PROFILER_GROUP>(i), str, M0PROFILER_FLAGS::DEFAULT_OUTPUT))
-			{
-				std::ofstream output(
-					fmt(
-						fmt::arg("STREAM", M0PROFILER_OUT_STREAM),
-						fmt::arg("NAME", M0PROFILE_NAMES[i]),
-						fmt::arg("TIME", buf)
-					),
-					std::ios::app | std::ios::out
-				);
-				output << str.rdbuf();
-			}
+		ReplyToCCmd(color::names::red, "Type -1 to dump all profilers, or one of the followings:"sv);
+		for (int i = 0; i < static_cast<size_t>(M0PROFILER_GROUP::COUNT); i++)
+			ReplyToCCmd(color::names::red, "{}: \"{}\""sv, i, M0PROFILE_NAMES[i]);
 
-			Msg("Dumping \"%s\"\n", M0PROFILE_NAMES[i]);
-		}
+		break;
 	}
-}*/
+	default:
+	{
+		if (type >= 0 && type < static_cast<M0PROFILER_GROUP_T>(M0PROFILER_GROUP::COUNT))
+		{
+			M0Profiler::OutputToStream(
+				static_cast<M0PROFILER_GROUP>(type),
+				fmt(M0PROFILER_OUT_STREAM, M0PROFILE_NAMES[type], time).c_str(),
+				flags
+			);
+
+			ReplyToCCmd(color::names::violet, "Dumping \"%s\""sv, M0PROFILE_NAMES[type]);
+		}
+		break;
+	}
+	}
+}
+M01_CONCOMMAND(dump_mprof, DumpProfiler, "Dump M0Profiler's results manually");

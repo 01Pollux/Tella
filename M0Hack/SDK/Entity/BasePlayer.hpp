@@ -189,7 +189,9 @@ enum class PlayerLifeState : uint8_t
 {
 	Alive,
 	Dying,
-	Dead
+	Dead,
+	Respawnable,
+	DiscardBody
 };
 
 enum class TFClass

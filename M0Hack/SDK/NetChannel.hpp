@@ -200,7 +200,7 @@ public:
 		int			CurrentIndex;	// current frame index
 		NetFrame	Frames[64];		// frame history
 		NetFrame*	CurrentFrame;	// current frame
-	} ;
+	};
 
 
 	bool		ProcessingMessages;

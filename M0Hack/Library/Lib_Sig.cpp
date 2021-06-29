@@ -1,5 +1,5 @@
 #include "Lib_Sig.hpp"
-#include "../Helper/Json.hpp"
+#include "Json.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -18,9 +18,9 @@ namespace M0SigSearch
 		return str;
 	}
 
-	M0Pointer ResolveSymbol(M0Pointer lib, const char* symbol)
+	void* ResolveSymbol(void* lib, const char* symbol)
 	{
-		return GetProcAddress(static_cast<HMODULE>(lib), symbol);
+		return GetProcAddress(reinterpret_cast<HMODULE>(lib), symbol);
 	}
 
 	static void PatternToBytes(const char* pattern, vector<int>& bytes)
@@ -50,10 +50,10 @@ namespace M0SigSearch
 		}
 	}
 
-	M0Pointer FindPattern(M0Pointer lib, const char* pattern)
+	void* FindPattern(void* lib, const char* pattern)
 	{
 		MEMORY_BASIC_INFORMATION MBI{ };
-		if (!VirtualQuery(reinterpret_cast<LPCVOID>(lib), &MBI, sizeof(MEMORY_BASIC_INFORMATION)))
+		if (!VirtualQuery(lib, &MBI, sizeof(MEMORY_BASIC_INFORMATION)))
 			return nullptr;
 
 		uint8_t* cur_address = reinterpret_cast<uint8_t*>(MBI.AllocationBase);
@@ -81,7 +81,7 @@ namespace M0SigSearch
 			}
 
 			if (found)
-				return static_cast<M0Pointer>(cur_address);
+				return cur_address;
 
 			cur_address++;
 		}
@@ -89,13 +89,11 @@ namespace M0SigSearch
 		return nullptr;
 	}
 
-	size_t FindPatternByString(M0Pointer ptr, const char* str, std::vector<M0Pointer>& results, size_t search_size)
+	size_t FindPatternByString(void* ptr, const std::string_view str, std::vector<void*>& results, size_t search_size)
 	{
-		const char* sym = str;
-		if (!str || !*sym)
+		if (!str[0])
 			return NULL;
 
-		const size_t len = strlen(str);
 		uintptr_t* pCur = static_cast<uintptr_t*>(ptr);
 		const uintptr_t* pEnd = pCur + search_size;
 
@@ -103,26 +101,26 @@ namespace M0SigSearch
 		{
 			if (!pCur)
 				break;
-			if (*reinterpret_cast<uint8_t*>(pCur) == sym[0])
+			if (pCur[0] == str[0])
 			{
 				bool skip = false;
-				for (uint8_t i = 0; i < len; i++)
+				for (uint8_t i = 0; i < str.size(); i++)
 				{
-					if (reinterpret_cast<uint8_t*>(pCur)[i] != sym[i])
+					if (pCur[i] != str[i])
 					{
 						skip = true;
 						break;
 					}
 				}
 				if (!skip)
-					results.push_back(static_cast<M0Pointer>(pCur));
+					results.push_back(ptr);
 			}
 		}
 
 		return results.size();
 	}
 
-	const M0Pointer FindSig(M0SigInfo info)
+	void* FindSig(M0SigSearch::SigInfo info)
 	{
 		Json::Value sigs;
 		{
@@ -146,15 +144,14 @@ namespace M0SigSearch
 
 		if (data.isMember("read"))
 			read = data["read"].asInt();
-
 		
-		M0Pointer addr = M0SigSearch::FindPattern(info.Library->GetAddress(), pattern);
+		void* addr = M0SigSearch::FindPattern(info.Library->GetAddress(), pattern);
 		if (addr)
 		{
-			addr = reinterpret_cast<M0Pointer>(reinterpret_cast<uintptr_t>(addr) + extra);
+			addr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(addr) + extra);
 
 			for (int i = 0; i < read; i++)
-				addr = *reinterpret_cast<M0Pointer*>(addr);
+				addr = *reinterpret_cast<void**>(addr);
 		}
 
 		return addr;

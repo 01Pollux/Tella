@@ -6,17 +6,18 @@
 #include <vector>
 #include <functional>
 
-struct M0SigInfo
-{
-	M0Library* Library;
-	const char* Symbol;
-};
 
 namespace M0SigSearch
 {
-	M0Pointer ResolveSymbol(M0Pointer lib, const char* symbol);
-	M0Pointer FindPattern(M0Pointer lib, const char* pattern);
-	size_t FindPatternByString(M0Pointer ptr, const char* str, std::vector<M0Pointer>& results, size_t search_size);
+	struct SigInfo
+	{
+		M0Library*	Library;
+		const char* Symbol;
+	};
 
-	const M0Pointer FindSig(M0SigInfo info);
+	_NODISCARD void*	ResolveSymbol(void* lib, const char* symbol);
+	_NODISCARD void*	FindPattern(void* lib, const char* pattern);
+	_NODISCARD size_t	FindPatternByString(void* ptr, const std::string_view str, std::vector<void*>& results, size_t search_size);
+
+	_NODISCARD void*	FindSig(SigInfo info);
 }

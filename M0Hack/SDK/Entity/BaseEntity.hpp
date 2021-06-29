@@ -145,8 +145,13 @@ public:
 
 	GAMEPROP_DECL_RECV(ICollideable,		"CBaseAnimating", "m_Collision",		CollisionProp);
 	GAMEPROP_DECL_RECV(int,					"CBaseAnimating", "m_CollisionGroup",	CollisionGroup);
+	GAMEPROP_DECL_DTM(int,									  "m_iEFlags",			EFlags);
 
 	GAMEPROP_DECL_RECV(float,				"CBaseAnimating", "m_flSimulationTime",	SimulationTime);
+	GAMEPROP_DECL_RECV(float,				"CBaseAnimating", "m_flAnimTime",		AnimationTime);
+	GAMEPROP_DECL_RECV(float,				"CBaseAnimating", "m_flCycle",			Cycle);
+	GAMEPROP_DECL_RECV(int,					"CBaseAnimating", "m_nSequence",		Sequence);
+
 	GAMEPROP_DECL_RECV(TFTeam,				"CBaseAnimating", "m_iTeamNum",			TeamNum);
 	GAMEPROP_DECL_RECV(IBaseHandle,			"CBaseAnimating", "m_hOwnerEntity",		OwnerEntity);
 	GAMEPROP_DECL_RECV(int,					"CBaseAnimating", "m_nHitboxSet",		HitboxSet);
@@ -164,7 +169,7 @@ class IBaseEntityWrapper
 public:
 	IBaseEntityWrapper(int index)							noexcept { set(EntityClassType::GetEntity(index)); };
 
-	IBaseEntityWrapper(IBaseHandle hndl)					noexcept { set(EntityClassType::GetEntity(hndl)); };
+	IBaseEntityWrapper(const IBaseHandle& hndl)				noexcept { set(EntityClassType::GetEntity(hndl)); };
 
 	IBaseEntityWrapper(EntityClassType* ptr)				noexcept { set(ptr); };
 	IBaseEntityWrapper(const EntityClassType* ptr)			noexcept { set(ptr); };

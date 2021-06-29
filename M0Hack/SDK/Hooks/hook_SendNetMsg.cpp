@@ -8,7 +8,7 @@
 
 
 DECL_DHOOK_HANDLER(SendNetMsg, M0PROFILER_GROUP::HOOK_SEND_NETMESSAGE, bool, INetMessage&, bool, bool);
-EXPOSE_DHOOK(SendNetMsg, "SendNetMsg", M0Libraries::Engine->FindPattern("NetChan::SendNetMsg"));
+EXPOSE_DHOOK(SendNetMsg, "SendNetMsg", M0Library{ M0ENGINE_DLL }.FindPattern("NetChan::SendNetMsg"));
 
 class SendNetMsg_Mgr
 {
@@ -50,7 +50,7 @@ public:
 	}
 
 private:
-	HookRes OnSendNetMsg(const INetMessage&) const;
+	MHookRes OnSendNetMsg(const INetMessage&) const;
 
 	void ParseKeyValues(const KeyValues* kv) const;
 
@@ -60,7 +60,7 @@ private:
 } static sendnetmsg_hook;
 
 
-HookRes SendNetMsg_Mgr::OnSendNetMsg(const INetMessage& msg) const
+MHookRes SendNetMsg_Mgr::OnSendNetMsg(const INetMessage& msg) const
 {
 	if (Enable)
 	{
@@ -120,7 +120,7 @@ HookRes SendNetMsg_Mgr::OnSendNetMsg(const INetMessage& msg) const
 		}
 	}
 	
-	return HookRes::Continue;
+	return { };
 }
 
 

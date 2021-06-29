@@ -4,9 +4,6 @@
     <Filter Include="Cheats">
       <UniqueIdentifier>{fcc02b85-547f-4233-8866-dfac7edf6dfe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GlobalHook">
-      <UniqueIdentifier>{38d646ff-6a58-4dbd-86fc-8ba9df826ef7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Helper">
       <UniqueIdentifier>{a32234c9-dd31-4df5-91ad-3abe05cfec78}</UniqueIdentifier>
     </Filter>
@@ -24,9 +21,6 @@
     </Filter>
     <Filter Include="SDK\MathLib">
       <UniqueIdentifier>{5771dbac-ae54-4f32-879f-6bbe392764f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GlobalHook\Detour">
-      <UniqueIdentifier>{2ca80b96-5a38-4352-b80c-d35546d98eb2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cheats\Aimbot">
       <UniqueIdentifier>{eda6216e-26a8-48cb-bcc0-e6ccfa7119a0}</UniqueIdentifier>
@@ -52,11 +46,17 @@
     <Filter Include="SDK\Hooks">
       <UniqueIdentifier>{fa7d22a0-5885-404e-b173-c2fe867f6270}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SDK\Proto">
-      <UniqueIdentifier>{a1eb561b-f160-4400-bfcb-d83c3addfa96}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SDK\Steam">
       <UniqueIdentifier>{9f5b6533-d380-47a2-bcd7-8fd4bfeec4fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cheats\Extras\Backtrack">
+      <UniqueIdentifier>{75865935-c01b-4804-8a25-254c7eb4abe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GlobalHooks">
+      <UniqueIdentifier>{38d646ff-6a58-4dbd-86fc-8ba9df826ef7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GlobalHooks\Detour">
+      <UniqueIdentifier>{e4947cf5-5e55-45e3-bf40-b0e1fa21f5ae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -161,27 +161,6 @@
     </ClInclude>
     <ClInclude Include="Helper\Timer.hpp">
       <Filter>Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\defines.hpp">
-      <Filter>GlobalHook</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\detour.hpp">
-      <Filter>GlobalHook</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\listener.hpp">
-      <Filter>GlobalHook</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\vhook.hpp">
-      <Filter>GlobalHook</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\vtable.hpp">
-      <Filter>GlobalHook</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\Detour\detours.hpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHook\Detour\detver.hpp">
-      <Filter>GlobalHook\Detour</Filter>
     </ClInclude>
     <ClInclude Include="Cheats\Main.hpp">
       <Filter>Cheats</Filter>
@@ -343,12 +322,6 @@
     <ClInclude Include="SDK\KeyValues.hpp">
       <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\GCSys.hpp">
-      <Filter>SDK\Proto</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\Proto\GCMsg.hpp">
-      <Filter>SDK\Proto</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\Hooks\GameCoordinator.hpp">
       <Filter>SDK\Hooks</Filter>
     </ClInclude>
@@ -358,29 +331,32 @@
     <ClInclude Include="SDK\Steam\Enums.hpp">
       <Filter>SDK\Steam</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\gcsystem.hpp">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="Cheats\Extras\Backtrack\Backtrack.hpp">
+      <Filter>Cheats\Extras\Backtrack</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\base_gcmessages.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="TellaHooks\policy.hpp">
+      <Filter>GlobalHooks</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\econ_gcmessages.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="TellaHooks\tellahook.hpp">
+      <Filter>GlobalHooks</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\gcsdk_gcmessages.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="TellaHooks\th_vtable.hpp">
+      <Filter>GlobalHooks</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\gcsystemmsgs.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="TellaHooks\detour.hpp">
+      <Filter>GlobalHooks</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\steammessages.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="TellaHooks\Detour\detours.hpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\tf_gcmessages.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="TellaHooks\Detour\detver.hpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\Proto\tf_proto_def_messages.pb.h">
-      <Filter>SDK\Proto</Filter>
+    <ClInclude Include="GlobalHooks\event_listener.hpp">
+      <Filter>GlobalHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalHooks\core.hpp">
+      <Filter>GlobalHooks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -437,42 +413,6 @@
     </ClCompile>
     <ClCompile Include="Helper\DataMap.cpp">
       <Filter>Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\listener.cpp">
-      <Filter>GlobalHook</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\vtable.cpp">
-      <Filter>GlobalHook</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\disasm.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\disolarm.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\disolarm64.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\disolia64.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\disolx64.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\disolx86.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\image.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\modules.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\creatwth.cpp">
-      <Filter>GlobalHook\Detour</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalHook\Detour\detours.cpp">
-      <Filter>GlobalHook\Detour</Filter>
     </ClCompile>
     <ClCompile Include="Cheats\MenuPanel.cpp">
       <Filter>Cheats</Filter>
@@ -613,35 +553,47 @@
     <ClCompile Include="Cheats\Extras\Auto-Backstab.cpp">
       <Filter>Cheats\Extras</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\GCSys.cpp">
-      <Filter>SDK\Proto</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\Hooks\hook_GameCoordinator.cpp">
       <Filter>SDK\Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\econ_gcmessages.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="Cheats\Extras\Backtrack\Backtrack.cpp">
+      <Filter>Cheats\Extras\Backtrack</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\gcsdk_gcmessages.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="Cheats\Extras\Backtrack\Backtrack_Datagram.cpp">
+      <Filter>Cheats\Extras\Backtrack</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\gcsystemmsgs.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="TellaHooks\Detour\disasm.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\steammessages.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="TellaHooks\Detour\disolarm.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\tf_gcmessages.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="TellaHooks\Detour\disolarm64.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\tf_proto_def_messages.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="TellaHooks\Detour\disolia64.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\Proto\base_gcmessages.pb.cc">
-      <Filter>SDK\Proto</Filter>
+    <ClCompile Include="TellaHooks\Detour\disolx64.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="libprotobuf.lib" />
+    <ClCompile Include="TellaHooks\Detour\disolx86.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="TellaHooks\Detour\image.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="TellaHooks\Detour\modules.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="TellaHooks\Detour\creatwth.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="TellaHooks\Detour\detours.cpp">
+      <Filter>GlobalHooks\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalHooks\event_listener.cpp">
+      <Filter>GlobalHooks</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

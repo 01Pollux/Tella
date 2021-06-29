@@ -36,15 +36,13 @@ void IESPHack::CollectEntities()
 }
 
 
-HookRes IESPHack::OnPaintTraverse(uint32_t paintID)
+MHookRes IESPHack::OnPaintTraverse(uint32_t paintID)
 {
-	using HookRes::Continue;
-
 	if (paintID != VGUI::FocusOverlayPanel)
-		return Continue;
+		return { };
 
 	if (ITFPlayerInternal::BadLocal())
-		return Continue;
+		return { };
 
 	static bool should_begin = false;
 	static AutoCTimer<2.1f> timer_check;
@@ -53,7 +51,7 @@ HookRes IESPHack::OnPaintTraverse(uint32_t paintID)
 		should_begin = IsAnyActive();
 
 	if (!should_begin)
-		return Continue;
+		return { };
 
 	{
 		PROFILE_USECTION("ESP::CollectEntities", M0PROFILER_GROUP::CHEAT_PROFILE);
@@ -66,7 +64,7 @@ HookRes IESPHack::OnPaintTraverse(uint32_t paintID)
 			DrawFromData(&data);
 	}
 
-	return Continue;
+	return { };
 }
 
 

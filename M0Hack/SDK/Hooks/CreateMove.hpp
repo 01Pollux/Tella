@@ -1,17 +1,9 @@
 #pragma once
 
-#include "GlobalHook/vhook.hpp"
+#include "GlobalHooks/tellahook.hpp"
 #include "cdll_int.hpp"
 #include "UserCmd.hpp"
 
-namespace M0HookManager
-{
-	namespace Policy
-	{
-		MAKE_VHOOK_POLICY(CreateMove, "CreateMove", bool, float, UserCmd*);
-	}
-}
+TH_DECL_REFERENCE_MFP(CreateMove, "CreateMove", bool, float, UserCmd*);
 
-M0_INTERFACE;
-extern bool* pSendPacket;
-M0_END;
+namespace Interfaces { extern bool* pSendPacket; }

@@ -7,10 +7,10 @@ ITFHudManager::ITFHudManager()
 {
 	namespace HUD = Offsets::ClientDLL::HUD;
 
-	static IHudElement*** gHUD = reinterpret_cast<IHudElement***>(M0Libraries::Client->FindPattern("gHUD"));
+	static IHudElement*** gHUD = static_cast<IHudElement***>(M0Library{ M0CLIENT_DLL }.FindPattern("gHUD"));
 
-	huds = gHUD[HUD::Manager::This_To_Vec];
-	count = reinterpret_cast<int>(gHUD[HUD::Manager::This_To_SizeOfVec]);
+	Huds = gHUD[HUD::Manager::This_To_Vec];
+	Count = reinterpret_cast<int>(gHUD[HUD::Manager::This_To_SizeOfVec]);
 }
 
 IHudElement* ITFHudManager::find(const char* name) noexcept

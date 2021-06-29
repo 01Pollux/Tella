@@ -1,0 +1,567 @@
+{
+   "Aimbot" : {
+      "Aim Priority" : {
+         "description" : "Filter Entity by given priority",
+         "value" : "Fov And Distance"
+      },
+      "Aim for buildings" : {
+         "description" : "Target buildings",
+         "value" : true
+      },
+      "Aim for projectiles" : {
+         "description" : "Target projectiles",
+         "value" : false
+      },
+      "Bypass cloak" : {
+         "description" : "Don't ignore invisible spies",
+         "value" : false
+      },
+      "Bypass conds" : {
+         "description" : "Don't ignore 'invisible' conds",
+         "value" : true
+      },
+      "Debug" : {
+         "Box" : {
+            "value" : false
+         },
+         "Delay" : {
+            "description" : "Repeat Delay",
+            "value" : 1.5
+         },
+         "Hitbox" : {
+            "value" : false
+         },
+         "Line" : {
+            "value" : false
+         }
+      },
+      "Enable" : {
+         "description" : "Enable aimbot",
+         "value" : true
+      },
+      "FOV" : {
+         "description" : "Target must be in this fov to be a valid target",
+         "value" : 37
+      },
+      "Glow" : {
+         "Color" : {
+            "description" : "Glow Color",
+            "value" : {
+               "alpha" : 255,
+               "blue" : 231,
+               "green" : 231,
+               "red" : 0
+            }
+         },
+         "Enable" : {
+            "description" : "Display glow effect for target (requires mat_dxlevel >= 9)",
+            "value" : false
+         }
+      },
+      "Hitbox Priority" : {
+         "description" : "Process best aim position, Smart = Handles localplayer weapon's then switch to 'Nearest' if it fails",
+         "value" : "Smart"
+      },
+      "Input" : {
+         "Aim key" : {
+            "description" : "Enable aimbot by pressing key (in hexadecimal)",
+            "value" : 46
+         },
+         "Auto aim" : {
+            "description" : "Aim without pressing L-Mouse",
+            "value" : false
+         },
+         "Auto shoot" : {
+            "description" : "Automatically shoot if the target is in range",
+            "value" : false
+         },
+         "Can toggle" : {
+            "description" : "allow user to set on/off aim state",
+            "value" : true
+         },
+         "Key lock" : {
+            "description" : "Only aim if key is down",
+            "value" : false
+         }
+      },
+      "Max range" : {
+         "description" : "Max valid range to target",
+         "value" : 1024
+      },
+      "Miss Chance" : {
+         "description" : "Chance to invalidate/miss the target",
+         "value" : 15
+      },
+      "Only medics" : {
+         "description" : "Only target medics",
+         "value" : false
+      },
+      "Only zoom" : {
+         "description" : "Only aim if player is scoped as a sniper",
+         "value" : true
+      },
+      "Particle" : {
+         "Enable" : {
+            "description" : "Draw particles for target",
+            "value" : true
+         },
+         "Name" : {
+            "description" : "Particle name string",
+            "value" : "soldierbuff_blue_buffed"
+         }
+      },
+      "Player only" : {
+         "description" : "Only target players",
+         "value" : true
+      },
+      "Smooth" : {
+         "Default" : {
+            "description" : "Default FOV decrease rate",
+            "value" : 42
+         },
+         "Sniper" : {
+            "value" : 0.18999999761581421
+         },
+         "Soldier" : {
+            "value" : 0.70999997854232788
+         },
+         "Spy" : {
+            "value" : 0.090000003576278687
+         }
+      },
+      "Target lock" : {
+         "description" : "Keep track of old target",
+         "value" : true
+      }
+   },
+   "AutoDetonate" : {
+      "Enable" : {
+         "description" : "Automatically Detonate sticky bomb",
+         "value" : true
+      },
+      "Ignore Stealth" : {
+         "value" : true
+      }
+   },
+   "AutoStab" : {
+      "Enable" : {
+         "description" : "Automatically stab player's",
+         "value" : true
+      }
+   },
+   "Backtrack" : {
+      "Enable" : {
+         "description" : "Enable player backtracking",
+         "value" : false
+      },
+      "Latency" : {
+         "description" : "Set Backtrack Latency",
+         "value" : 0
+      }
+   },
+   "Debug" : {
+      "Echo" : {
+         "Color" : {
+            "description" : "Print color",
+            "value" : {
+               "alpha" : 255,
+               "blue" : 255,
+               "green" : 0,
+               "red" : 255
+            }
+         },
+         "Enable" : {
+            "description" : "Print debug messages to tf-console",
+            "value" : false
+         }
+      },
+      "Enable Time" : {
+         "description" : "Debug Time",
+         "value" : false
+      },
+      "SendNetMsgs" : {
+         "Enable" : {
+            "description" : "Debugging some incoming netmessages",
+            "value" : true
+         }
+      },
+      "Types" : {
+         "Dbg" : {
+            "description" : "Enable debug messages",
+            "value" : false
+         },
+         "Err" : {
+            "description" : "Enable error messages",
+            "value" : true
+         },
+         "Msg" : {
+            "description" : "Enable print messages",
+            "value" : true
+         }
+      }
+   },
+   "ESP" : {
+      "Building Manager" : {
+         "Blu" : {
+            "Draw Ammo" : {
+               "description" : "Draw building's ammo",
+               "value" : false
+            },
+            "Draw Color" : {
+               "description" : "ESP's draw color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 255,
+                  "green" : 0,
+                  "red" : 106
+               }
+            },
+            "Draw Distance" : {
+               "description" : "Draw distance between localplayer and the building",
+               "value" : false
+            },
+            "Draw Health" : {
+               "description" : "Draw building's health",
+               "value" : false
+            },
+            "Draw Level" : {
+               "description" : "Draw building's level",
+               "value" : false
+            },
+            "Draw Mode" : {
+               "description" : "ESP's draw mode",
+               "value" : "Box"
+            },
+            "Draw Name" : {
+               "description" : "Draw building's name",
+               "value" : false
+            },
+            "Draw Owner" : {
+               "description" : "Draw building's owner",
+               "value" : false
+            },
+            "Draw State" : {
+               "description" : "Draw building's state",
+               "value" : false
+            },
+            "Draw Team" : {
+               "description" : "Draw building's team",
+               "value" : false
+            },
+            "Enable" : {
+               "description" : "Draw building's ESP",
+               "value" : true
+            },
+            "Font Color" : {
+               "description" : "ESP's text color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 173,
+                  "green" : 173,
+                  "red" : 191
+               }
+            },
+            "Max Distance" : {
+               "description" : "ESP's max draw distance",
+               "value" : 1024
+            }
+         },
+         "Red" : {
+            "Draw Ammo" : {
+               "description" : "Draw building's ammo",
+               "value" : false
+            },
+            "Draw Color" : {
+               "description" : "ESP's draw color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 240,
+                  "green" : 0,
+                  "red" : 255
+               }
+            },
+            "Draw Distance" : {
+               "description" : "Draw distance between localplayer and the building",
+               "value" : false
+            },
+            "Draw Health" : {
+               "description" : "Draw building's health",
+               "value" : false
+            },
+            "Draw Level" : {
+               "description" : "Draw building's level",
+               "value" : false
+            },
+            "Draw Mode" : {
+               "description" : "ESP's draw mode",
+               "value" : "Box"
+            },
+            "Draw Name" : {
+               "description" : "Draw building's name",
+               "value" : false
+            },
+            "Draw Owner" : {
+               "description" : "Draw building's owner",
+               "value" : false
+            },
+            "Draw State" : {
+               "description" : "Draw building's state",
+               "value" : false
+            },
+            "Draw Team" : {
+               "description" : "Draw building's team",
+               "value" : false
+            },
+            "Enable" : {
+               "description" : "Draw building's ESP",
+               "value" : true
+            },
+            "Font Color" : {
+               "description" : "ESP's text color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 173,
+                  "green" : 173,
+                  "red" : 191
+               }
+            },
+            "Max Distance" : {
+               "description" : "ESP's max draw distance",
+               "value" : 1024
+            }
+         }
+      },
+      "Object Manager" : {
+         "Draw Distance" : {
+            "description" : "Draw distance between localplayer and the object",
+            "value" : false
+         },
+         "Draw Name" : {
+            "description" : "Draw object's name",
+            "value" : false
+         },
+         "Draw Packs" : {
+            "description" : "Draw Packs",
+            "value" : false
+         },
+         "Draw Pipes" : {
+            "description" : "Draw Pipe bomb",
+            "value" : false
+         },
+         "Draw Rockets" : {
+            "description" : "Draw Rockets",
+            "value" : false
+         },
+         "Draw Stickies" : {
+            "description" : "Draw stickie bomb",
+            "value" : false
+         },
+         "Enable" : {
+            "description" : "Draw object's ESP",
+            "value" : false
+         }
+      },
+      "Player Manager" : {
+         "Blu" : {
+            "Draw Class" : {
+               "description" : "Draw player tf-class",
+               "value" : true
+            },
+            "Draw Color" : {
+               "description" : "ESP's draw color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 194,
+                  "green" : 255,
+                  "red" : 0
+               }
+            },
+            "Draw Conditions" : {
+               "description" : "Draw some player's conds",
+               "value" : false
+            },
+            "Draw Distance" : {
+               "description" : "Draw distance between localplayer and the player",
+               "value" : false
+            },
+            "Draw Health" : {
+               "description" : "Draw how much health a player has",
+               "value" : true
+            },
+            "Draw Mode" : {
+               "description" : "ESP's draw mode",
+               "value" : "Box"
+            },
+            "Draw Name" : {
+               "description" : "Draw player's name",
+               "value" : true
+            },
+            "Draw Team" : {
+               "description" : "Draw player's team",
+               "value" : false
+            },
+            "Draw UberCharge" : {
+               "description" : "Draw how much uber a medic has",
+               "value" : true
+            },
+            "Enable" : {
+               "description" : "Draw player's ESP",
+               "value" : false
+            },
+            "Font Color" : {
+               "description" : "ESP's text color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 173,
+                  "green" : 173,
+                  "red" : 191
+               }
+            },
+            "Ignore cloaked players" : {
+               "description" : "Don't draw cloaked spies",
+               "value" : true
+            },
+            "Max Distance" : {
+               "description" : "ESP's max draw distance",
+               "value" : 1024
+            }
+         },
+         "Red" : {
+            "Draw Class" : {
+               "description" : "Draw player tf-class",
+               "value" : true
+            },
+            "Draw Color" : {
+               "description" : "ESP's draw color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 0,
+                  "green" : 85,
+                  "red" : 255
+               }
+            },
+            "Draw Conditions" : {
+               "description" : "Draw some player's conds",
+               "value" : false
+            },
+            "Draw Distance" : {
+               "description" : "Draw distance between localplayer and the player",
+               "value" : false
+            },
+            "Draw Health" : {
+               "description" : "Draw how much health a player has",
+               "value" : true
+            },
+            "Draw Mode" : {
+               "description" : "ESP's draw mode",
+               "value" : "Box"
+            },
+            "Draw Name" : {
+               "description" : "Draw player's name",
+               "value" : true
+            },
+            "Draw Team" : {
+               "description" : "Draw player's team",
+               "value" : false
+            },
+            "Draw UberCharge" : {
+               "description" : "Draw how much uber a medic has",
+               "value" : true
+            },
+            "Enable" : {
+               "description" : "Draw player's ESP",
+               "value" : true
+            },
+            "Font Color" : {
+               "description" : "ESP's text color",
+               "value" : {
+                  "alpha" : 255,
+                  "blue" : 173,
+                  "green" : 173,
+                  "red" : 191
+               }
+            },
+            "Ignore cloaked players" : {
+               "description" : "Don't draw cloaked spies",
+               "value" : true
+            },
+            "Max Distance" : {
+               "description" : "ESP's max draw distance",
+               "value" : 1304
+            }
+         }
+      }
+   },
+   "Inventory Manager" : {
+      "Models" : {
+         "Enable" : {
+            "description" : "Enable Custom Models",
+            "value" : false
+         }
+      },
+      "Weapons" : {
+         "Enable" : {
+            "description" : "Enable custom weapons",
+            "value" : true
+         }
+      }
+   },
+  "Visual": {
+    "Hide Scope": {
+      "description": "Hide sniper zoom overlay",
+      "value": true
+    },
+    "Spectators": {
+      "Enabled": {
+        "description": "Expose who is spectating you",
+        "value": true
+      },
+      "Position": {
+        "description": "Dead players list position",
+        "value": null
+      }
+    }
+  },
+  "DLL Info": {
+    "Manual Mapping": {
+      "description": "Manual mapped DLL, injected without LoadLibrary",
+      "value": false
+    },
+    "Console": {
+      "description": "Load dll with stdout console",
+      "value": false
+    },
+    "Exception Handler": {
+      "description": "Load dll with vectored exception handler",
+      "value": true
+    },
+    "Save Profilers": {
+      "description": "Automatically save profilers",
+      "value": true
+    },
+    "No SteamMiniDump": {
+      "description": "Detoured SteamAPI_WriteMiniDump to not write any minidumps",
+      "value": true
+    },
+    "Load": {
+      "Auto Init Vars": {
+        "description": "Auto init variables",
+        "value": true
+      },
+      "Play Sound": {
+        "description": "Play sound",
+        "value": "./Miku/Sounds/ReZero_CallOfTheWitch.wav"
+      }
+    },
+    "Unload": {
+      "Auto Save Vars": {
+        "description": "Auto init variables",
+        "value": false
+      },
+      "Play Sound": {
+        "description": "Play sound",
+        "value": "./Miku/Sounds/ReZero_CallOfTheWitch"
+      }
+    }
+  }
+}

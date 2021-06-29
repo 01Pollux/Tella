@@ -18,7 +18,6 @@ namespace Visuals
 			true,
 			"Hide sniper zoom overlay"
 		};
-		IDetour detour_CHudScope_ShouldDraw;
 	};
 
 	HideScope hide_scope;
@@ -38,10 +37,8 @@ Visuals::HideScope::HideScope()
 		EVENT_KEY_LOAD_DLL,
 		[](M0EventData*)
 		{
-			M0Pointer ptr = M0Libraries::Client->FindPattern("CHudScope::ShouldDraw");
-			if (!ptr)
-				M0Logger::Err("Failed to attach detour for CHudScope::ShouldDraw");
-			else
+			void* ptr = M0Library{ M0CLIENT_DLL }.FindPattern("CHudScope::ShouldDraw");
+			if (ptr)
 				DETOUR_LINK_TO_MEMBER(CHudScope_ShouldDraw, ptr);
 		},
 		EVENT_NULL_NAME

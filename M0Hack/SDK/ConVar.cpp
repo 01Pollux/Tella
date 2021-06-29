@@ -7,7 +7,7 @@ namespace ConCommandHelper
 {
 	static VCVarDLLIdentifier DLLIdentifier = -1;
 	static bool ConBaseRegistered = false;
-	static ConVarFlag ConBaseFlags = ConVarFlag::None;
+	static uint32_t ConBaseFlags = 0;
 
 
 	class CCDefaultAccessor : public IConCommandBaseAccessor
@@ -22,7 +22,7 @@ namespace ConCommandHelper
 	static CCDefaultAccessor DefaultAccessor;
 }
 
-void ConCommandBase::Register(ConVarFlag nCVarFlag, IConCommandBaseAccessor* pAccessor)
+void ConCommandBase::Register(uint32_t nCVarFlag, IConCommandBaseAccessor* pAccessor)
 {
 	if (!Interfaces::CVar || ConCommandHelper::ConBaseRegistered)
 		return;
@@ -59,9 +59,9 @@ void ConCommandBase::Unregister()
 }
 
 
-ConCommandBase::ConCommandBase(const char* pName, const char* pHelpString , ConVarFlag flags)
+ConCommandBase::ConCommandBase(const char* pName, const char* pHelpString , MConVarFlag flags)
 {
-	CreateBase(pName, pHelpString, flags);
+	CreateBase(pName, pHelpString, flags.to_ulong());
 }
 
 VCVarDLLIdentifier ConCommandBase::GetDLLIdentifier() const
@@ -70,7 +70,7 @@ VCVarDLLIdentifier ConCommandBase::GetDLLIdentifier() const
 }
 
 
-void ConCommandBase::CreateBase(const char* pName, const char* pHelpString, ConVarFlag flags)
+void ConCommandBase::CreateBase(const char* pName, const char* pHelpString, uint32_t flags)
 {
 	Is_Registered = false;
 
@@ -79,7 +79,7 @@ void ConCommandBase::CreateBase(const char* pName, const char* pHelpString, ConV
 
 	Flags = flags;
 	
-	if (!(Flags & ConVarFlag::Unregistered))
+	if (!(Flags & bitmask::to_mask(ConVarFlag::Unregistered)))
 	{
 		NextBase = ConCommandBases;
 		ConCommandBases = this;
@@ -107,24 +107,24 @@ static int ConCommand_DefaultCompletionFunc(const char* partial, char commands[C
 	return 0;
 }
 
-ConCommand::ConCommand(const char* pName, ConCommandCallbackV callback, const char* pHelpString, ConVarFlag flags, ConCommandCompletionCallback completionFunc) :
+ConCommand::ConCommand(const char* pName, ConCommandCallbackV callback, const char* pHelpString, MConVarFlag flags, ConCommandCompletionCallback completionFunc) :
 	VoidCallback(callback), 
 	UsingNewCommandCallback(false), 
 	UsingCommandCallbackInterface(false),
 	CompletionCallback(completionFunc ? completionFunc : ConCommand_DefaultCompletionFunc),
 	HasCompletionCallback(completionFunc ? true : false)
 {
-	ConCommandBase::CreateBase(pName, pHelpString, flags);
+	ConCommandBase::CreateBase(pName, pHelpString, flags.to_ulong());
 }
 
-ConCommand::ConCommand(const char* pName, ConCommandCallback callback, const char* pHelpString, ConVarFlag flags, ConCommandCompletionCallback completionFunc) :
+ConCommand::ConCommand(const char* pName, ConCommandCallback callback, const char* pHelpString, MConVarFlag flags, ConCommandCompletionCallback completionFunc) :
 	Callback(callback),
 	UsingNewCommandCallback(true),
 	UsingCommandCallbackInterface(false),
 	CompletionCallback(completionFunc ? completionFunc : ConCommand_DefaultCompletionFunc),
 	HasCompletionCallback(completionFunc ? true : false)
 {
-	ConCommandBase::CreateBase(pName, pHelpString, flags);
+	ConCommandBase::CreateBase(pName, pHelpString, flags.to_ulong());
 }
 
 int ConCommand::AutoCompleteSuggest(const char* partial, ValveUtlVector<const char*>& commands)
@@ -163,7 +163,7 @@ void ConCommand::Dispatch(const CCommand& command)
 
 void ConVar::InternalSetValue(const char* value)
 {
-	if (IsFlagSet(ConVarFlag::MaterialThreadMask))
+	if (IsFlagSet(static_cast<uint32_t>(bitmask::to_mask(ConVarFlag::Mask_MaterialThread))))
 	{
 		if (Interfaces::CVar && !Interfaces::CVar->IsMaterialThreadSetAllowed())
 		{
@@ -192,7 +192,7 @@ void ConVar::InternalSetValue(const char* value)
 	FloatValue = fNewValue;
 	IntValue = static_cast<int>(fNewValue);
 
-	if (!IsFlagSet(ConVarFlag::NotString))
+	if (!IsFlagSet(static_cast<uint32_t>(bitmask::to_mask(ConVarFlag::NotString))))
 		ChangeStringValue(val, flOldValue);
 }
 
@@ -201,7 +201,7 @@ void ConVar::InternalSetFloatValue(float fNewValue, bool force)
 	if (fNewValue == FloatValue && force)
 		return;
 
-	if (IsFlagSet(ConVarFlag::MaterialThreadMask))
+	if (IsFlagSet(static_cast<uint32_t>(bitmask::to_mask(ConVarFlag::Mask_MaterialThread))))
 	{
 		if (Interfaces::CVar && !Interfaces::CVar->IsMaterialThreadSetAllowed())
 		{
@@ -216,7 +216,7 @@ void ConVar::InternalSetFloatValue(float fNewValue, bool force)
 	FloatValue = fNewValue;
 	IntValue = static_cast<int>(fNewValue);
 
-	if (!IsFlagSet(ConVarFlag::NotString))
+	if (!IsFlagSet(static_cast<uint32_t>(bitmask::to_mask(ConVarFlag::NotString))))
 	{
 		char tempVal[32];
 		snprintf(tempVal, sizeof(tempVal), "%f", FloatValue);
@@ -229,7 +229,7 @@ void ConVar::InternalSetIntValue(int nValue)
 	if (nValue == IntValue)
 		return;
 
-	if (IsFlagSet(ConVarFlag::MaterialThreadMask))
+	if (IsFlagSet(static_cast<uint32_t>(bitmask::to_mask(ConVarFlag::Mask_MaterialThread))))
 	{
 		if (Interfaces::CVar && !Interfaces::CVar->IsMaterialThreadSetAllowed())
 		{
@@ -246,7 +246,7 @@ void ConVar::InternalSetIntValue(int nValue)
 	FloatValue = fValue;
 	IntValue = nValue;
 
-	if (!IsFlagSet(ConVarFlag::NotString))
+	if (!IsFlagSet(static_cast<uint32_t>(bitmask::to_mask(ConVarFlag::NotString))))
 	{
 		char tempVal[32];
 		snprintf(tempVal, sizeof(tempVal), "%d", IntValue);
@@ -255,7 +255,7 @@ void ConVar::InternalSetIntValue(int nValue)
 }
 
 void ConVar::Create(
-	const char* pName, const char* pDefaultValue, ConVarFlag flags,
+	const char* pName, const char* pDefaultValue, MConVarFlag flags,
 	const char* pHelpString, bool bMin, float fMin,
 	bool bMax, float fMax, bool bCompMin,
 	float fCompMin, bool bCompMax, float fCompMax,
@@ -286,7 +286,7 @@ void ConVar::Create(
 	FloatValue = static_cast<float>(atof(StringValue.get()));
 	IntValue = static_cast<int>(atoi(StringValue.get()));
 
-	ConCommandBase::CreateBase(pName, pHelpString, flags);
+	ConCommandBase::CreateBase(pName, pHelpString, flags.to_ulong());
 }
 
 bool ConVar::ClampValue(float& value)

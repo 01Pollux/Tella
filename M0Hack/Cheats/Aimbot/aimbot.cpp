@@ -44,7 +44,7 @@ void IAimbotHack::OnLoadDLL()
 		[this](const char*)
 		{
 			Vars.GlowInfo.Handler_.allocate();
-			return HookRes::Continue;
+			return MHookRes{ };
 		}
 	);
 
@@ -53,7 +53,7 @@ void IAimbotHack::OnLoadDLL()
 		[this]()
 		{
 			Vars.GlowInfo.Handler_.destroy();
-			return HookRes::Continue;
+			return MHookRes{ };
 		}
 	);
 }
@@ -105,16 +105,14 @@ void IAimbotHack::DrawDebug(IBaseEntity pEnt, const Vector& aim_pos)
 }
 
 
-HookRes IAimbotHack::OnCreateMovePre(UserCmd* cmd)
+MHookRes IAimbotHack::OnCreateMovePre(UserCmd* cmd)
 {
-	using HookRes::Continue;
-
 	ShouldProcess = false;
 
 	if (!Vars.Enable)
 	{
 		Invalidate();
-		return Continue;
+		return { };
 	}
 
 	PROFILE_SECTION("Aimbot::CreateMove_Pre", M0PROFILER_GROUP::CHEAT_PROFILE, cheat);
@@ -125,36 +123,36 @@ HookRes IAimbotHack::OnCreateMovePre(UserCmd* cmd)
 	if (pMe->LifeState != PlayerLifeState::Alive)
 	{
 		Invalidate();
-		return Continue;
+		return { };
 	}
 
 	else if (!CheckInputs(cmd))
 	{
 		Invalidate();
-		return Continue;
+		return { };
 	}
 
 	else if (Vars.MissChance && Random::Int(0, 100) < Vars.MissChance)
-		return Continue;
+		return { };
 	
 	auto& data = GetBestTarget(cmd);
 	if (!data.validate(this, cmd))
 	{
 		Invalidate();
-		return Continue;
+		return { };
 	}
 
 	Vars.TargetLock.Invalid_ = false;
 	ShouldProcess = true;
 
-	return Continue;
+	return { };
 }
 
 
-HookRes IAimbotHack::OnCreateMovePost(UserCmd* cmd)
+MHookRes IAimbotHack::OnCreateMovePost(UserCmd* cmd)
 {
 	if (!ShouldProcess)
-		return HookRes::Continue;
+		return { };
 
 	ShouldProcess = false;
 
@@ -222,7 +220,7 @@ HookRes IAimbotHack::OnCreateMovePost(UserCmd* cmd)
 			DrawDebug(data.target, data.results);
 	}
 
-	return do_override ? HookRes::ChangeReturnValue : HookRes::Continue;
+	return do_override ? MHookRes(bitmask::to_mask(HookRes::ChangeReturnValue)) : MHookRes{ };
 }
 
 #include "ConVar.hpp"

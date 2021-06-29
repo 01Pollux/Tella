@@ -13,7 +13,7 @@ void IAimbotParticleHelper::update(IBaseEntity pEnt, const std::string& name)
 	{
         ITFParticleData* paricle = new ITFParticleData(pEnt.get(), name.c_str(), ParticleAttachment::AbsOriginFollow);
 
-        TimerID particle_timer = ITimerSys::CreateFuture(150ms, TimerFlags::ExecuteOnMapEnd,
+        TimerID particle_timer = ITimerSys::CreateFuture(150ms, bitmask::to_mask(TimerFlags::ExecuteOnMapEnd),
             [this](TimerRawData data)
             {
                 ITFUniqueParticle pInfo{ static_cast<ITFParticleData*>(data) };

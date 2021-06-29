@@ -11,7 +11,7 @@ namespace Visuals
 		DrawDeadPlayers();
 
 	private:
-		HookRes OnPaintTraverse(uint32_t);
+		MHookRes OnPaintTraverse(uint32_t);
 
 		M0Config::Bool Enable{
 			"Visual.Spectators.Enabled",
@@ -28,19 +28,17 @@ namespace Visuals
 	static DrawDeadPlayers dummy_drawspeclist;
 }
 
-HookRes Visuals::DrawDeadPlayers::OnPaintTraverse(uint32_t paintID)
+MHookRes Visuals::DrawDeadPlayers::OnPaintTraverse(uint32_t paintID)
 {
-	using HookRes::Continue;
-
 	if (paintID != VGUI::FocusOverlayPanel)
-		return Continue;
+		return { };
 
-	if (!Enable)
-		return Continue;
+	if (!Enable || ITFPlayerInternal::BadLocal())
+		return { };
 
 	ILocalPlayer pMe;
 	if (!pMe)
-		return Continue;
+		return { };
 
 	PROFILE_USECTION("Visuals_DrawSpecList", M0PROFILER_GROUP::CHEAT_PROFILE);
 
@@ -100,7 +98,7 @@ HookRes Visuals::DrawDeadPlayers::OnPaintTraverse(uint32_t paintID)
 		}
 	}
 
-	return Continue;
+	return { };
 }
 
 

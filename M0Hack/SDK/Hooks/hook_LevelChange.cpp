@@ -4,11 +4,11 @@
 #include "ResourceEntity.hpp"
 
 
-DECL_VHOOK_HANDLER(LevelInit,		M0PROFILER_GROUP::GLOBAL_VHOOK_ANY, void, const char*);
-DECL_VHOOK_HANDLER(LevelShutdown,	M0PROFILER_GROUP::GLOBAL_VHOOK_ANY, void);
+DECL_VHOOK_HANDLER(LevelInit,		M0PROFILER_GROUP::GLOBAL_HOOK_ANY, void, const char*);
+DECL_VHOOK_HANDLER(LevelShutdown,	M0PROFILER_GROUP::GLOBAL_HOOK_ANY, void);
 
-EXPOSE_VHOOK(LevelInit,		"LevelInit",	M0Libraries::Client->FindPattern("ClientModePointer"), Offsets::ClientDLL::VTIdx_LevelInit);
-EXPOSE_VHOOK(LevelShutdown, "LevelShutdown",M0Libraries::Client->FindPattern("ClientModePointer"), Offsets::ClientDLL::VTIdx_LevelShutdown);
+EXPOSE_VHOOK(LevelInit,		"LevelInit",	M0Library{M0CLIENT_DLL}.FindPattern("ClientModePointer"), Offsets::ClientDLL::VTIdx_LevelInit);
+EXPOSE_VHOOK(LevelShutdown, "LevelShutdown",M0Library{M0CLIENT_DLL}.FindPattern("ClientModePointer"), Offsets::ClientDLL::VTIdx_LevelShutdown);
 
 
 
@@ -26,12 +26,13 @@ public:
 
 				LevelShutdown->AddPostHook(
 					HookCall::ReservedFirst,
-					[]()
+					[]() -> MHookRes
 					{
 						ITimerSys::RunOnLevelShutdown();
 						TFResourceEntity::Player = nullptr;
 						TFResourceEntity::Monster = nullptr;
-						return HookRes::Continue;
+
+						return { };
 					}
 				);
 

@@ -175,6 +175,7 @@ void IAimbotHack::GetBestPlayer(const UserCmd* cmd)
 	AimbotState.set(static_cast<IBaseEntity>(pBest), true);
 }
 
+
 void IAimbotHack::GetBestEntity(const UserCmd* cmd)
 {
 	ILocalPlayer pMe;
@@ -202,11 +203,8 @@ void IAimbotHack::GetBestEntity(const UserCmd* cmd)
 		if (!pEnt)
 			continue;
 
-		if (!IsValidEntity(pEnt))
+		if (!IsValidEntity(pEnt, my_team))
 			continue;
-
-		//if (pEnt->GetTeam() == my_team)
-		//	continue;
 
 		const Vector& player_pos = pEnt->GetAbsOrigin();
 		const double delta_dist = my_eyepos.DistTo(player_pos);
@@ -302,7 +300,7 @@ bool IAimbotHack::IsValidPlayer(const ITFPlayer pPlayer)
 	return true;
 }
 
-bool IAimbotHack::IsValidEntity(const IBaseEntity pEnt)
+bool IAimbotHack::IsValidEntity(const IBaseEntity pEnt, const TFTeam team)
 {
 	const Vector& player_pos = pEnt->GetAbsOrigin();
 
@@ -312,8 +310,8 @@ bool IAimbotHack::IsValidEntity(const IBaseEntity pEnt)
 	case EntClassID::CObjectDispenser:
 	case EntClassID::CObjectTeleporter:
 	{
-		if (!Vars.AimForBuildings)
-			return true;
+		if (Vars.AimForBuildings)
+			return pEnt->TeamNum != team;
 		break;
 	}
 
@@ -330,7 +328,11 @@ bool IAimbotHack::IsValidEntity(const IBaseEntity pEnt)
 	case EntClassID::CTFGrenadePipebombProjectile:
 	{
 		if (Vars.AimForProjectiles)
-			return true;
+		{
+			const IBaseWeapon pWpn{ static_cast<IBaseWeapon>(pEnt) };
+			if (const IBaseWeapon pLauncher = pWpn->Launcher.get())
+				return pLauncher->TeamNum != team;
+		}
 		break;
 	}
 

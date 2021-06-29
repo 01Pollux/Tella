@@ -41,7 +41,7 @@ public:
 	GAMEPROP_DECL_RECV(float,				"CTFSniperRifle",					"m_flChargedDamage",		ChargedDamage);
 
 	GAMEPROP_DECL_RECV(EntGrenadeProjType,	"CTFGrenadePipebombProjectile",		"m_iType",					Type);
-	GAMEPROP_DECL_RECV(IHandleEntity,		"CTFGrenadePipebombProjectile",		"m_hLauncher",				Launcher);
+	GAMEPROP_DECL_RECV(IBaseHandle,			"CTFGrenadePipebombProjectile",		"m_hLauncher",				Launcher);
 
 	GAMEPROP_DECL_RECV(float,				"CWeaponMedigun",					"m_flChargeLevel",			ChargeLevel);
 	GAMEPROP_DECL_RECV(float,				"CWeaponMedigun",					"m_hHealingTarget",			HealingTarget);

@@ -8,8 +8,7 @@ enum class M0PROFILER_GROUP : char8_t
 {
 	ANY,
 
-	GLOBAL_VHOOK_ANY,
-	GLOBAL_DHOOK_ANY,
+	GLOBAL_HOOK_ANY,
 
 	HOOK_PAINT_TRAVERSE,
 	HOOK_CREATE_MOVE,
@@ -29,8 +28,7 @@ constexpr M0PROFILER_GROUP_NAME M0PROFILE_NAMES[]
 {
 	"Generics",
 
-	"Virtual Function Hooks",
-	"Detoured Function Hooks",
+	"Function Hooks Callbacks",
 
 	"vguiPanel PaintTravese",
 	"ClientDLL CreateMove",
@@ -46,16 +44,16 @@ constexpr M0PROFILER_GROUP_NAME M0PROFILE_NAMES[]
 constexpr const char* M0PROFILER_OUT_STREAM = "./Miku/Log/Profiler";
 constexpr const char* M0PROFILER_NULL_NAME = nullptr;
 
-enum class M0PROFILER_FLAGS
+enum class M0PROFILER_FLAGS_
 {
-	EMPTY			= 0,
-	HIDE_CHILDRENS	= 1 << 0,	// don't show 'records', only display the results (min, max, avg...)
-	CLEAR_STATE		= 1 << 1,	// clear the map after outputing to stringstream
-	STREAM_SEEK_BEG = 1 << 2,	// set the stringstream's position back to beginning
+	Hide_Childrens,		// don't show 'records', only display the results (min, max, avg...)
+	Clear_State,		// clear the map after outputing to stringstream
+	Stream_Seek_Beg,	// set the stringstream's position back to beginning
 
-	DEFAULT_OUTPUT	= CLEAR_STATE | STREAM_SEEK_BEG,
+	_Highest_Enum,
 };
-ECLASS_BITWISE_OPERATORS(M0PROFILER_FLAGS);
+using M0PROFILER_FLAGS = bitmask::mask<M0PROFILER_FLAGS_>;
+
 
 
 class M0Profiler
@@ -84,7 +82,7 @@ public:
 	static void				Stop(M0PROFILER_GROUP groups[], size_t num) noexcept;
 
 	//	print the current state to a stringstream
-	static bool				OutputToStream(M0PROFILER_GROUP group, std::stringstream& stream, M0PROFILER_FLAGS flags = M0PROFILER_FLAGS::EMPTY);
+	static bool				OutputToStream(M0PROFILER_GROUP group, std::stringstream& stream, M0PROFILER_FLAGS flags = M0PROFILER_FLAGS{ });
 	//	get current state
 	static M0PROFILER_MAP&	GetDataMap(M0PROFILER_GROUP group) noexcept;
 	//	reset current state
@@ -92,7 +90,7 @@ public:
 
 	static void				RenderToImGui(bool*);
 
-	static void				OutputToStream(M0PROFILER_GROUP group, const char* output_name, M0PROFILER_FLAGS flags = M0PROFILER_FLAGS::EMPTY);
+	static void				OutputToStream(M0PROFILER_GROUP group, const char* output_name, M0PROFILER_FLAGS flags = M0PROFILER_FLAGS{ });
 
 public:
 	M0Profiler(const M0Profiler&) = delete;	M0Profiler& operator=(const M0Profiler&) = delete;
